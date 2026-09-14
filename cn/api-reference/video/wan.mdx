@@ -4,7 +4,9 @@ description: "阿里通义万相视频模型：文生、图生、参考生与视
 api: "POST https://www.qingbo.dev/v1/tasks"
 ---
 
-万相（Wan）是阿里通义的视频模型线。本页覆盖八个视频模型：`wan2.5-preview`、`wan2.6`、`wan2.6-i2v`、`wan2.6-i2v-flash` 做文生与图生，`wan2.7` 与 `wan3.0-video` 是多模态统一入口（文本、首尾帧、参考素材、视频续写走同一个模型 ID），`wan2.7-r2v` 做参考生视频，`wan2.7-videoedit` 做视频编辑。八个模型共用 `POST /v1/tasks`，换模型只改 `model`，但参数集合、可传的媒体输入和计费维度各不相同。万相的图像模型见 [Wan Image 系列](/cn/api-reference/image/wan-image)。
+万相（Wan）是阿里通义的视频模型线。本页覆盖九个视频模型：`wan2.5-preview`、`wan2.6`、`wan2.6-i2v`、`wan2.6-i2v-flash` 做文生与图生，`wan2.7` 与 `wan3.0-video` / `wan3.0-video-prime` 是多模态统一入口（文本、首尾帧、参考素材、视频续写走同一个模型 ID），`wan2.7-r2v` 做参考生视频，`wan2.7-videoedit` 做视频编辑。九个模型共用 `POST /v1/tasks`，换模型只改 `model`，但参数集合、可传的媒体输入和计费维度各不相同。万相的图像模型见 [Wan Image 系列](/cn/api-reference/image/wan-image)。
+
+`wan3.0-video-prime` 是 `wan3.0-video` 的加速版：参数、取值范围、约束与计费维度完全相同，出片更快、单价更高，换用只改 `model`。
 
 ## 快速开始
 
@@ -125,7 +127,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ## 请求参数
 
 <ParamField body="model" type="string" required>
-  八选一：`wan2.5-preview`、`wan2.6`、`wan2.6-i2v`、`wan2.6-i2v-flash`、`wan2.7`、`wan2.7-r2v`、`wan2.7-videoedit`、`wan3.0-video`。
+  九选一：`wan2.5-preview`、`wan2.6`、`wan2.6-i2v`、`wan2.6-i2v-flash`、`wan2.7`、`wan2.7-r2v`、`wan2.7-videoedit`、`wan3.0-video` / `wan3.0-video-prime`。
 </ParamField>
 
 <ParamField body="action" type="string" default="generate">
@@ -136,11 +138,11 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 <ParamField body="prompt" type="string">
   视频内容描述或编辑指令。
 
-  `wan2.7-r2v` 必填。`wan2.7` 与 `wan3.0-video` 在没有任何媒体输入时必填。其余模型可选，但用于指导运镜与动作。
+  `wan2.7-r2v` 必填。`wan2.7` 与 `wan3.0-video` / `wan3.0-video-prime` 在没有任何媒体输入时必填。其余模型可选，但用于指导运镜与动作。
 </ParamField>
 
 <ParamField body="negative_prompt" type="string">
-  负面提示词，排除不想要的内容。`wan3.0-video` 不接受这个参数，其余七个模型都接受。
+  负面提示词，排除不想要的内容。`wan3.0-video` / `wan3.0-video-prime` 不接受这个参数，其余七个模型都接受。
 </ParamField>
 
 <ParamField body="image_urls" type="string[]">
@@ -151,19 +153,19 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
   - `wan2.7`：1–2 张（1 张为首帧，2 张为首尾帧）；与 `first_frame_image`、`video_urls`、`aspect_ratio` 互斥
   - `wan2.7-r2v`：1–5 张主体 / 风格参考；与 `video_urls` 互斥；与 `first_frame_image` 同传时最多 4 张
   - `wan2.7-videoedit`：最多 4 张风格 / 内容参考
-  - `wan3.0-video`：最多 10 张；`generation_type: "frame"` 时只接受 1–2 张帧图
+  - `wan3.0-video` / `wan3.0-video-prime`：最多 10 张；`generation_type: "frame"` 时只接受 1–2 张帧图
 </ParamField>
 
 <ParamField body="first_frame_image" type="string">
-  首帧图片 URL。`wan2.7`、`wan2.7-r2v` 与 `wan3.0-video` 接受。
+  首帧图片 URL。`wan2.7`、`wan2.7-r2v` 与 `wan3.0-video` / `wan3.0-video-prime` 接受。
 
   - `wan2.7`：不能与 `image_urls`、`video_urls` 或 `aspect_ratio` 混用
   - `wan2.7-r2v`：最多搭配 4 张参考图，不能与 `video_urls` 或 `aspect_ratio` 混用，比例跟随首帧
-  - `wan3.0-video`：不能与 `image_urls`、`video_urls`、`audio_urls`、`file_url`、`link_url` 混用
+  - `wan3.0-video` / `wan3.0-video-prime`：不能与 `image_urls`、`video_urls`、`audio_urls`、`file_url`、`link_url` 混用
 </ParamField>
 
 <ParamField body="last_frame_image" type="string">
-  尾帧图片 URL。`wan2.7` 与 `wan3.0-video` 接受，必须与 `first_frame_image` 一起提供。
+  尾帧图片 URL。`wan2.7` 与 `wan3.0-video` / `wan3.0-video-prime` 接受，必须与 `first_frame_image` 一起提供。
 </ParamField>
 
 <ParamField body="video_urls" type="string[]">
@@ -172,15 +174,15 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
   - `wan2.7`：最多 1 段，2–10 秒，用于视频续写
   - `wan2.7-r2v`：最多 5 段，单段最长 5 秒、合计最长 25 秒
   - `wan2.7-videoedit`：**必传**，恰好 1 段，2–10 秒
-  - `wan3.0-video`：最多 5 段，单段最长 15 秒、合计最长 15 秒
+  - `wan3.0-video` / `wan3.0-video-prime`：最多 5 段，单段最长 15 秒、合计最长 15 秒
 </ParamField>
 
 <ParamField body="audio_urls" type="string[]">
-  自定义音频。`wan2.6-i2v-flash` 最多 1 段（3–30 秒），`wan2.7` 最多 1 段（2–30 秒），`wan3.0-video` 最多 5 段（单段 1–15 秒、合计最长 15 秒）。其余模型不接受。
+  自定义音频。`wan2.6-i2v-flash` 最多 1 段（3–30 秒），`wan2.7` 最多 1 段（2–30 秒），`wan3.0-video` / `wan3.0-video-prime` 最多 5 段（单段 1–15 秒、合计最长 15 秒）。其余模型不接受。
 </ParamField>
 
 <ParamField body="generate_audio" type="boolean">
-  是否生成有声视频。`wan2.5-preview` 与 `wan2.6` 默认 `false`，`wan2.6-i2v-flash` 与 `wan3.0-video` 默认 `true`。其余模型不接受这个参数。
+  是否生成有声视频。`wan2.5-preview` 与 `wan2.6` 默认 `false`，`wan2.6-i2v-flash` 与 `wan3.0-video` / `wan3.0-video-prime` 默认 `true`。其余模型不接受这个参数。
 </ParamField>
 
 <ParamField body="resolution" type="string">
@@ -188,9 +190,9 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 
   - `wan2.5-preview`：`480p`、`720p`、`1080p`
   - `wan2.6`、`wan2.6-i2v`、`wan2.6-i2v-flash`、`wan2.7`、`wan2.7-r2v`、`wan2.7-videoedit`：`720p`、`1080p`
-  - `wan3.0-video`：`480p`、`720p`、`1080p`
+  - `wan3.0-video` / `wan3.0-video-prime`：`480p`、`720p`、`1080p`
 
-  默认值：`wan2.6-i2v`、`wan2.6-i2v-flash`、`wan2.7`、`wan2.7-r2v`、`wan2.7-videoedit` 为 `720p`，`wan3.0-video` 为 `480p`。
+  默认值：`wan2.6-i2v`、`wan2.6-i2v-flash`、`wan2.7`、`wan2.7-r2v`、`wan2.7-videoedit` 为 `720p`，`wan3.0-video` / `wan3.0-video-prime` 为 `480p`。
 </ParamField>
 
 <ParamField body="duration" type="integer">
@@ -200,27 +202,27 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
   - `wan2.6`：`5`、`10` 或 `15`
   - `wan2.6-i2v`、`wan2.6-i2v-flash`、`wan2.7`、`wan2.7-r2v`：`2`–`15` 任意整数
   - `wan2.7-videoedit`：`2`–`10` 任意整数，另接受 `0`（沿用源视频时长）
-  - `wan3.0-video`：`2`–`30` 任意整数
+  - `wan3.0-video` / `wan3.0-video-prime`：`2`–`30` 任意整数
 
-  `wan2.6-i2v` 默认 `5`。带 `video_urls` 时输出时长另有上限：`wan2.7` 与 `wan2.7-r2v` 最长 10 秒，`wan3.0-video` 最长 15 秒。
+  `wan2.6-i2v` 默认 `5`。带 `video_urls` 时输出时长另有上限：`wan2.7` 与 `wan2.7-r2v` 最长 10 秒，`wan3.0-video` / `wan3.0-video-prime` 最长 15 秒。
 </ParamField>
 
 <ParamField body="aspect_ratio" type="string">
-  画面比例。`wan2.5-preview`、`wan2.6`、`wan2.7`、`wan2.7-r2v`、`wan2.7-videoedit` 支持 `16:9`、`9:16`、`1:1`、`4:3`、`3:4`；`wan3.0-video` 在这五种之外还支持 `adaptive`，默认 `adaptive`。
+  画面比例。`wan2.5-preview`、`wan2.6`、`wan2.7`、`wan2.7-r2v`、`wan2.7-videoedit` 支持 `16:9`、`9:16`、`1:1`、`4:3`、`3:4`；`wan3.0-video` / `wan3.0-video-prime` 在这五种之外还支持 `adaptive`，默认 `adaptive`。
 
   `wan2.6-i2v` 与 `wan2.6-i2v-flash` 不接受这个参数，画幅跟随输入图。另外几种情况下这个参数也不能传：`wan2.6` 带 `image_urls` 时、`wan2.7` 带 `first_frame_image` / `image_urls` / `video_urls` 时、`wan2.7-r2v` 带 `first_frame_image` 时——这些场景的画幅跟随输入素材。
 </ParamField>
 
 <ParamField body="seed" type="integer">
-  随机种子。相同请求配相同种子会生成相似结果。八个模型都接受。
+  随机种子。相同请求配相同种子会生成相似结果。九个模型都接受。
 </ParamField>
 
 <ParamField body="watermark" type="boolean">
-  是否给输出视频加水印。八个模型都接受。
+  是否给输出视频加水印。九个模型都接受。
 </ParamField>
 
 <ParamField body="prompt_extend" type="boolean" default="true">
-  提示词智能扩写，对短提示词效果提升明显。`wan3.0-video` 不接受这个参数，其余七个模型都接受。
+  提示词智能扩写，对短提示词效果提升明显。`wan3.0-video` / `wan3.0-video-prime` 不接受这个参数，其余七个模型都接受。
 
   `wan2.6-i2v` 与 `wan2.6-i2v-flash` 在设置 `shot_type` 时要求 `prompt_extend` 为 `true`。
 </ParamField>
@@ -240,19 +242,19 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 </ParamField>
 
 <ParamField body="image_with_roles" type="array">
-  带角色的图片数组，每项 `{url, role}`，`role` 取 `first_frame`、`last_frame` 或 `reference`；与 `first_frame_image` / `last_frame_image` 合并发送。只有 `wan2.7`、`wan2.7-r2v`、`wan3.0-video` 接受。
+  带角色的图片数组，每项 `{url, role}`，`role` 取 `first_frame`、`last_frame` 或 `reference`；与 `first_frame_image` / `last_frame_image` 合并发送。只有 `wan2.7`、`wan2.7-r2v`、`wan3.0-video` / `wan3.0-video-prime` 接受。
 </ParamField>
 
 <ParamField body="generation_type" type="string">
-  图片数组的归属：`frame`（首尾帧）或 `reference`（参考图）。只有 `wan3.0-video` 接受；不传时由输入素材自动判定。
+  图片数组的归属：`frame`（首尾帧）或 `reference`（参考图）。只有 `wan3.0-video` / `wan3.0-video-prime` 接受；不传时由输入素材自动判定。
 </ParamField>
 
 <ParamField body="file_url" type="string">
-  参考文档地址。只有 `wan3.0-video` 接受，与 `link_url` 互斥。
+  参考文档地址。只有 `wan3.0-video` / `wan3.0-video-prime` 接受，与 `link_url` 互斥。
 </ParamField>
 
 <ParamField body="link_url" type="string">
-  参考网页地址。只有 `wan3.0-video` 接受，与 `file_url` 互斥。
+  参考网页地址。只有 `wan3.0-video` / `wan3.0-video-prime` 接受，与 `file_url` 互斥。
 </ParamField>
 
 <ParamField body="metadata" type="object">
@@ -261,13 +263,13 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 
 通用的 `callback_url`、`callback_events`、`Prefer: wait`、`Idempotency-Key` 和费用上限请求头见[提交任务](/cn/api-reference/task/submit)。
 
-八个模型都不接受 `n` 与 `quality`。以上之外的参数会返回 `400`，不计费。
+九个模型都不接受 `n` 与 `quality`。以上之外的参数会返回 `400`，不计费。
 
 ## 限制
 
 | 模型 ID | 条件 | 限制 |
 |---|---|---|
-| 八个模型 | 每次任务 | 一次任务只产出一个结果，不支持用 `n` 批量生成 |
+| 九个模型 | 每次任务 | 一次任务只产出一个结果，不支持用 `n` 批量生成 |
 | `wan2.5-preview` | `resolution: "480p"` | 480p 只支持 16:9 / 9:16 / 1:1 |
 | `wan2.6` | 传了 `image_urls` | 图生视频模式不支持 `aspect_ratio`，比例跟随输入图 |
 | `wan2.6-i2v` | 每次任务 | 需要恰好 1 张首帧图片，画幅随图片 |
@@ -286,14 +288,14 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 | `wan2.7-r2v` | 传了 `video_urls` | 带参考视频时不混用图片，输出最长 10 秒 |
 | `wan2.7-r2v` | 传了 `first_frame_image` | 首帧最多搭配四张参考图，比例跟随首帧 |
 | `wan2.7-videoedit` | 每次任务 | 视频编辑必须且只能提供一段输入视频 |
-| `wan3.0-video` | 每次任务 | 参考视频和参考音频各最多五段 |
-| `wan3.0-video` | 没有任何输入 | 必须提供提示词或参考素材 |
-| `wan3.0-video` | 传了 `last_frame_image` | 尾帧必须与首帧一起提供 |
-| `wan3.0-video` | 传了 `first_frame_image` | 首尾帧不能与参考素材混用 |
-| `wan3.0-video` | `generation_type: "frame"` | frame 模式只接受一至两张帧图 |
-| `wan3.0-video` | `generation_type: "reference"` | reference 模式不能混入首尾帧 |
-| `wan3.0-video` | 传了 `video_urls` | 带参考视频时输出最长 15 秒 |
-| `wan3.0-video` | 传了 `file_url` | `file_url` 与 `link_url` 不能同时提供 |
+| `wan3.0-video` / `wan3.0-video-prime` | 每次任务 | 参考视频和参考音频各最多五段 |
+| `wan3.0-video` / `wan3.0-video-prime` | 没有任何输入 | 必须提供提示词或参考素材 |
+| `wan3.0-video` / `wan3.0-video-prime` | 传了 `last_frame_image` | 尾帧必须与首帧一起提供 |
+| `wan3.0-video` / `wan3.0-video-prime` | 传了 `first_frame_image` | 首尾帧不能与参考素材混用 |
+| `wan3.0-video` / `wan3.0-video-prime` | `generation_type: "frame"` | frame 模式只接受一至两张帧图 |
+| `wan3.0-video` / `wan3.0-video-prime` | `generation_type: "reference"` | reference 模式不能混入首尾帧 |
+| `wan3.0-video` / `wan3.0-video-prime` | 传了 `video_urls` | 带参考视频时输出最长 15 秒 |
+| `wan3.0-video` / `wan3.0-video-prime` | 传了 `file_url` | `file_url` 与 `link_url` 不能同时提供 |
 
 ## 计费
 
@@ -301,7 +303,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 
 | 模型 ID | 计费维度 |
 |---|---|
-| `wan2.5-preview` `wan2.6` `wan2.6-i2v` `wan3.0-video` | 分辨率档 × 输出秒数 |
+| `wan2.5-preview` `wan2.6` `wan2.6-i2v` `wan3.0-video` `wan3.0-video-prime` | 分辨率档 × 输出秒数 |
 | `wan2.6-i2v-flash` | 分辨率档 × 输出秒数；有声输出走带声档 |
 | `wan2.7` `wan2.7-r2v` | 分辨率档 × 输出秒数；带参考视频时另按参考视频秒数加收一笔 |
 | `wan2.7-videoedit` | 分辨率档 × 输出秒数，最低按 6 秒计 |
@@ -312,7 +314,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 
 **最低计费时长**（`wan2.7-videoedit`）——`price_config.min_billing_duration` 为 `6`，计费秒数取请求时长与 6 秒中的较大值。`duration: 0` 按源视频时长结算，同样不低于 6 秒。
 
-**默认档位**（`wan3.0-video`）——不传 `resolution` 时按 `480p` 档结算。
+**默认档位**（`wan3.0-video` / `wan3.0-video-prime`）——不传 `resolution` 时按 `480p` 档结算。
 
 只有成功出片才计费。任务失败、取消，或没有返回可用视频时，全额退款。最终费用以任务响应里的 `cost` 为准——整数 quota，**500,000 quota = 1 USD**，不是美元。
 
@@ -365,7 +367,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 | `wan2.6-i2v-flash` | `720p` `1080p` | `2`–`15` | `image_urls`（必传 1 张）· `audio_urls` ≤1 |
 | `wan2.7` | `720p` `1080p` | `2`–`15` | `image_urls` ≤2 · `first_frame_image` / `last_frame_image` · `video_urls` ≤1 · `audio_urls` ≤1 |
 | `wan2.7-r2v` | `720p` `1080p` | `2`–`15` | `image_urls` ≤5 · `first_frame_image` · `video_urls` ≤5 |
-| `wan3.0-video` | `480p` `720p` `1080p` | `2`–`30` | `image_urls` ≤10 · `first_frame_image` / `last_frame_image` · `video_urls` ≤5 · `audio_urls` ≤5 · `file_url` / `link_url` |
+| `wan3.0-video` / `wan3.0-video-prime` | `480p` `720p` `1080p` | `2`–`30` | `image_urls` ≤10 · `first_frame_image` / `last_frame_image` · `video_urls` ≤5 · `audio_urls` ≤5 · `file_url` / `link_url` |
 
 **视频编辑**（`action: "edit"`）
 

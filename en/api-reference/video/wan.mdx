@@ -4,7 +4,9 @@ description: "Alibaba Tongyi Wanxiang video models: text, image, reference and v
 api: "POST https://www.qingbo.dev/v1/tasks"
 ---
 
-Wan is Alibaba Tongyi's video model line. This page covers eight video models: `wan2.5-preview`, `wan2.6`, `wan2.6-i2v` and `wan2.6-i2v-flash` handle text- and image-to-video; `wan2.7` and `wan3.0-video` are multimodal entry points (text, frames, reference assets and video continuation all use one model ID); `wan2.7-r2v` does reference-to-video; `wan2.7-videoedit` does video editing. All eight share `POST /v1/tasks` and switching models means changing `model`, but the parameter set, the media inputs each takes, and the billing dimensions differ. For Wan image models, see [Wan Image Series](/en/api-reference/image/wan-image).
+Wan is Alibaba Tongyi's video model line. This page covers nine video models: `wan2.5-preview`, `wan2.6`, `wan2.6-i2v` and `wan2.6-i2v-flash` handle text- and image-to-video; `wan2.7` and `wan3.0-video` / `wan3.0-video-prime` are multimodal entry points (text, frames, reference assets and video continuation all use one model ID); `wan2.7-r2v` does reference-to-video; `wan2.7-videoedit` does video editing. All nine share `POST /v1/tasks` and switching models means changing `model`, but the parameter set, the media inputs each takes, and the billing dimensions differ. For Wan image models, see [Wan Image Series](/en/api-reference/image/wan-image).
+
+`wan3.0-video-prime` is the accelerated edition of `wan3.0-video`: the same parameters, value ranges, constraints and billing dimensions, with faster generation at a higher rate. Switching only changes `model`.
 
 ## Quick start
 
@@ -125,7 +127,7 @@ A successful submission returns a `task_id`. Poll [`GET /v1/tasks/{task_id}`](/e
 ## Request parameters
 
 <ParamField body="model" type="string" required>
-  One of eight: `wan2.5-preview`, `wan2.6`, `wan2.6-i2v`, `wan2.6-i2v-flash`, `wan2.7`, `wan2.7-r2v`, `wan2.7-videoedit`, `wan3.0-video`.
+  One of nine: `wan2.5-preview`, `wan2.6`, `wan2.6-i2v`, `wan2.6-i2v-flash`, `wan2.7`, `wan2.7-r2v`, `wan2.7-videoedit`, `wan3.0-video` / `wan3.0-video-prime`.
 </ParamField>
 
 <ParamField body="action" type="string" default="generate">
@@ -136,11 +138,11 @@ A successful submission returns a `task_id`. Poll [`GET /v1/tasks/{task_id}`](/e
 <ParamField body="prompt" type="string">
   Description of the video, or the edit instruction.
 
-  Required for `wan2.7-r2v`. Required for `wan2.7` and `wan3.0-video` when no media input is present. Optional elsewhere, but useful to guide camera and motion.
+  Required for `wan2.7-r2v`. Required for `wan2.7` and `wan3.0-video` / `wan3.0-video-prime` when no media input is present. Optional elsewhere, but useful to guide camera and motion.
 </ParamField>
 
 <ParamField body="negative_prompt" type="string">
-  Content to avoid. `wan3.0-video` does not take this parameter; the other seven models do.
+  Content to avoid. `wan3.0-video` / `wan3.0-video-prime` does not take this parameter; the other seven models do.
 </ParamField>
 
 <ParamField body="image_urls" type="string[]">
@@ -151,19 +153,19 @@ A successful submission returns a `task_id`. Poll [`GET /v1/tasks/{task_id}`](/e
   - `wan2.7` — 1–2 images (one = first frame, two = first and last frame); mutually exclusive with `first_frame_image`, `video_urls` and `aspect_ratio`
   - `wan2.7-r2v` — 1–5 subject / style references; mutually exclusive with `video_urls`; at most 4 when combined with `first_frame_image`
   - `wan2.7-videoedit` — up to 4 style / content references
-  - `wan3.0-video` — up to 10; with `generation_type: "frame"` only 1–2 frame images
+  - `wan3.0-video` / `wan3.0-video-prime` — up to 10; with `generation_type: "frame"` only 1–2 frame images
 </ParamField>
 
 <ParamField body="first_frame_image" type="string">
-  First-frame image URL. Taken by `wan2.7`, `wan2.7-r2v` and `wan3.0-video`.
+  First-frame image URL. Taken by `wan2.7`, `wan2.7-r2v` and `wan3.0-video` / `wan3.0-video-prime`.
 
   - `wan2.7` — cannot be mixed with `image_urls`, `video_urls` or `aspect_ratio`
   - `wan2.7-r2v` — may accompany up to 4 reference images; cannot be mixed with `video_urls` or `aspect_ratio`, and the ratio follows the first frame
-  - `wan3.0-video` — cannot be mixed with `image_urls`, `video_urls`, `audio_urls`, `file_url` or `link_url`
+  - `wan3.0-video` / `wan3.0-video-prime` — cannot be mixed with `image_urls`, `video_urls`, `audio_urls`, `file_url` or `link_url`
 </ParamField>
 
 <ParamField body="last_frame_image" type="string">
-  Last-frame image URL. Taken by `wan2.7` and `wan3.0-video`, and only together with `first_frame_image`.
+  Last-frame image URL. Taken by `wan2.7` and `wan3.0-video` / `wan3.0-video-prime`, and only together with `first_frame_image`.
 </ParamField>
 
 <ParamField body="video_urls" type="string[]">
@@ -172,15 +174,15 @@ A successful submission returns a `task_id`. Poll [`GET /v1/tasks/{task_id}`](/e
   - `wan2.7` — at most 1 clip, 2–10 s, for video continuation
   - `wan2.7-r2v` — at most 5 clips, each up to 5 s, 25 s in total
   - `wan2.7-videoedit` — **required**, exactly 1 clip, 2–10 s
-  - `wan3.0-video` — at most 5 clips, each up to 15 s, 15 s in total
+  - `wan3.0-video` / `wan3.0-video-prime` — at most 5 clips, each up to 15 s, 15 s in total
 </ParamField>
 
 <ParamField body="audio_urls" type="string[]">
-  Custom audio. `wan2.6-i2v-flash` takes at most 1 clip (3–30 s), `wan2.7` at most 1 clip (2–30 s), `wan3.0-video` at most 5 clips (each 1–15 s, 15 s in total). The other models do not take it.
+  Custom audio. `wan2.6-i2v-flash` takes at most 1 clip (3–30 s), `wan2.7` at most 1 clip (2–30 s), `wan3.0-video` / `wan3.0-video-prime` at most 5 clips (each 1–15 s, 15 s in total). The other models do not take it.
 </ParamField>
 
 <ParamField body="generate_audio" type="boolean">
-  Whether the output carries an audio track. `wan2.5-preview` and `wan2.6` default to `false`; `wan2.6-i2v-flash` and `wan3.0-video` default to `true`. The other models do not take this parameter.
+  Whether the output carries an audio track. `wan2.5-preview` and `wan2.6` default to `false`; `wan2.6-i2v-flash` and `wan3.0-video` / `wan3.0-video-prime` default to `true`. The other models do not take this parameter.
 </ParamField>
 
 <ParamField body="resolution" type="string">
@@ -188,9 +190,9 @@ A successful submission returns a `task_id`. Poll [`GET /v1/tasks/{task_id}`](/e
 
   - `wan2.5-preview` — `480p`, `720p`, `1080p`
   - `wan2.6`, `wan2.6-i2v`, `wan2.6-i2v-flash`, `wan2.7`, `wan2.7-r2v`, `wan2.7-videoedit` — `720p`, `1080p`
-  - `wan3.0-video` — `480p`, `720p`, `1080p`
+  - `wan3.0-video` / `wan3.0-video-prime` — `480p`, `720p`, `1080p`
 
-  Defaults: `720p` for `wan2.6-i2v`, `wan2.6-i2v-flash`, `wan2.7`, `wan2.7-r2v` and `wan2.7-videoedit`; `480p` for `wan3.0-video`.
+  Defaults: `720p` for `wan2.6-i2v`, `wan2.6-i2v-flash`, `wan2.7`, `wan2.7-r2v` and `wan2.7-videoedit`; `480p` for `wan3.0-video` / `wan3.0-video-prime`.
 </ParamField>
 
 <ParamField body="duration" type="integer">
@@ -200,27 +202,27 @@ A successful submission returns a `task_id`. Poll [`GET /v1/tasks/{task_id}`](/e
   - `wan2.6` — `5`, `10` or `15`
   - `wan2.6-i2v`, `wan2.6-i2v-flash`, `wan2.7`, `wan2.7-r2v` — any integer `2`–`15`
   - `wan2.7-videoedit` — any integer `2`–`10`, plus `0` (keep the source video length)
-  - `wan3.0-video` — any integer `2`–`30`
+  - `wan3.0-video` / `wan3.0-video-prime` — any integer `2`–`30`
 
-  `wan2.6-i2v` defaults to `5`. With `video_urls` present the output length is capped further: 10 seconds for `wan2.7` and `wan2.7-r2v`, 15 seconds for `wan3.0-video`.
+  `wan2.6-i2v` defaults to `5`. With `video_urls` present the output length is capped further: 10 seconds for `wan2.7` and `wan2.7-r2v`, 15 seconds for `wan3.0-video` / `wan3.0-video-prime`.
 </ParamField>
 
 <ParamField body="aspect_ratio" type="string">
-  Aspect ratio. `wan2.5-preview`, `wan2.6`, `wan2.7`, `wan2.7-r2v` and `wan2.7-videoedit` support `16:9`, `9:16`, `1:1`, `4:3` and `3:4`; `wan3.0-video` adds `adaptive` and defaults to it.
+  Aspect ratio. `wan2.5-preview`, `wan2.6`, `wan2.7`, `wan2.7-r2v` and `wan2.7-videoedit` support `16:9`, `9:16`, `1:1`, `4:3` and `3:4`; `wan3.0-video` / `wan3.0-video-prime` adds `adaptive` and defaults to it.
 
   `wan2.6-i2v` and `wan2.6-i2v-flash` do not take this parameter — the aspect ratio follows the input image. It also cannot be sent by `wan2.6` alongside `image_urls`, by `wan2.7` alongside `first_frame_image` / `image_urls` / `video_urls`, or by `wan2.7-r2v` alongside `first_frame_image`; in those cases the aspect ratio follows the input asset.
 </ParamField>
 
 <ParamField body="seed" type="integer">
-  Random seed. The same request with the same seed produces similar results. All eight models take it.
+  Random seed. The same request with the same seed produces similar results. All nine models take it.
 </ParamField>
 
 <ParamField body="watermark" type="boolean">
-  Whether to add a watermark to the output. All eight models take it.
+  Whether to add a watermark to the output. All nine models take it.
 </ParamField>
 
 <ParamField body="prompt_extend" type="boolean" default="true">
-  Smart prompt expansion, a clear improvement for short prompts. `wan3.0-video` does not take this parameter; the other seven models do.
+  Smart prompt expansion, a clear improvement for short prompts. `wan3.0-video` / `wan3.0-video-prime` does not take this parameter; the other seven models do.
 
   `wan2.6-i2v` and `wan2.6-i2v-flash` require `prompt_extend` to be `true` whenever `shot_type` is set.
 </ParamField>
@@ -240,19 +242,19 @@ A successful submission returns a `task_id`. Poll [`GET /v1/tasks/{task_id}`](/e
 </ParamField>
 
 <ParamField body="image_with_roles" type="array">
-  Role-tagged image array of `{url, role}`, where `role` is `first_frame`, `last_frame` or `reference`; merged with `first_frame_image` / `last_frame_image`. Only `wan2.7`, `wan2.7-r2v` and `wan3.0-video` take it.
+  Role-tagged image array of `{url, role}`, where `role` is `first_frame`, `last_frame` or `reference`; merged with `first_frame_image` / `last_frame_image`. Only `wan2.7`, `wan2.7-r2v` and `wan3.0-video` / `wan3.0-video-prime` take it.
 </ParamField>
 
 <ParamField body="generation_type" type="string">
-  How the image array is classified: `frame` (first / last frame) or `reference` (reference images). Only `wan3.0-video` takes it; omitted, the classification follows the input assets.
+  How the image array is classified: `frame` (first / last frame) or `reference` (reference images). Only `wan3.0-video` / `wan3.0-video-prime` takes it; omitted, the classification follows the input assets.
 </ParamField>
 
 <ParamField body="file_url" type="string">
-  Reference document URL. Only `wan3.0-video` takes it, and it is mutually exclusive with `link_url`.
+  Reference document URL. Only `wan3.0-video` / `wan3.0-video-prime` takes it, and it is mutually exclusive with `link_url`.
 </ParamField>
 
 <ParamField body="link_url" type="string">
-  Reference web page URL. Only `wan3.0-video` takes it, and it is mutually exclusive with `file_url`.
+  Reference web page URL. Only `wan3.0-video` / `wan3.0-video-prime` takes it, and it is mutually exclusive with `file_url`.
 </ParamField>
 
 <ParamField body="metadata" type="object">
@@ -261,13 +263,13 @@ A successful submission returns a `task_id`. Poll [`GET /v1/tasks/{task_id}`](/e
 
 See [Submit Task](/en/api-reference/task/submit) for `callback_url`, `callback_events`, `Prefer: wait`, `Idempotency-Key`, and the maximum-cost header.
 
-None of the eight models support `n` or `quality`. Any other parameter returns `400` and is not billed.
+None of the nine models support `n` or `quality`. Any other parameter returns `400` and is not billed.
 
 ## Limits
 
 | Model ID | Condition | Limit |
 |---|---|---|
-| All eight models | Per task | This model produces one result per task; n is not supported |
+| All nine models | Per task | This model produces one result per task; n is not supported |
 | `wan2.5-preview` | `resolution: "480p"` | 480p only supports 16:9 / 9:16 / 1:1 |
 | `wan2.6` | `image_urls` present | aspect_ratio is not supported in image-to-video mode |
 | `wan2.6-i2v` | Per task | One video per task; exactly one first-frame image, the aspect ratio follows the image |
@@ -286,14 +288,14 @@ None of the eight models support `n` or `quality`. Any other parameter returns `
 | `wan2.7-r2v` | `video_urls` present | With reference video, images cannot be mixed in and output is limited to ten seconds |
 | `wan2.7-r2v` | `first_frame_image` present | A first frame may accompany up to four reference images and determines the ratio |
 | `wan2.7-videoedit` | Per task | Video editing requires exactly one input video |
-| `wan3.0-video` | Per task | At most five reference videos and five audio clips are accepted |
-| `wan3.0-video` | No input at all | A prompt or reference media is required |
-| `wan3.0-video` | `last_frame_image` present | A last frame requires a first frame |
-| `wan3.0-video` | `first_frame_image` present | Frame controls cannot be mixed with reference media |
-| `wan3.0-video` | `generation_type: "frame"` | Frame mode accepts one or two frame images only |
-| `wan3.0-video` | `generation_type: "reference"` | Reference mode cannot include frame controls |
-| `wan3.0-video` | `video_urls` present | With reference video, output is limited to 15 seconds |
-| `wan3.0-video` | `file_url` present | file_url and link_url are mutually exclusive |
+| `wan3.0-video` / `wan3.0-video-prime` | Per task | At most five reference videos and five audio clips are accepted |
+| `wan3.0-video` / `wan3.0-video-prime` | No input at all | A prompt or reference media is required |
+| `wan3.0-video` / `wan3.0-video-prime` | `last_frame_image` present | A last frame requires a first frame |
+| `wan3.0-video` / `wan3.0-video-prime` | `first_frame_image` present | Frame controls cannot be mixed with reference media |
+| `wan3.0-video` / `wan3.0-video-prime` | `generation_type: "frame"` | Frame mode accepts one or two frame images only |
+| `wan3.0-video` / `wan3.0-video-prime` | `generation_type: "reference"` | Reference mode cannot include frame controls |
+| `wan3.0-video` / `wan3.0-video-prime` | `video_urls` present | With reference video, output is limited to 15 seconds |
+| `wan3.0-video` / `wan3.0-video-prime` | `file_url` present | file_url and link_url are mutually exclusive |
 
 ## Pricing
 
@@ -301,7 +303,7 @@ The whole series is billed by **resolution tier × output seconds**. `price_conf
 
 | Model ID | Billing dimensions |
 |---|---|
-| `wan2.5-preview` `wan2.6` `wan2.6-i2v` `wan3.0-video` | Resolution tier × output seconds |
+| `wan2.5-preview` `wan2.6` `wan2.6-i2v` `wan3.0-video` `wan3.0-video-prime` | Resolution tier × output seconds |
 | `wan2.6-i2v-flash` | Resolution tier × output seconds; audio output uses the sound tier |
 | `wan2.7` `wan2.7-r2v` | Resolution tier × output seconds; a reference video adds a separate charge for its own seconds |
 | `wan2.7-videoedit` | Resolution tier × output seconds, with a six-second floor |
@@ -312,7 +314,7 @@ The whole series is billed by **resolution tier × output seconds**. `price_conf
 
 **Minimum billed duration (`wan2.7-videoedit`)** — `price_config.min_billing_duration` is `6`, so billed seconds are the larger of the requested duration and 6. `duration: 0` settles on the source video length, also with the six-second floor.
 
-**Default tier (`wan3.0-video`)** — with no `resolution`, the task settles at the `480p` tier.
+**Default tier (`wan3.0-video` / `wan3.0-video-prime`)** — with no `resolution`, the task settles at the `480p` tier.
 
 You are only billed for a successfully generated video. Failed and cancelled tasks, and tasks that return no usable video, are refunded in full. The final charge is the `cost` field on the task response — an integer quota at **500,000 quota = 1 USD**, not dollars.
 
@@ -365,7 +367,7 @@ Generated videos are returned in `result.videos`; `url` is an array and `expires
 | `wan2.6-i2v-flash` | `720p` `1080p` | `2`–`15` | `image_urls` (1 required) · `audio_urls` ≤1 |
 | `wan2.7` | `720p` `1080p` | `2`–`15` | `image_urls` ≤2 · `first_frame_image` / `last_frame_image` · `video_urls` ≤1 · `audio_urls` ≤1 |
 | `wan2.7-r2v` | `720p` `1080p` | `2`–`15` | `image_urls` ≤5 · `first_frame_image` · `video_urls` ≤5 |
-| `wan3.0-video` | `480p` `720p` `1080p` | `2`–`30` | `image_urls` ≤10 · `first_frame_image` / `last_frame_image` · `video_urls` ≤5 · `audio_urls` ≤5 · `file_url` / `link_url` |
+| `wan3.0-video` / `wan3.0-video-prime` | `480p` `720p` `1080p` | `2`–`30` | `image_urls` ≤10 · `first_frame_image` / `last_frame_image` · `video_urls` ≤5 · `audio_urls` ≤5 · `file_url` / `link_url` |
 
 **Video editing (`action: "edit"`)**
 
