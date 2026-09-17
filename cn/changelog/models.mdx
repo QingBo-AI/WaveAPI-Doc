@@ -2,6 +2,16 @@
 title: "模型动态"
 ---
 
+<Update label="2026-09-17" description="模型上架">
+**DeepSeek V4.1 Flash 上架**
+
+- **模型 ID**：`deepseek-v4.1-flash`
+- DeepSeek V4 Flash 的新一代：上下文扩到 1M tokens，单次输出最长约 384K tokens，默认开启思考。
+- 走 `POST /v1/chat/completions`，支持流式、JSON Schema 结构化输出与函数调用，命中自动缓存的部分按缓存读价结算。
+- 按时段计价：请求按提交时刻所在时段结算，完整时段价表见 `GET /v1/models` 返回的 `price_config.text_schedule`。
+- **文档**：[文本模型总览](/cn/api-reference/text/overview)
+</Update>
+
 <Update label="2026-09-14" description="模型上架">
 **Wan 3.0 Video Prime 上架**
 

@@ -77,6 +77,7 @@ MODELS = [
  m("gemini-2.5-pro","google",1.125,9,tier=dict(T200,op=">",inp=2.25,out=13.5),ver="TSJFN"),
  m("gemini-2.5-flash-lite","google",0.09,0.36,ver="TSJFN"),
  # ---------- DeepSeek ----------
+ m("deepseek-v4.1-flash","deepseek",None,None,sched=True,ver="TSJFC",limits=("1M","384K"),notes=["按时段计价，见本节末表"],notes_en=["time-of-day pricing, see the table at the end of this section"]),
  m("deepseek-v4-pro","deepseek",None,None,sched=True,ver="TSJFC",limits=("1M","393K"),notes=["按时段计价，见本节末表"],notes_en=["time-of-day pricing, see the table at the end of this section"]),
  m("deepseek-v4-flash","deepseek",None,None,sched=True,ver="TSJFC",limits=("128K","16K"),notes=["按时段计价，见本节末表"],notes_en=["time-of-day pricing, see the table at the end of this section"]),
  m("deepseek-r1-0528","deepseek",0.495,1.971,ver="TSJF"),
