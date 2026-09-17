@@ -255,6 +255,7 @@ Besides the OpenAI-compatible endpoint, these models can also be called on the G
 
 | Model ID | Billing | JSON / Tools |
 |---|---|:---:|
+| `deepseek-v4.1-flash` | time-of-day | ✓ / ✓ |
 | `deepseek-v4-pro` | time-of-day | ✓ / ✓ |
 | `deepseek-v4-flash` | time-of-day | ✓ / ✓ |
 | `deepseek-r1-0528` | input + output | ✓ / ✓ |
@@ -264,6 +265,7 @@ Besides the OpenAI-compatible endpoint, these models can also be called on the G
 
 **Model notes**
 
+- `deepseek-v4.1-flash` — max input 1M, max output 384K; supports automatic cache hits; time-of-day pricing, see the table at the end of this section
 - `deepseek-v4-pro` — max input 1M, max output 393K; supports automatic cache hits; time-of-day pricing, see the table at the end of this section
 - `deepseek-v4-flash` — max input 128K, max output 16K; supports automatic cache hits; time-of-day pricing, see the table at the end of this section
 - `deepseek-v3.2-exp` — no strict JSON Schema; separate model from `deepseek-v3.2` (2025-09-29 experimental build)

@@ -2,6 +2,16 @@
 title: "Model Updates"
 ---
 
+<Update label="2026-09-17" description="Model launch">
+**DeepSeek V4.1 Flash is available**
+
+- **Model ID**: `deepseek-v4.1-flash`
+- The next generation of DeepSeek V4 Flash: a 1M-token context, up to about 384K output tokens per response, and thinking on by default.
+- Served on `POST /v1/chat/completions` with streaming, JSON Schema structured output and function calling; tokens that hit the automatic cache settle at the cache-read rate.
+- Time-of-day pricing: a request settles at the rates of the window it was submitted in. The full schedule is `price_config.text_schedule` on `GET /v1/models`.
+- **Docs**: [Text Models Overview](/en/api-reference/text/overview)
+</Update>
+
 <Update label="2026-09-14" description="Model launch">
 **Wan 3.0 Video Prime is available**
 

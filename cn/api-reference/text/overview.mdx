@@ -253,6 +253,7 @@ OpenAI 兼容接口之外，下列模型还可以走 Gemini 原生接口：`gemi
 
 | 模型 ID | 计费方式 | JSON / 工具 |
 |---|---|:---:|
+| `deepseek-v4.1-flash` | 时段价 | ✓ / ✓ |
 | `deepseek-v4-pro` | 时段价 | ✓ / ✓ |
 | `deepseek-v4-flash` | 时段价 | ✓ / ✓ |
 | `deepseek-r1-0528` | 输入输出两项 | ✓ / ✓ |
@@ -262,6 +263,7 @@ OpenAI 兼容接口之外，下列模型还可以走 Gemini 原生接口：`gemi
 
 **模型备注**
 
+- `deepseek-v4.1-flash` — 最大输入 1M、最大输出 384K；支持自动缓存命中；按时段计价，见本节末表
 - `deepseek-v4-pro` — 最大输入 1M、最大输出 393K；支持自动缓存命中；按时段计价，见本节末表
 - `deepseek-v4-flash` — 最大输入 128K、最大输出 16K；支持自动缓存命中；按时段计价，见本节末表
 - `deepseek-v3.2-exp` — 不提供严格 JSON Schema；与 `deepseek-v3.2` 是两个独立模型（2025-09-29 实验版）
