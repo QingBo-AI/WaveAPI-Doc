@@ -6,6 +6,20 @@ title: "Pricing Updates"
 This page lists, newest first, each model's launch pricing and the price changes that followed. Launch entries show the model's **current** unit price (earlier prices are in the corresponding "Price change" entries); retired models are kept and marked with their retirement date. Pricing changes apply only to calls made **after** the change takes effect; historical calls are unaffected. Each model's live unit price is shown in the [Models overview](/en/docs/models) and the console "Model Market"; check each call's cost fields and units against [Request & Response Format](/en/docs/request-response) and the relevant endpoint documentation.
 </Note>
 
+<Update label="2026-09-19" description="Pricing change">
+**Three DeepSeek V4 models repriced; the schedule drops from three tiers to two**
+
+The schedule now matches the upstream settlement windows: daily 00:00–14:00 UTC is the peak tier and 14:00–24:00 UTC is the off-peak tier (Beijing time is UTC+8). The earlier split — weekdays 01:00–04:00 and 06:00–10:00 at peak, everything else cheaper — is no longer used. Rates per window (per 1M tokens, input / cache read / output):
+
+| Model | Daily 00:00–14:00 | Daily 14:00–24:00 |
+|---|---|---|
+| `deepseek-v4-pro` | \$1.1314 / \$0.2263 / \$3.3943 | \$0.5657 / \$0.1131 / \$1.6971 |
+| `deepseek-v4.1-flash` | \$0.2514 / \$0.0251 / \$1.0057 | \$0.1257 / \$0.0126 / \$0.5029 |
+| `deepseek-v4-flash` | \$0.3771 / \$0.0754 / \$1.1314 | \$0.1886 / \$0.0377 / \$0.5657 |
+
+Every window goes up for all three models. Cache-hit rates rise the most, but stay well below the input rate of the same window. The full schedule is `price_config.text_schedule` on `GET /v1/models`, and it is the basis for settlement.
+</Update>
+
 <Update label="2026-09-17" description="Pricing change">
 **DeepSeek V4 Flash lowered to the new official price**
 

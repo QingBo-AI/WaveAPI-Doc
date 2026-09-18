@@ -271,15 +271,14 @@ Besides the OpenAI-compatible endpoint, these models can also be called on the G
 - `deepseek-v3.2-exp` — no strict JSON Schema; separate model from `deepseek-v3.2` (2025-09-29 experimental build)
 - `deepseek-v3.1-terminus` — no strict JSON Schema; no longer listed on DeepSeek's main API
 
-V4 Pro / Flash are priced by the **UTC time slot at request start** (Beijing time = UTC+8). The rate is fixed when the request begins and is used for both the response cost and the final settlement, even if the response crosses a slot boundary. Pass `thinking: {"type": "disabled"}` to turn thinking off. V4 cache-hit rates replace the matching input charge; there is no separate cache write. V3.x / R1 bill two rates; `deepseek-v3.2-exp` and `deepseek-v3.1-terminus` offer no strict JSON Schema — use `deepseek-v3.2` or `deepseek-r1-0528` when you need schema guarantees.
+The V4 line (Pro / Flash / 4.1 Flash) is priced by the **UTC time slot at request start** (Beijing time = UTC+8). The rate is fixed when the request begins and is used for both the response cost and the final settlement, even if the response crosses a slot boundary. Pass `thinking: {"type": "disabled"}` to turn thinking off. V4 cache-hit rates replace the matching input charge; there is no separate cache write. V3.x / R1 bill two rates; `deepseek-v3.2-exp` and `deepseek-v3.1-terminus` offer no strict JSON Schema — use `deepseek-v3.2` or `deepseek-r1-0528` when you need schema guarantees.
 
 | Slot (UTC, start inclusive, end exclusive) | Tier |
 |---|---|
-| Mon–Fri 01:00–04:00, 06:00–10:00 | peak |
-| Daily 00:00–14:00 outside the slots above | standard |
+| Daily 00:00–14:00 | peak |
 | Daily 14:00–24:00 | off-peak (cheapest) |
 
-Beijing time is UTC+8. The per-slot input / output / cache-read rates for Pro and Flash are in
+Beijing time is UTC+8. The per-slot input / output / cache-read rates for each model are in
 `price_config.text_schedule` on `GET /v1/models` — that is the complete table and the basis for settlement.
 
 ### Qwen (Alibaba Cloud)
