@@ -1,7 +1,7 @@
 ---
 title: "FLUX 3 Video"
 description: "Black Forest Labs FLUX 3 Video: text, keyframes and video continuation with synced audio, billed by resolution tier × seconds"
-api: "POST https://www.qingbo.dev/v1/tasks"
+api: "POST https://api.qingbo.ai/v1/tasks"
 ---
 
 FLUX 3 Video is Black Forest Labs' video model. It generates 5–20 second clips with synchronized audio from text, from 1–10 ordered keyframes, or from a continuation video. This page covers the standard tier `flux-3-video` and the draft tier `flux-3-video-draft`: the two take exactly the same parameters, and the draft tier is `hd` only, lower quality and cheaper — useful for previewing a shot before rendering it on the standard tier. Switching tiers means changing `model`; the two never switch automatically.
@@ -11,7 +11,7 @@ FLUX 3 Video is Black Forest Labs' video model. It generates 5–20 second clips
 <CodeGroup>
 
 ```bash Text-to-video
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -H "Idempotency-Key: flux-video-001" \
@@ -26,7 +26,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash Keyframes
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -43,7 +43,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash Video continuation
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -57,7 +57,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash Draft preview
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -173,8 +173,8 @@ What one call cost: the `cost` field on the task response (integer quota, 500,00
     ]
   },
   "urls": {
-    "get": "https://www.qingbo.dev/v1/tasks/task-wave1788780141b950265604",
-    "cancel": "https://www.qingbo.dev/v1/tasks/task-wave1788780141b950265604/cancel"
+    "get": "https://api.qingbo.ai/v1/tasks/task-wave1788780141b950265604",
+    "cancel": "https://api.qingbo.ai/v1/tasks/task-wave1788780141b950265604/cancel"
   }
 }
 ```

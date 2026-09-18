@@ -1,7 +1,7 @@
 ---
 title: "Get subscription"
 description: "OpenAI-compatible credit limit lookup"
-api: "GET https://www.qingbo.dev/v1/dashboard/billing/subscription"
+api: "GET https://api.qingbo.ai/v1/dashboard/billing/subscription"
 ---
 
 Returns the account's **total credit** in the same shape as OpenAI's `/dashboard/billing/subscription`, for existing credit-checking tools.
@@ -12,7 +12,7 @@ Returns the account's **total credit** in the same shape as OpenAI's `/dashboard
 
 <RequestExample>
 ```bash cURL
-curl https://www.qingbo.dev/v1/dashboard/billing/subscription \
+curl https://api.qingbo.ai/v1/dashboard/billing/subscription \
   -H "Authorization: Bearer $WAVE_API_KEY"
 ```
 </RequestExample>

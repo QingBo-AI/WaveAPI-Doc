@@ -27,7 +27,7 @@ submit → queued → processing → completed / failed
 import openai
 
 client = openai.OpenAI(
-    base_url="https://www.qingbo.dev/v1",
+    base_url="https://api.qingbo.ai/v1",
     api_key="your-api-key"
 )
 
@@ -99,7 +99,7 @@ Set `callback_url` when submitting a task and QWave API will push the result to 
 Only `queued` tasks can be cancelled. Cancellation automatically refunds the quota:
 
 ```bash
-curl -X POST https://www.qingbo.dev/v1/tasks/{task_id}/cancel \
+curl -X POST https://api.qingbo.ai/v1/tasks/{task_id}/cancel \
   -H "Authorization: Bearer YOUR_API_KEY"
 ```
 

@@ -1,7 +1,7 @@
 ---
 title: "Nano Banana 经济版"
 description: "Nano Banana（Gemini Image）经济线路：按张固定价的文生图与多图参考编辑"
-api: "POST https://www.qingbo.dev/v1/tasks"
+api: "POST https://api.qingbo.ai/v1/tasks"
 ---
 
 Nano Banana 是 Google Gemini 的图像模型线。本页覆盖**四个经济版模型**，它们共用同一套请求参数、同一种计费方式（按成功出图的固定张价），只在画幅、分辨率和专有参数上有区别——换档只改 `model`。需要按实际 token 用量结算时，用[Nano Banana 官方版](/cn/api-reference/image/gemini/nano-banana)。
@@ -15,7 +15,7 @@ Nano Banana 是 Google Gemini 的图像模型线。本页覆盖**四个经济版
 <CodeGroup>
 
 ```bash 文生图
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -H "Idempotency-Key: nb-demo-001" \
@@ -30,7 +30,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash 参考图编辑
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -H "Idempotency-Key: nb-edit-001" \
@@ -46,7 +46,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash 多图参考
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -63,7 +63,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash 联网检索
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -182,8 +182,8 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
     ]
   },
   "urls": {
-    "get": "https://www.qingbo.dev/v1/tasks/task-wave1789004688b950049238",
-    "cancel": "https://www.qingbo.dev/v1/tasks/task-wave1789004688b950049238/cancel"
+    "get": "https://api.qingbo.ai/v1/tasks/task-wave1789004688b950049238",
+    "cancel": "https://api.qingbo.ai/v1/tasks/task-wave1789004688b950049238/cancel"
   }
 }
 ```

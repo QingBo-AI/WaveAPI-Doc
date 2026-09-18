@@ -1,7 +1,7 @@
 ---
 title: "Nano Banana 官方版"
 description: "Nano Banana（Gemini Image）官方线路：按实际 token 用量结算的文生图与多图参考编辑"
-api: "POST https://www.qingbo.dev/v1/tasks"
+api: "POST https://api.qingbo.ai/v1/tasks"
 ---
 
 本页覆盖 Nano Banana 的**三条官方 API 线路**：旗舰、快速和最轻三档。它们共用同一套请求参数和同一种计费方式（按实际 token 用量结算），只在画幅、分辨率和专有参数上有区别——换档只改 `model`。需要在提交前就确定单张费用时，用[Nano Banana 经济版](/cn/api-reference/image/gemini/nano-banana-rev)。
@@ -15,7 +15,7 @@ api: "POST https://www.qingbo.dev/v1/tasks"
 <CodeGroup>
 
 ```bash 文生图
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -H "Idempotency-Key: nb-official-001" \
@@ -30,7 +30,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash 参考图编辑
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -H "Idempotency-Key: nb-official-edit-001" \
@@ -46,7 +46,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash 多图参考
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -63,7 +63,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash 联网检索
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -184,8 +184,8 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
     ]
   },
   "urls": {
-    "get": "https://www.qingbo.dev/v1/tasks/task-wave1789004688b950049238",
-    "cancel": "https://www.qingbo.dev/v1/tasks/task-wave1789004688b950049238/cancel"
+    "get": "https://api.qingbo.ai/v1/tasks/task-wave1789004688b950049238",
+    "cancel": "https://api.qingbo.ai/v1/tasks/task-wave1789004688b950049238/cancel"
   }
 }
 ```

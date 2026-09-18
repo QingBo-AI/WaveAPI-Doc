@@ -9,7 +9,7 @@ The portal, model catalog and documentation have been rebuilt around one idea: o
 
 **What is new**
 
-- **Portal and console**: home, the model catalog ([/explore](https://qingbo.dev/explore)), pricing ([/pricing](https://qingbo.dev/pricing)), rankings and the console are all redesigned. English lives at `/`, Chinese at `/zh-Hans-CN`. Old paths under `/v2` and `/zh` redirect automatically.
+- **Portal and console**: home, the model catalog ([/explore](https://wave.qingbo.ai/explore)), pricing ([/pricing](https://wave.qingbo.ai/pricing)), rankings and the console are all redesigned. English lives at `/`, Chinese at `/zh-Hans-CN`. Old paths under `/v2` and `/zh` redirect automatically.
 - **Model catalog**: 92 media model groups (34 image, 52 video, 6 audio) plus every text model. Each model's price tiers, supported actions and parameters are public on its catalog page, comparable by entry price and filterable by vendor and task.
 - **One task endpoint**: image, video and audio all go through `POST /v1/tasks`, with `action` selecting generate, edit, extend and so on, and `ref_task_id` chaining a follow-up onto an earlier task. Text models keep the OpenAI-compatible `/v1/chat/completions`.
 - **Billing rules**: everything is priced in USD. A task freezes the quoted amount on submission; upstream errors, timeouts and content refusals release it automatically. Models settled on token usage (Nano Banana official, GPT Image official, Gemini Omni) settle on actual usage after completion and refund the difference. Every freeze and release is visible in the console's call log.

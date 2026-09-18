@@ -1,7 +1,7 @@
 ---
 title: "Veo Series"
 description: "Google Veo 3.1: the official line billed per second at 4 / 6 / 8 seconds, the economy line billed per finished clip with extension support"
-api: "POST https://www.qingbo.dev/v1/tasks"
+api: "POST https://api.qingbo.ai/v1/tasks"
 ---
 
 Google's Veo 3.1 video line comes in two routes. The official route, `veo3.1-fast` and `veo3.1-quality`, offers 4 / 6 / 8 second output, first and last frames, native audio and `seed`, billed per second. The economy route, `veo3.1-lite`, `veo3.1-fast-rev` and `veo3.1-quality-rev`, reaches Veo through an aggregator, always outputs eight seconds and is billed per finished clip; the two `-rev` tiers can also extend a video they generated earlier. The two routes differ in both parameters and billing, and never switch to each other.
@@ -11,7 +11,7 @@ Google's Veo 3.1 video line comes in two routes. The official route, `veo3.1-fas
 <CodeGroup>
 
 ```bash Text to video (official)
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -H "Idempotency-Key: veo-demo-001" \
@@ -26,7 +26,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash First/last frame (official)
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -42,7 +42,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash Native audio (official)
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -58,7 +58,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash Text to video (economy)
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -72,7 +72,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash First/last frame (economy)
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -90,7 +90,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash Reference images (economy)
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -109,7 +109,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash Extend (economy)
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -283,8 +283,8 @@ You are only billed for a successfully generated video. Failed and cancelled tas
     ]
   },
   "urls": {
-    "get": "https://www.qingbo.dev/v1/tasks/task-wave1775285160b950328499",
-    "cancel": "https://www.qingbo.dev/v1/tasks/task-wave1775285160b950328499/cancel"
+    "get": "https://api.qingbo.ai/v1/tasks/task-wave1775285160b950328499",
+    "cancel": "https://api.qingbo.ai/v1/tasks/task-wave1775285160b950328499/cancel"
   },
   "billing_status": "settled",
   "cost": 288000

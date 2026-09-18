@@ -1,7 +1,7 @@
 ---
 title: "Flow Music"
 description: "Text-to-music on the Lyria engine, with lyrics, title, BPM, length and seed control"
-api: "POST https://www.qingbo.dev/v1/tasks"
+api: "POST https://api.qingbo.ai/v1/tasks"
 ---
 
 `flow-music` runs the Lyria engine to turn a style prompt and lyrics into a full song or an instrumental, and can also write lyrics on their own. Both actions are submitted through the unified task endpoint `POST /v1/tasks`: `generate` produces audio, `lyrics` produces text. For follow-up work such as extending, covering or splitting stems, use [Suno Music Generation](/en/api-reference/audio/suno).
@@ -11,7 +11,7 @@ api: "POST https://www.qingbo.dev/v1/tasks"
 <CodeGroup>
 
 ```bash Lyrics plus style
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -25,7 +25,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash Style prompt only
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -38,7 +38,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash Lyrics only
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -136,8 +136,8 @@ Only a successful result is billed. Failed and cancelled tasks, and tasks that r
     ]
   },
   "urls": {
-    "get": "https://www.qingbo.dev/v1/tasks/task-wave1789004688b950049238",
-    "cancel": "https://www.qingbo.dev/v1/tasks/task-wave1789004688b950049238/cancel"
+    "get": "https://api.qingbo.ai/v1/tasks/task-wave1789004688b950049238",
+    "cancel": "https://api.qingbo.ai/v1/tasks/task-wave1789004688b950049238/cancel"
   },
   "billing_status": "settled",
   "cost": 33750
@@ -164,8 +164,8 @@ Only a successful result is billed. Failed and cancelled tasks, and tasks that r
     }
   },
   "urls": {
-    "get": "https://www.qingbo.dev/v1/tasks/task-wave1789004688b950049238",
-    "cancel": "https://www.qingbo.dev/v1/tasks/task-wave1789004688b950049238/cancel"
+    "get": "https://api.qingbo.ai/v1/tasks/task-wave1789004688b950049238",
+    "cancel": "https://api.qingbo.ai/v1/tasks/task-wave1789004688b950049238/cancel"
   },
   "billing_status": "settled",
   "cost": 11250

@@ -8,7 +8,7 @@ QWave API supports multiple image generation models, **all called through the un
 ## Endpoint
 
 ```
-POST https://www.qingbo.dev/v1/tasks
+POST https://api.qingbo.ai/v1/tasks
 ```
 
 For the async flow, see [Task System](/en/docs/task-system) — Submit → Status → Result + optional webhook.
@@ -57,7 +57,7 @@ Images have two entries. Billing is identical on both; they differ in parameter 
 | Use it for | New integrations, and anything needing masked inpainting, quality tiers, resolution tiers or multi-image references | Existing OpenAI SDK projects — point `base_url` at us and go |
 
 <Note>
-To migrate with the OpenAI SDK, set `base_url` to `https://www.qingbo.dev/v1` and change `model` to one of our model IDs.
+To migrate with the OpenAI SDK, set `base_url` to `https://api.qingbo.ai/v1` and change `model` to one of our model IDs.
 Model-specific capabilities (the `mask_url` mask, the `1k` / `2k` / `4k` resolution tiers, reference-image limits and so on)
 follow the task API documentation — the parameters on our model pages describe the task API.
 </Note>

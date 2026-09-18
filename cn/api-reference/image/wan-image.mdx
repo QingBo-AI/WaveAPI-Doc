@@ -1,7 +1,7 @@
 ---
 title: "Wan Image 系列"
 description: "阿里通义万相 2.7 图像模型：文生图与图像编辑统一接口，支持框选编辑与自定义配色"
-api: "POST https://www.qingbo.dev/v1/tasks"
+api: "POST https://api.qingbo.ai/v1/tasks"
 ---
 
 Wan 2.7 Image 把图片生成与编辑放在同一套请求里：文生图只给 `prompt`，图生图、局部改写、多图融合都走 `edit` 并带上 `image_urls`。本页覆盖标准版与专业版两个模型，它们的参数集合完全相同，差别只在文生图的最高分辨率和单价——换档只改 `model`。
@@ -11,7 +11,7 @@ Wan 2.7 Image 把图片生成与编辑放在同一套请求里：文生图只给
 <CodeGroup>
 
 ```bash 文生图
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -H "Idempotency-Key: wan-image-demo-001" \
@@ -27,7 +27,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash 组图
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -42,7 +42,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash 多图参考编辑
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -H "Idempotency-Key: wan-image-edit-001" \
@@ -60,7 +60,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash 框选区域编辑
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -187,8 +187,8 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
     ]
   },
   "urls": {
-    "get": "https://www.qingbo.dev/v1/tasks/task-wave1789004688b950049238",
-    "cancel": "https://www.qingbo.dev/v1/tasks/task-wave1789004688b950049238/cancel"
+    "get": "https://api.qingbo.ai/v1/tasks/task-wave1789004688b950049238",
+    "cancel": "https://api.qingbo.ai/v1/tasks/task-wave1789004688b950049238/cancel"
   },
   "billing_status": "settled",
   "cost": 13500

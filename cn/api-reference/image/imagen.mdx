@@ -1,7 +1,7 @@
 ---
 title: "Imagen 4.0"
 description: "Google DeepMind 旗舰文生图 — 原生 2K 输出,写实质感,中英文字渲染准确"
-api: "POST https://www.qingbo.dev/v1/tasks"
+api: "POST https://api.qingbo.ai/v1/tasks"
 ---
 
 <Warning>
@@ -26,7 +26,7 @@ Google DeepMind 出品的 **Imagen 4.0** 文生图模型 — 原生 2K 输出,�
 <CodeGroup>
 
 ```bash 文生图(最简)
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -36,7 +36,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash 海报场景(强文字渲染)
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -48,7 +48,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash 多比例对照(横竖双版本)
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{

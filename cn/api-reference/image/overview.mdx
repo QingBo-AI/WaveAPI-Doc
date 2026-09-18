@@ -8,7 +8,7 @@ description: "通过 /v1/tasks 统一端点调用所有图像生成模型,异步
 ## 请求端点
 
 ```
-POST https://www.qingbo.dev/v1/tasks
+POST https://api.qingbo.ai/v1/tasks
 ```
 
 异步流程详见 [任务系统](/cn/docs/task-system) — Submit → Status → Result + 可选 webhook。
@@ -57,7 +57,7 @@ POST https://www.qingbo.dev/v1/tasks
 | 适合 | 新接入、需要掩码重绘 / 画质档 / 分辨率档 / 多图参考的场景 | 已有 OpenAI SDK 的项目，改 `base_url` 就能跑 |
 
 <Note>
-用 OpenAI SDK 迁移时，把 `base_url` 指向 `https://www.qingbo.dev/v1`，`model` 换成对应的模型 ID 即可。
+用 OpenAI SDK 迁移时，把 `base_url` 指向 `https://api.qingbo.ai/v1`，`model` 换成对应的模型 ID 即可。
 各模型独有的能力（掩码 `mask_url`、`1k` / `2k` / `4k` 分辨率档、参考图张数上限等）以任务接口的文档为准，
 各模型页描述的都是任务接口的参数。
 </Note>

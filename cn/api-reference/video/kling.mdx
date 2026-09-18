@@ -1,7 +1,7 @@
 ---
 title: "Kling 系列"
 description: "快手可灵视频模型：文生视频、首尾帧、参考图与参考视频、视频编辑与动作控制"
-api: "POST https://www.qingbo.dev/v1/tasks"
+api: "POST https://api.qingbo.ai/v1/tasks"
 ---
 
 快手可灵（Kling）的视频模型线，当前有 7 个模型：通用生成的 `kling-3.0-turbo`、`kling-v2-6`、`kling-v3`，带参考视频与视频编辑能力的 `kling-v3-omni`、`kling-video-o1`，以及做动作迁移的 `kling-v2-6-motion-control`、`kling-v3-motion-control`。它们共用同一个任务接口 `POST /v1/tasks`，换模型只改 `model`，但支持的动作、参数与时长各不相同，逐项差异见「可用模型」。
@@ -11,7 +11,7 @@ api: "POST https://www.qingbo.dev/v1/tasks"
 <CodeGroup>
 
 ```bash 文生视频
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -H "Idempotency-Key: kling-demo-001" \
@@ -27,7 +27,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash 首尾帧图生视频
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -44,7 +44,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash 原生音频
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -59,7 +59,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash 多镜头分镜
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -79,7 +79,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash 参考视频生成
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -94,7 +94,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash 视频编辑
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -108,7 +108,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash 动作控制
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -305,8 +305,8 @@ Kling 系列不接受 `seed`、`quality` 和 `size`。以上之外的参数会�
     ]
   },
   "urls": {
-    "get": "https://www.qingbo.dev/v1/tasks/task-wave1788753089b950634993",
-    "cancel": "https://www.qingbo.dev/v1/tasks/task-wave1788753089b950634993/cancel"
+    "get": "https://api.qingbo.ai/v1/tasks/task-wave1788753089b950634993",
+    "cancel": "https://api.qingbo.ai/v1/tasks/task-wave1788753089b950634993/cancel"
   },
   "billing_status": "settled",
   "cost": 189000

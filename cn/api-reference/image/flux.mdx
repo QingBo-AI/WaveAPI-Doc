@@ -1,7 +1,7 @@
 ---
 title: "FLUX 系列"
 description: "Black Forest Labs FLUX 图像模型：FLUX.2 按百万像素档出图，FLUX.1 Kontext 按张固定价做上下文编辑"
-api: "POST https://www.qingbo.dev/v1/tasks"
+api: "POST https://api.qingbo.ai/v1/tasks"
 ---
 
 FLUX 是 Black Forest Labs 的图像模型系列，本页覆盖当前可用的五个模型，分成两代：FLUX.2 可以选输出的百万像素档、最多带 8 张参考图，按 MP 档计价；FLUX.1 Kontext 专做上下文编辑，输出固定 1 MP、最多 4 张参考图，按张固定价。两代共用同一个任务接口和同一套动作，换模型只改 `model`。
@@ -11,7 +11,7 @@ FLUX 是 Black Forest Labs 的图像模型系列，本页覆盖当前可用的�
 <CodeGroup>
 
 ```bash 文生图
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -H "Idempotency-Key: flux-demo-001" \
@@ -26,7 +26,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash 上下文编辑
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -H "Idempotency-Key: flux-edit-001" \
@@ -40,7 +40,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash 调节步数与引导强度
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -168,8 +168,8 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
     ]
   },
   "urls": {
-    "get": "https://www.qingbo.dev/v1/tasks/task-wave1789004688b950049238",
-    "cancel": "https://www.qingbo.dev/v1/tasks/task-wave1789004688b950049238/cancel"
+    "get": "https://api.qingbo.ai/v1/tasks/task-wave1789004688b950049238",
+    "cancel": "https://api.qingbo.ai/v1/tasks/task-wave1789004688b950049238/cancel"
   },
   "billing_status": "settled",
   "cost": 20250

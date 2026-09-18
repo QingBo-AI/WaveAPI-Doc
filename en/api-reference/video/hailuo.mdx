@@ -1,7 +1,7 @@
 ---
 title: "Hailuo Series"
 description: "MiniMax Hailuo video: Hailuo 02, 2.3 and 2.3 Fast — text-to-video and first / last frame video"
-api: "POST https://www.qingbo.dev/v1/tasks"
+api: "POST https://api.qingbo.ai/v1/tasks"
 ---
 
 MiniMax's Hailuo video line. This page covers `minimax-hailuo-02`, `minimax-hailuo-2.3` and `minimax-hailuo-2.3-fast`: all three go through the same task endpoint, all three have `generate` as their only action, and each turns text or a first-frame image into one clip of a fixed length — switching tiers means changing `model` and nothing else. For reference video, reference audio or a native soundtrack, use [MiniMax H3](/en/api-reference/video/minimax-h3).
@@ -11,7 +11,7 @@ MiniMax's Hailuo video line. This page covers `minimax-hailuo-02`, `minimax-hail
 <CodeGroup>
 
 ```bash Text to video
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -H "Idempotency-Key: hailuo-demo-001" \
@@ -25,7 +25,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash First frame
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -39,7 +39,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash First and last frame
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -54,7 +54,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash Fast tier
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -178,8 +178,8 @@ You are only billed for a video that is produced. Failed and cancelled tasks, an
   "billing_status": "settled",
   "cost": 58500,
   "urls": {
-    "get": "https://www.qingbo.dev/v1/tasks/task-wave1788773955b950509106",
-    "cancel": "https://www.qingbo.dev/v1/tasks/task-wave1788773955b950509106/cancel"
+    "get": "https://api.qingbo.ai/v1/tasks/task-wave1788773955b950509106",
+    "cancel": "https://api.qingbo.ai/v1/tasks/task-wave1788773955b950509106/cancel"
   }
 }
 ```

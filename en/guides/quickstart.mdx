@@ -5,7 +5,7 @@ description: "Get up and running with QWave API in 5 minutes"
 
 ## Prerequisites
 
-- A QWave API account ([sign up](https://qingbo.dev/login))
+- A QWave API account ([sign up](https://wave.qingbo.ai/login))
 - An API key
 - Basic programming knowledge
 
@@ -13,7 +13,7 @@ description: "Get up and running with QWave API in 5 minutes"
 
 <Steps>
   <Step title="Sign in to the dashboard">
-    Visit the [Dashboard](https://qingbo.dev/dashboard/keys) and log in
+    Visit the [Dashboard](https://wave.qingbo.ai/dashboard/keys) and log in
   </Step>
   <Step title="Create a key">
     On the API keys page, click "Create new key"
@@ -37,7 +37,7 @@ QWave API is fully compatible with the OpenAI SDK — just swap the `base_url`.
 from openai import OpenAI
 
 client = OpenAI(
-    base_url="https://www.qingbo.dev/v1",
+    base_url="https://api.qingbo.ai/v1",
     api_key="YOUR_API_KEY"
 )
 
@@ -55,7 +55,7 @@ print(response.choices[0].message.content)
 import OpenAI from 'openai';
 
 const client = new OpenAI({
-  baseURL: 'https://www.qingbo.dev/v1',
+  baseURL: 'https://api.qingbo.ai/v1',
   apiKey: 'YOUR_API_KEY'
 });
 
@@ -70,7 +70,7 @@ console.log(response.choices[0].message.content);
 ```
 
 ```bash cURL
-curl https://www.qingbo.dev/v1/chat/completions \
+curl https://api.qingbo.ai/v1/chat/completions \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -d '{

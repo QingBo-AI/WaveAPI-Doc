@@ -1,7 +1,7 @@
 ---
 title: "Seedance Series"
 description: "ByteDance Seedance video generation: text, image, first/last frame and multimodal references, plus video edit and extend on 2.5, billed by resolution tier × seconds"
-api: "POST https://www.qingbo.dev/v1/tasks"
+api: "POST https://api.qingbo.ai/v1/tasks"
 ---
 
 The ByteDance Seedance video line: the two 1.0 tiers cover text-to-video and first/last-frame control, 1.5 Pro adds multi-image reference and native audio, the three 2.0 tiers widen references to images, video and audio, and 2.5 adds video editing and video extension on top. This page covers the seven available models. They share one task endpoint and one set of parameters, and differ in the resolutions, duration ranges and reference material each accepts — switching tiers means changing `model`.
@@ -15,7 +15,7 @@ Seedance is the video line; the image models under the similar name are the [See
 <CodeGroup>
 
 ```bash Text to video
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -H "Idempotency-Key: seedance-demo-001" \
@@ -30,7 +30,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash First and last frame
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -45,7 +45,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash Multi-image reference
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -63,7 +63,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash Reference video
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -78,7 +78,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash Video edit
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -93,7 +93,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash Video extend
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -288,8 +288,8 @@ You are billed only for a delivered video. Failed and cancelled tasks, and upstr
   "billing_status": "settled",
   "cost": 75000,
   "urls": {
-    "get": "https://www.qingbo.dev/v1/tasks/task-wave1775285160b950328499",
-    "cancel": "https://www.qingbo.dev/v1/tasks/task-wave1775285160b950328499/cancel"
+    "get": "https://api.qingbo.ai/v1/tasks/task-wave1775285160b950328499",
+    "cancel": "https://api.qingbo.ai/v1/tasks/task-wave1775285160b950328499/cancel"
   }
 }
 ```

@@ -1,14 +1,14 @@
 ---
 title: "Claude Messages API"
 description: "The native Messages endpoint, kept for apps already built on the Anthropic SDK"
-api: "POST https://www.qingbo.dev/v1/messages"
+api: "POST https://api.qingbo.ai/v1/messages"
 ---
 
 The native Anthropic Messages endpoint, kept for apps already built on the Anthropic SDK. It serves `claude-sonnet-5` and `claude-opus-5` only, and exposes nothing beyond what Chat offers, so new integrations should use the [General Chat API](/en/api-reference/text/general-chat).
 
 <RequestExample>
 ```bash cURL
-curl -X POST https://www.qingbo.dev/v1/messages \
+curl -X POST https://api.qingbo.ai/v1/messages \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -H "anthropic-version: 2023-06-01" \
@@ -29,7 +29,7 @@ curl -X POST https://www.qingbo.dev/v1/messages \
 import anthropic
 
 client = anthropic.Anthropic(
-    base_url="https://www.qingbo.dev/v1",
+    base_url="https://api.qingbo.ai/v1",
     api_key="YOUR_API_KEY"
 )
 
@@ -49,7 +49,7 @@ print(message.content[0].text)
 import Anthropic from '@anthropic-ai/sdk';
 
 const client = new Anthropic({
-  baseURL: 'https://www.qingbo.dev/v1',
+  baseURL: 'https://api.qingbo.ai/v1',
   apiKey: 'YOUR_API_KEY'
 });
 
@@ -87,7 +87,7 @@ func main() {
     }
 
     body, _ := json.Marshal(payload)
-    req, _ := http.NewRequest("POST", "https://www.qingbo.dev/v1/messages", bytes.NewBuffer(body))
+    req, _ := http.NewRequest("POST", "https://api.qingbo.ai/v1/messages", bytes.NewBuffer(body))
     req.Header.Set("Authorization", "Bearer YOUR_API_KEY")
     req.Header.Set("Content-Type", "application/json")
     req.Header.Set("anthropic-version", "2023-06-01")
@@ -122,7 +122,7 @@ public class Main {
 
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
-            .uri(URI.create("https://www.qingbo.dev/v1/messages"))
+            .uri(URI.create("https://api.qingbo.ai/v1/messages"))
             .header("Authorization", "Bearer YOUR_API_KEY")
             .header("Content-Type", "application/json")
             .header("anthropic-version", "2023-06-01")
@@ -205,7 +205,7 @@ public class Main {
 <ParamField header="x-api-key" type="string" required>
   API key used for authentication.
 
-  Visit the [API Key management page](https://qingbo.dev/dashboard/keys) to obtain your API Key.
+  Visit the [API Key management page](https://wave.qingbo.ai/dashboard/keys) to obtain your API Key.
 
   Add it to the request header:
 
@@ -222,7 +222,7 @@ public class Main {
   Example: `2023-06-01`
 </ParamField>
 
-Set the Anthropic SDK base URL to `https://www.qingbo.dev`; the SDK appends `/v1/messages` itself, so `/v1` does not need to be added again.
+Set the Anthropic SDK base URL to `https://api.qingbo.ai`; the SDK appends `/v1/messages` itself, so `/v1` does not need to be added again.
 
 ## Body
 

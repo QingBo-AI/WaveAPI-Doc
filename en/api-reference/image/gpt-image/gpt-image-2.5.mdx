@@ -1,7 +1,7 @@
 ---
 title: "GPT Image 2.5"
 description: "Five quality levels for text-to-image and reference editing, on the Flare and Sunburst lines, billed from token usage"
-api: "POST https://www.qingbo.dev/v1/tasks"
+api: "POST https://api.qingbo.ai/v1/tasks"
 ---
 
 GPT Image 2.5 is the next generation of the official GPT Image line. It keeps the actions and parameters of GPT Image 2, widens quality from three levels to five, and re-scales the output usage of the levels that share a name. Two models are available, `gpt-image-2.5` (the Flare line) and `gpt-image-2.5-sunburst` (the Sunburst line); their request shape, value ranges and billing are identical, and they differ only in the trade-off between speed and editing precision. Switching between them means changing the `model` field alone.
@@ -22,7 +22,7 @@ Both models carry the same rates, so the same set of parameters costs the same o
 <CodeGroup>
 
 ```bash Text to image
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -H "Idempotency-Key: image25-demo-001" \
@@ -38,7 +38,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash Reference editing
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -H "Idempotency-Key: image25-edit-001" \

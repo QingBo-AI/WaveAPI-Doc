@@ -1,7 +1,7 @@
 ---
 title: "Submit Task"
 description: "POST /v1/tasks — Submit an asynchronous generation task"
-api: "POST https://www.qingbo.dev/v1/tasks"
+api: "POST https://api.qingbo.ai/v1/tasks"
 ---
 
 Submit an image, video, or audio generation task and immediately receive a `task_id`.
@@ -61,7 +61,7 @@ for the result within a single call:
 - **Window exceeded** → the current state plus `pre_consumed_cost` is returned; continue polling `GET /v1/tasks/{task_id}`
 
 ```bash
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Prefer: wait=60" \
   -H "Content-Type: application/json" \
@@ -82,7 +82,7 @@ with the same key within 24 hours reuse the originally created task (same
 <CodeGroup>
 
 ```bash cURL
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -97,7 +97,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 import requests
 
 response = requests.post(
-    "https://www.qingbo.dev/v1/tasks",
+    "https://api.qingbo.ai/v1/tasks",
     headers={"Authorization": "Bearer YOUR_API_KEY"},
     json={
         "model": "veo3.1-fast",

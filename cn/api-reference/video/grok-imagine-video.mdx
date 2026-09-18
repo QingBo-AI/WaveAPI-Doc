@@ -1,7 +1,7 @@
 ---
 title: "Grok Imagine Video 系列"
 description: "xAI Grok Imagine 视频生成：官方版与经济版共四个模型，按分辨率档 × 秒数计费"
-api: "POST https://www.qingbo.dev/v1/tasks"
+api: "POST https://api.qingbo.ai/v1/tasks"
 ---
 
 xAI 的 Grok Imagine 视频线，当前有四个模型 ID，全部通过统一任务接口 `POST /v1/tasks` 提交，只有 `generate` 一个动作，也全部按输出分辨率档乘生成秒数计费。官方线路的 `grok-imagine-video-1.5` 最高到 1080p、时长从 1 秒起，`grok-imagine-video` 还接受参考视频；经济版的 `grok-imagine-video-1.5-rev` 和 `grok-imagine-1.0-video-rev` 只有 480p / 720p、时长从 6 秒起，参考图不加价。图像生成见 [Grok Imagine 系列](/cn/api-reference/image/grok-imagine)。
@@ -11,7 +11,7 @@ xAI 的 Grok Imagine 视频线，当前有四个模型 ID，全部通过统一�
 <CodeGroup>
 
 ```bash 文生视频
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -H "Idempotency-Key: grok-video-001" \
@@ -26,7 +26,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash 图生视频
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -H "Idempotency-Key: grok-video-i2v-001" \
@@ -42,7 +42,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash 经济版多图参考
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -61,7 +61,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash 固定随机种子
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -173,8 +173,8 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
     ]
   },
   "urls": {
-    "get": "https://www.qingbo.dev/v1/tasks/task-wave1775285160b950328499",
-    "cancel": "https://www.qingbo.dev/v1/tasks/task-wave1775285160b950328499/cancel"
+    "get": "https://api.qingbo.ai/v1/tasks/task-wave1775285160b950328499",
+    "cancel": "https://api.qingbo.ai/v1/tasks/task-wave1775285160b950328499/cancel"
   }
 }
 ```

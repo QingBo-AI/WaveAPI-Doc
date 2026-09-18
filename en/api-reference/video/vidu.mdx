@@ -1,7 +1,7 @@
 ---
 title: "Vidu Q3 Series"
 description: "ShengShu Vidu Q3: reference-to-video, multi-reference blending, text-to-video and first / last frames with native audio, up to 16 seconds"
-api: "POST https://www.qingbo.dev/v1/tasks"
+api: "POST https://api.qingbo.ai/v1/tasks"
 ---
 
 ShengShu Technology's Vidu Q3 line. This page covers `vidu-q3`, `vidu-q3-mix`, `vidu-q3-pro` and `vidu-q3-turbo`: all four go through the same task endpoint, all four have `generate` as their only action, and all four are billed by resolution tier and seconds. They differ in whether reference images are required, which resolutions they offer, and whether they produce audio. The first two are reference-to-video (`image_urls` is required, and the characters and style come from those images); the other two do text-to-video as well as start-frame and first-and-last-frame video, with native audio on by default.
@@ -11,7 +11,7 @@ ShengShu Technology's Vidu Q3 line. This page covers `vidu-q3`, `vidu-q3-mix`, `
 <CodeGroup>
 
 ```bash Reference to video
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -H "Idempotency-Key: vidu-demo-001" \
@@ -26,7 +26,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash Multi-reference blend
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -45,7 +45,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash Text to video
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -60,7 +60,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash First and last frame
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -178,8 +178,8 @@ You are only billed for a video that is produced. Failed and cancelled tasks, an
   "billing_status": "settled",
   "cost": 31500,
   "urls": {
-    "get": "https://www.qingbo.dev/v1/tasks/task-wave1788769966b950814242",
-    "cancel": "https://www.qingbo.dev/v1/tasks/task-wave1788769966b950814242/cancel"
+    "get": "https://api.qingbo.ai/v1/tasks/task-wave1788769966b950814242",
+    "cancel": "https://api.qingbo.ai/v1/tasks/task-wave1788769966b950814242/cancel"
   }
 }
 ```

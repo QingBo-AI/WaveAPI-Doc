@@ -1,7 +1,7 @@
 ---
 title: "Vidu Q3 系列"
 description: "生数科技 Vidu Q3：参考图生视频、多参考融合、文生视频与首尾帧，原生音频，最长 16 秒"
-api: "POST https://www.qingbo.dev/v1/tasks"
+api: "POST https://api.qingbo.ai/v1/tasks"
 ---
 
 生数科技 Vidu Q3 系列。本页覆盖 `vidu-q3`、`vidu-q3-mix`、`vidu-q3-pro` 和 `vidu-q3-turbo`：四个模型走同一个任务接口，都只有 `generate` 一个动作，都按分辨率档与秒数计费，区别在于要不要参考图、支持哪些分辨率档，以及能不能生成音频。前两个是参考生视频（`image_urls` 必填，人物与风格由参考图决定），后两个既能文生视频也能用首帧或首尾帧，并且默认带原生音频。
@@ -11,7 +11,7 @@ api: "POST https://www.qingbo.dev/v1/tasks"
 <CodeGroup>
 
 ```bash 参考图生视频
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -H "Idempotency-Key: vidu-demo-001" \
@@ -26,7 +26,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash 多参考融合
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -45,7 +45,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash 文生视频
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -60,7 +60,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash 首尾帧
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -178,8 +178,8 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
   "billing_status": "settled",
   "cost": 31500,
   "urls": {
-    "get": "https://www.qingbo.dev/v1/tasks/task-wave1788769966b950814242",
-    "cancel": "https://www.qingbo.dev/v1/tasks/task-wave1788769966b950814242/cancel"
+    "get": "https://api.qingbo.ai/v1/tasks/task-wave1788769966b950814242",
+    "cancel": "https://api.qingbo.ai/v1/tasks/task-wave1788769966b950814242/cancel"
   }
 }
 ```

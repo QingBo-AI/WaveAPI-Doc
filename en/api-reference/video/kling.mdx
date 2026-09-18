@@ -1,7 +1,7 @@
 ---
 title: "Kling Series"
 description: "Kuaishou Kling video models: text-to-video, first/last frames, image and video references, video editing and motion control"
-api: "POST https://www.qingbo.dev/v1/tasks"
+api: "POST https://api.qingbo.ai/v1/tasks"
 ---
 
 Kuaishou's Kling video line currently has seven models: `kling-3.0-turbo`, `kling-v2-6` and `kling-v3` for general generation, `kling-v3-omni` and `kling-video-o1` for video references and video editing, and `kling-v2-6-motion-control` and `kling-v3-motion-control` for motion transfer. They share the task endpoint `POST /v1/tasks` — switching models means changing `model` — but their actions, parameters and durations differ; see Available models for the per-model breakdown.
@@ -11,7 +11,7 @@ Kuaishou's Kling video line currently has seven models: `kling-3.0-turbo`, `klin
 <CodeGroup>
 
 ```bash Text to video
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -H "Idempotency-Key: kling-demo-001" \
@@ -27,7 +27,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash First/last frame
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -44,7 +44,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash Native audio
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -59,7 +59,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash Multi-shot storyboard
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -79,7 +79,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash Video reference
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -94,7 +94,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash Video editing
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -108,7 +108,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash Motion control
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -305,8 +305,8 @@ You are only billed for a successfully generated video. Failed and cancelled tas
     ]
   },
   "urls": {
-    "get": "https://www.qingbo.dev/v1/tasks/task-wave1788753089b950634993",
-    "cancel": "https://www.qingbo.dev/v1/tasks/task-wave1788753089b950634993/cancel"
+    "get": "https://api.qingbo.ai/v1/tasks/task-wave1788753089b950634993",
+    "cancel": "https://api.qingbo.ai/v1/tasks/task-wave1788753089b950634993/cancel"
   },
   "billing_status": "settled",
   "cost": 189000

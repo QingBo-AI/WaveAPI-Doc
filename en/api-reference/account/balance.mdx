@@ -1,7 +1,7 @@
 ---
 title: "Get balance"
 description: "Check your wallet balance, usage to date and total credit with your own API key"
-api: "GET https://www.qingbo.dev/v1/dashboard/billing/balance"
+api: "GET https://api.qingbo.ai/v1/dashboard/billing/balance"
 ---
 
 Check your wallet with your own WaveAPI key and get all three numbers at once: **available balance, usage to date and total credit**. This is a **self-service** endpoint — no admin permission required.
@@ -12,7 +12,7 @@ The `dashboard` in the path is a shape kept for compatibility with existing tool
 
 <RequestExample>
 ```bash cURL
-curl https://www.qingbo.dev/v1/dashboard/billing/balance \
+curl https://api.qingbo.ai/v1/dashboard/billing/balance \
   -H "Authorization: Bearer $WAVE_API_KEY"
 ```
 
@@ -20,14 +20,14 @@ curl https://www.qingbo.dev/v1/dashboard/billing/balance \
 import os, requests
 
 r = requests.get(
-    "https://www.qingbo.dev/v1/dashboard/billing/balance",
+    "https://api.qingbo.ai/v1/dashboard/billing/balance",
     headers={"Authorization": f"Bearer {os.environ['WAVE_API_KEY']}"},
 )
 print(r.json()["total_available_usd"])
 ```
 
 ```javascript JavaScript
-const r = await fetch('https://www.qingbo.dev/v1/dashboard/billing/balance', {
+const r = await fetch('https://api.qingbo.ai/v1/dashboard/billing/balance', {
   headers: { Authorization: `Bearer ${process.env.WAVE_API_KEY}` }
 });
 const data = await r.json();
@@ -60,7 +60,7 @@ console.log(data.total_available_usd);
 ## Authorizations
 
 <ParamField header="Authorization" type="string" required>
-  `Bearer YOUR_API_KEY` — any key from your [console](https://qingbo.dev/dashboard/keys) works.
+  `Bearer YOUR_API_KEY` — any key from your [console](https://wave.qingbo.ai/dashboard/keys) works.
 </ParamField>
 
 ## Response

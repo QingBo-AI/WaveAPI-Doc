@@ -1,7 +1,7 @@
 ---
 title: "GPT Image 2 Reverse"
 description: "Text-to-image and reference editing at a fixed price per image by output resolution"
-api: "POST https://www.qingbo.dev/v1/tasks"
+api: "POST https://api.qingbo.ai/v1/tasks"
 ---
 
 `gpt-image-2-rev` provides GPT Image 2 text-to-image generation and reference-image editing through an aggregator. Pricing is fixed by output resolution, making the per-image cost known before submission.
@@ -15,7 +15,7 @@ This is a reverse line, not the official OpenAI API. Use [`gpt-image-2`](/en/api
 <CodeGroup>
 
 ```bash Generate an image
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -H "Idempotency-Key: image-rev-001" \
@@ -30,7 +30,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash Edit a reference image
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -H "Idempotency-Key: image-rev-edit-001" \

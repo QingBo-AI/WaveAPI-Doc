@@ -1,7 +1,7 @@
 ---
 title: "PixVerse V6"
 description: "PixVerse V6：文生 / 图生 / 首尾帧 / 多图融合，1–15 秒任意整数时长，可选原生音频"
-api: "POST https://www.qingbo.dev/v1/tasks"
+api: "POST https://api.qingbo.ai/v1/tasks"
 ---
 
 PixVerse V6 是 PixVerse 的统一视频生成模型：一个模型同时覆盖文生视频、图生视频、首尾帧转场和多图参考融合，支持多镜头连续叙事、原生同步音频（对白、音效与背景音乐）以及电影镜头控制，输出 360p 到 1080p、1–15 秒的片段。生成模式不靠动作区分，靠传哪些媒体字段决定。请求统一走 `POST /v1/tasks` 异步提交。
@@ -11,7 +11,7 @@ PixVerse V6 是 PixVerse 的统一视频生成模型：一个模型同时覆盖�
 <CodeGroup>
 
 ```bash 文生视频
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -H "Idempotency-Key: pixverse-demo-001" \
@@ -26,7 +26,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash 带音频
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -40,7 +40,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash 图生视频
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -54,7 +54,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash 首尾帧
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -69,7 +69,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash 多图融合
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -213,8 +213,8 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
   "billing_status": "settled",
   "cost": 22500,
   "urls": {
-    "get": "https://www.qingbo.dev/v1/tasks/task-wave1775285160b950328499",
-    "cancel": "https://www.qingbo.dev/v1/tasks/task-wave1775285160b950328499/cancel"
+    "get": "https://api.qingbo.ai/v1/tasks/task-wave1775285160b950328499",
+    "cancel": "https://api.qingbo.ai/v1/tasks/task-wave1775285160b950328499/cancel"
   }
 }
 ```

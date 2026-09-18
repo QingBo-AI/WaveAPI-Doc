@@ -1,7 +1,7 @@
 ---
 title: "Qwen Image 系列"
 description: "阿里 Qwen 图像模型：文生图与参考图编辑一体，擅长中英文排版与文字渲染"
-api: "POST https://www.qingbo.dev/v1/tasks"
+api: "POST https://api.qingbo.ai/v1/tasks"
 ---
 
 Qwen Image 是阿里巴巴 Qwen 团队的图像基础模型系列，把文生图和图像编辑统一在同一套接口里，强项是中英双语排版、信息图和海报里的文字渲染。本页覆盖当前可用的四个模型，分成两代：2.0 一代出图张数可达 6 张、按单一张价结算；3.0 一代支持多图参考与提示词扩写，参考图另行计费。
@@ -11,7 +11,7 @@ Qwen Image 是阿里巴巴 Qwen 团队的图像基础模型系列，把文生图
 <CodeGroup>
 
 ```bash 文生图
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -H "Idempotency-Key: qwen-image-demo-001" \
@@ -26,7 +26,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash 多图参考编辑
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -H "Idempotency-Key: qwen-image-edit-001" \
@@ -44,7 +44,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash 一次出多张
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -158,8 +158,8 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
     ]
   },
   "urls": {
-    "get": "https://www.qingbo.dev/v1/tasks/task-wave1789004688b950049238",
-    "cancel": "https://www.qingbo.dev/v1/tasks/task-wave1789004688b950049238/cancel"
+    "get": "https://api.qingbo.ai/v1/tasks/task-wave1789004688b950049238",
+    "cancel": "https://api.qingbo.ai/v1/tasks/task-wave1789004688b950049238/cancel"
   },
   "billing_status": "settled",
   "cost": 12377
