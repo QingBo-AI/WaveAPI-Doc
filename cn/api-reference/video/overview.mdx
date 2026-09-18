@@ -8,7 +8,7 @@ description: "通过 /v1/tasks 统一端点调用所有视频生成模型,异步
 ## 请求端点
 
 ```
-POST https://www.qingbo.dev/v1/tasks
+POST https://api.qingbo.ai/v1/tasks
 ```
 
 异步流程详见 [任务系统](/cn/docs/task-system) — Submit → Status → Result + 可选 webhook。
@@ -126,7 +126,7 @@ POST https://www.qingbo.dev/v1/tasks
 
 **算不出来会怎样** —— 若文件头无法解析(格式特殊、URL 不可达等),请求会被**拒绝**并返回 `400 input_video_duration_unknown`,**不会扣费**,而不是按上限估算收费。请改用常见容器格式(mp4 / webm)的可直接下载 URL。
 
-**提交前可预估** —— `POST https://www.qingbo.dev/waveapi/quote` 传入 `video_urls` 会返回这一单的准确价格,含探测到的输入秒数。
+**提交前可预估** —— `POST https://api.qingbo.ai/waveapi/quote` 传入 `video_urls` 会返回这一单的准确价格,含探测到的输入秒数。
 
 这是**公开工具接口,不需要 API key**。返回走标准信封 `{code, message, data}`,`data` 里是:
 

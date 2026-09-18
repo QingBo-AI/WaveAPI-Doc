@@ -1,7 +1,7 @@
 ---
 title: "MiniMax H3"
 description: "MiniMax H3 全模态视频生成：文本、参考图、首尾帧、参考视频与参考音频，以及 2K 再生成"
-api: "POST https://www.qingbo.dev/v1/tasks"
+api: "POST https://api.qingbo.ai/v1/tasks"
 ---
 
 MiniMax H3 是 MiniMax 的全模态视频模型：一个接口同时接受文本、图片、视频和音频输入，单次生成直接出带音轨的成片。本页覆盖两个模型：`minimax-h3` 负责生成，`minimax-h3-regeneration` 把已完成的 `minimax-h3` 768P 有声任务再生成原生 2K。只要文生视频或首帧生视频、不需要多模态参考时，[Hailuo 系列](/cn/api-reference/video/hailuo)更省。
@@ -11,7 +11,7 @@ MiniMax H3 是 MiniMax 的全模态视频模型：一个接口同时接受文本
 <CodeGroup>
 
 ```bash 文生视频
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -H "Idempotency-Key: h3-demo-001" \
@@ -26,7 +26,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash 首尾帧
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -41,7 +41,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash 多模态参考
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -57,7 +57,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash 2K 再生成
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -188,8 +188,8 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
   "billing_status": "settled",
   "cost": 144000,
   "urls": {
-    "get": "https://www.qingbo.dev/v1/tasks/task-wave1788783825b950188816",
-    "cancel": "https://www.qingbo.dev/v1/tasks/task-wave1788783825b950188816/cancel"
+    "get": "https://api.qingbo.ai/v1/tasks/task-wave1788783825b950188816",
+    "cancel": "https://api.qingbo.ai/v1/tasks/task-wave1788783825b950188816/cancel"
   }
 }
 ```

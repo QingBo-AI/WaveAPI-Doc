@@ -1,7 +1,7 @@
 ---
 title: "提交任务"
 description: "POST /v1/tasks — 提交异步生成任务"
-api: "POST https://www.qingbo.dev/v1/tasks"
+api: "POST https://api.qingbo.ai/v1/tasks"
 ---
 
 提交图像、视频或音频生成任务，立即返回 `task_id`。
@@ -58,7 +58,7 @@ api: "POST https://www.qingbo.dev/v1/tasks"
 - **超窗未完成** → 返回当前状态 + `pre_consumed_cost`，继续用 `GET /v1/tasks/{task_id}` 轮询
 
 ```bash
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Prefer: wait=60" \
   -H "Content-Type: application/json" \
@@ -77,7 +77,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 <CodeGroup>
 
 ```bash cURL
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -92,7 +92,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 import requests
 
 response = requests.post(
-    "https://www.qingbo.dev/v1/tasks",
+    "https://api.qingbo.ai/v1/tasks",
     headers={"Authorization": "Bearer YOUR_API_KEY"},
     json={
         "model": "veo3.1-fast",

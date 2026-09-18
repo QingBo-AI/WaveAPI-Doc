@@ -1,7 +1,7 @@
 ---
 title: "Omni-Flash-Ext"
 description: "The fixed-duration Omni video model: text-to-video, first-frame or three-image references, and reference-video rework"
-api: "POST https://www.qingbo.dev/v1/tasks"
+api: "POST https://api.qingbo.ai/v1/tasks"
 ---
 
 `omni-flash-ext` is the Omni model whose length you control: `duration` is `4`, `6`, `8` or `10` seconds, output runs from 360p to 4K, and the input can be a prompt alone, one first-frame image, three reference images, or a reference clip. When the model should pick the length itself, or you want to keep editing the same clip over several rounds, use [Gemini Omni Flash](/en/api-reference/video/omni/gemini-omni-flash).
@@ -11,7 +11,7 @@ api: "POST https://www.qingbo.dev/v1/tasks"
 <CodeGroup>
 
 ```bash Text to video
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -H "Idempotency-Key: omni-ext-001" \
@@ -26,7 +26,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash First-frame image
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -42,7 +42,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash Three reference images
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -62,7 +62,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash Reference video
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -178,8 +178,8 @@ This section describes the billing dimensions only; it carries no amounts.
   "billing_status": "settled",
   "cost": 67500,
   "urls": {
-    "get": "https://www.qingbo.dev/v1/tasks/{task_id}",
-    "cancel": "https://www.qingbo.dev/v1/tasks/{task_id}/cancel"
+    "get": "https://api.qingbo.ai/v1/tasks/{task_id}",
+    "cancel": "https://api.qingbo.ai/v1/tasks/{task_id}/cancel"
   }
 }
 ```

@@ -1,7 +1,7 @@
 ---
 title: "Grok Imagine Series"
 description: "xAI Grok Imagine image generation and editing: six models on one task endpoint, all priced per image"
-api: "POST https://www.qingbo.dev/v1/tasks"
+api: "POST https://api.qingbo.ai/v1/tasks"
 ---
 
 The xAI Grok Imagine image line currently offers six model IDs. All of them are submitted through the unified task endpoint `POST /v1/tasks` and all of them settle at a fixed price per successfully generated image — switching tiers only changes `model`. On the official route, `grok-imagine-image`, `grok-imagine-image-quality` and `grok-imagine-image-2.0` support reference-image editing and resolution selection, and charge separately for each reference image. The economy models `grok-imagine-image-2.0-rev`, `grok-imagine-1.5-rev` and `grok-imagine-1.5-edit-rev` take fewer parameters, output at a fixed tier, and cost less. For video, see [Grok Imagine Video Series](/en/api-reference/video/grok-imagine-video).
@@ -11,7 +11,7 @@ The xAI Grok Imagine image line currently offers six model IDs. All of them are 
 <CodeGroup>
 
 ```bash Text to image
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -H "Idempotency-Key: grok-image-001" \
@@ -26,7 +26,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash Reference image edit
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -H "Idempotency-Key: grok-image-edit-001" \
@@ -41,7 +41,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash Multiple references
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -59,7 +59,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash Choosing quality
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -74,7 +74,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash Economy text to image
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -193,8 +193,8 @@ You are only billed for a successfully generated image. Failed and cancelled tas
     ]
   },
   "urls": {
-    "get": "https://www.qingbo.dev/v1/tasks/task-wave1775290140a830128812",
-    "cancel": "https://www.qingbo.dev/v1/tasks/task-wave1775290140a830128812/cancel"
+    "get": "https://api.qingbo.ai/v1/tasks/task-wave1775290140a830128812",
+    "cancel": "https://api.qingbo.ai/v1/tasks/task-wave1775290140a830128812/cancel"
   }
 }
 ```

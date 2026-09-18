@@ -1,7 +1,7 @@
 ---
 title: "FLUX 3 Video"
 description: "Black Forest Labs FLUX 3 Video：文生、关键帧、视频续写，带同步音频，按分辨率档 × 秒数计费"
-api: "POST https://www.qingbo.dev/v1/tasks"
+api: "POST https://api.qingbo.ai/v1/tasks"
 ---
 
 FLUX 3 Video 是 Black Forest Labs 的视频模型，从文本、1–10 张有序关键帧或一段续写视频生成 5–20 秒带同步音频的片段。本页覆盖标准档 `flux-3-video` 与草稿档 `flux-3-video-draft`：两档参数集合完全相同，草稿档只出 `hd`、画质更低、单价更低，适合先快速看效果再用标准档出片。换档只改 `model`，两档之间不会自动切换。
@@ -11,7 +11,7 @@ FLUX 3 Video 是 Black Forest Labs 的视频模型，从文本、1–10 张有�
 <CodeGroup>
 
 ```bash 文生视频
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -H "Idempotency-Key: flux-video-001" \
@@ -26,7 +26,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash 关键帧
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -43,7 +43,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash 视频续写
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -57,7 +57,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash 草稿档预览
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -173,8 +173,8 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
     ]
   },
   "urls": {
-    "get": "https://www.qingbo.dev/v1/tasks/task-wave1788780141b950265604",
-    "cancel": "https://www.qingbo.dev/v1/tasks/task-wave1788780141b950265604/cancel"
+    "get": "https://api.qingbo.ai/v1/tasks/task-wave1788780141b950265604",
+    "cancel": "https://api.qingbo.ai/v1/tasks/task-wave1788780141b950265604/cancel"
   }
 }
 ```

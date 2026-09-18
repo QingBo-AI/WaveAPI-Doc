@@ -1,7 +1,7 @@
 ---
 title: "GPT Image 1 与 1.5 官方版"
 description: "文生图、参考图编辑与掩码局部重绘，按 token 用量计费"
-api: "POST https://www.qingbo.dev/v1/tasks"
+api: "POST https://api.qingbo.ai/v1/tasks"
 ---
 
 `gpt-image-1` 和 `gpt-image-1.5` 是 OpenAI 官方 API 线路上的两代图像模型，支持文生图、最多 15 张参考图编辑和掩码局部重绘。两者的动作、参数、取值集合和限制完全一致，切换模型只改 `model` 字段。所有操作都通过统一任务接口 `POST /v1/tasks` 提交。
@@ -15,7 +15,7 @@ api: "POST https://www.qingbo.dev/v1/tasks"
 <CodeGroup>
 
 ```bash 文生图
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -H "Idempotency-Key: image-gi15-001" \
@@ -30,7 +30,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash 参考图编辑
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -H "Idempotency-Key: image-gi1-edit-001" \
@@ -46,7 +46,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash 局部重绘
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{

@@ -1,14 +1,14 @@
 ---
 title: "Text-to-Speech"
 description: "Convert text into natural, fluent speech"
-api: "POST https://www.qingbo.dev/v1/audio/speech"
+api: "POST https://api.qingbo.ai/v1/audio/speech"
 ---
 
 A synchronous endpoint: the response is the audio file itself, with no `task_id` and no polling. It serves `gpt-4o-mini-tts` only; for songs and sung vocals, use [Suno Music Generation](/en/api-reference/audio/suno).
 
 <RequestExample>
 ```bash cURL
-curl https://www.qingbo.dev/v1/audio/speech \
+curl https://api.qingbo.ai/v1/audio/speech \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -23,7 +23,7 @@ curl https://www.qingbo.dev/v1/audio/speech \
 from openai import OpenAI
 
 client = OpenAI(
-    base_url="https://www.qingbo.dev/v1",
+    base_url="https://api.qingbo.ai/v1",
     api_key="YOUR_API_KEY"
 )
 
@@ -42,7 +42,7 @@ import OpenAI from 'openai';
 import fs from 'fs';
 
 const client = new OpenAI({
-  baseURL: 'https://www.qingbo.dev/v1',
+  baseURL: 'https://api.qingbo.ai/v1',
   apiKey: 'YOUR_API_KEY'
 });
 
@@ -76,7 +76,7 @@ func main() {
     }
 
     body, _ := json.Marshal(payload)
-    req, _ := http.NewRequest("POST", "https://www.qingbo.dev/v1/audio/speech", bytes.NewBuffer(body))
+    req, _ := http.NewRequest("POST", "https://api.qingbo.ai/v1/audio/speech", bytes.NewBuffer(body))
     req.Header.Set("Authorization", "Bearer YOUR_API_KEY")
     req.Header.Set("Content-Type", "application/json")
 
@@ -106,7 +106,7 @@ public class Main {
 
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
-            .uri(URI.create("https://www.qingbo.dev/v1/audio/speech"))
+            .uri(URI.create("https://api.qingbo.ai/v1/audio/speech"))
             .header("Authorization", "Bearer YOUR_API_KEY")
             .header("Content-Type", "application/json")
             .POST(HttpRequest.BodyPublishers.ofString(payload))

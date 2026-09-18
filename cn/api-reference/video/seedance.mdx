@@ -1,7 +1,7 @@
 ---
 title: "Seedance 系列"
 description: "字节跳动 Seedance 视频生成：文生 / 图生 / 首尾帧 / 多模态参考，2.5 另有视频编辑与延长，按分辨率档 × 秒数计费"
-api: "POST https://www.qingbo.dev/v1/tasks"
+api: "POST https://api.qingbo.ai/v1/tasks"
 ---
 
 字节跳动 Seedance 视频生成系列：1.0 两档做文生视频与首尾帧控制，1.5 Pro 加上多图参考与原生音频，2.0 三档把参考素材扩展到图片、视频和音频，2.5 在此之上多出视频编辑与视频延长两个动作。本页覆盖已上架的七个模型，它们共用同一个任务接口和同一套通用参数，差异集中在可选分辨率、时长范围、可接收的参考素材种类与数量上，换档只改 `model`。
@@ -15,7 +15,7 @@ Seedance 是视频模型；同名的图像模型是 [Seedream 系列](/cn/api-re
 <CodeGroup>
 
 ```bash 文生视频
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -H "Idempotency-Key: seedance-demo-001" \
@@ -30,7 +30,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash 首尾帧
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -45,7 +45,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash 多图参考
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -63,7 +63,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash 参考视频
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -78,7 +78,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash 视频编辑
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -93,7 +93,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash 视频延长
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -288,8 +288,8 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
   "billing_status": "settled",
   "cost": 75000,
   "urls": {
-    "get": "https://www.qingbo.dev/v1/tasks/task-wave1775285160b950328499",
-    "cancel": "https://www.qingbo.dev/v1/tasks/task-wave1775285160b950328499/cancel"
+    "get": "https://api.qingbo.ai/v1/tasks/task-wave1775285160b950328499",
+    "cancel": "https://api.qingbo.ai/v1/tasks/task-wave1775285160b950328499/cancel"
   }
 }
 ```

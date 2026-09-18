@@ -1,7 +1,7 @@
 ---
 title: "查询总额度"
 description: "OpenAI 兼容的额度上限查询"
-api: "GET https://www.qingbo.dev/v1/dashboard/billing/subscription"
+api: "GET https://api.qingbo.ai/v1/dashboard/billing/subscription"
 ---
 
 返回账号的**总额度**，形状与 OpenAI 的 `/dashboard/billing/subscription` 一致，供既有额度查询工具对接。
@@ -12,7 +12,7 @@ api: "GET https://www.qingbo.dev/v1/dashboard/billing/subscription"
 
 <RequestExample>
 ```bash cURL
-curl https://www.qingbo.dev/v1/dashboard/billing/subscription \
+curl https://api.qingbo.ai/v1/dashboard/billing/subscription \
   -H "Authorization: Bearer $WAVE_API_KEY"
 ```
 </RequestExample>

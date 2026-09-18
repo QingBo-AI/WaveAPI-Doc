@@ -1,14 +1,14 @@
 ---
 title: "Gemini 原生格式"
 description: "为已有 Gemini 客户端保留的原生接口，支持文本与流式输出"
-api: "POST https://www.qingbo.dev/v1beta/models/{model}:generateContent"
+api: "POST https://api.qingbo.ai/v1beta/models/{model}:generateContent"
 ---
 
 路径与请求体沿用 Google Gemini 的原生格式，用 `contents` 与 `generationConfig`，鉴权头是 `x-goog-api-key`。本接口不提供 Chat 之外的额外能力，新接入建议直接用[通用对话接口](/cn/api-reference/text/general-chat)。
 
 <RequestExample>
 ```bash cURL
-curl -X POST https://www.qingbo.dev/v1beta/models/gemini-3.6-flash:generateContent \
+curl -X POST https://api.qingbo.ai/v1beta/models/gemini-3.6-flash:generateContent \
   -H "x-goog-api-key: YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -33,7 +33,7 @@ import google.generativeai as genai
 genai.configure(
     api_key="YOUR_API_KEY",
     transport="rest",
-    client_options={"api_endpoint": "https://www.qingbo.dev/v1beta"}
+    client_options={"api_endpoint": "https://api.qingbo.ai/v1beta"}
 )
 
 model = genai.GenerativeModel("gemini-3.6-flash")
@@ -55,7 +55,7 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 const genAI = new GoogleGenerativeAI('YOUR_API_KEY');
 const model = genAI.getGenerativeModel({
   model: 'gemini-3.6-flash',
-  baseUrl: 'https://www.qingbo.dev/v1beta'
+  baseUrl: 'https://api.qingbo.ai/v1beta'
 });
 
 const result = await model.generateContent({
@@ -100,7 +100,7 @@ func main() {
     }
 
     body, _ := json.Marshal(payload)
-    url := "https://www.qingbo.dev/v1beta/models/gemini-3.6-flash:generateContent"
+    url := "https://api.qingbo.ai/v1beta/models/gemini-3.6-flash:generateContent"
     req, _ := http.NewRequest("POST", url, bytes.NewBuffer(body))
     req.Header.Set("x-goog-api-key", "YOUR_API_KEY")
     req.Header.Set("Content-Type", "application/json")
@@ -139,7 +139,7 @@ public class Main {
 
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
-            .uri(URI.create("https://www.qingbo.dev/v1beta/models/gemini-3.6-flash:generateContent"))
+            .uri(URI.create("https://api.qingbo.ai/v1beta/models/gemini-3.6-flash:generateContent"))
             .header("x-goog-api-key", "YOUR_API_KEY")
             .header("Content-Type", "application/json")
             .POST(HttpRequest.BodyPublishers.ofString(payload))
@@ -162,7 +162,7 @@ public class Main {
   x-goog-api-key: YOUR_API_KEY
   ```
 
-  Key 在[控制台](https://qingbo.dev/dashboard/keys)获取，用法见[认证](/cn/docs/authentication)。
+  Key 在[控制台](https://wave.qingbo.ai/dashboard/keys)获取，用法见[认证](/cn/docs/authentication)。
 </ParamField>
 
 ## 请求参数
@@ -247,7 +247,7 @@ public class Main {
 <CodeGroup>
 
 ```bash cURL
-curl https://www.qingbo.dev/v1beta/models/gemini-3.6-flash:generateContent \
+curl https://api.qingbo.ai/v1beta/models/gemini-3.6-flash:generateContent \
   -H "Content-Type: application/json" \
   -H "x-goog-api-key: YOUR_API_KEY" \
   -d '{
@@ -275,7 +275,7 @@ import google.generativeai as genai
 genai.configure(
     api_key="YOUR_API_KEY",
     transport="rest",
-    client_options={"api_endpoint": "https://www.qingbo.dev/v1beta"}
+    client_options={"api_endpoint": "https://api.qingbo.ai/v1beta"}
 )
 
 model = genai.GenerativeModel('gemini-3.6-flash')
@@ -298,7 +298,7 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 const genAI = new GoogleGenerativeAI('YOUR_API_KEY');
 const model = genAI.getGenerativeModel({ 
   model: 'gemini-3.6-flash',
-  baseUrl: 'https://www.qingbo.dev/v1beta'
+  baseUrl: 'https://api.qingbo.ai/v1beta'
 });
 
 const result = await model.generateContent({

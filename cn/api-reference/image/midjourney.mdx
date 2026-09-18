@@ -1,7 +1,7 @@
 ---
 title: "Midjourney"
 description: "出图之后还能放大、变体、扩图和局部重绘的图像模型"
-api: "POST https://www.qingbo.dev/v1/tasks"
+api: "POST https://api.qingbo.ai/v1/tasks"
 ---
 
 Midjourney 以高美学的艺术输出见长，默认渲染 2K 图像，`niji` 版本擅长动漫风格。这里只有 `midjourney` 一个模型 ID，一次调用做什么由 `action` 决定：`imagine` 从提示词出一组四宫格，其余动作都在上一步任务的结果上继续加工。所有动作都通过统一任务接口 `POST /v1/tasks` 提交。
@@ -31,7 +31,7 @@ Midjourney 以高美学的艺术输出见长，默认渲染 2K 图像，`niji` �
 <CodeGroup>
 
 ```bash 文生图
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -45,7 +45,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash 放大四宫格里的一张
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -57,7 +57,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash 做变体
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -258,8 +258,8 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
     ]
   },
   "urls": {
-    "get": "https://www.qingbo.dev/v1/tasks/task-wave1789004688b950049238",
-    "cancel": "https://www.qingbo.dev/v1/tasks/task-wave1789004688b950049238/cancel"
+    "get": "https://api.qingbo.ai/v1/tasks/task-wave1789004688b950049238",
+    "cancel": "https://api.qingbo.ai/v1/tasks/task-wave1789004688b950049238/cancel"
   }
 }
 ```
@@ -281,8 +281,8 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
     ]
   },
   "urls": {
-    "get": "https://www.qingbo.dev/v1/tasks/task-wave1789004901b950221487",
-    "cancel": "https://www.qingbo.dev/v1/tasks/task-wave1789004901b950221487/cancel"
+    "get": "https://api.qingbo.ai/v1/tasks/task-wave1789004901b950221487",
+    "cancel": "https://api.qingbo.ai/v1/tasks/task-wave1789004901b950221487/cancel"
   }
 }
 ```
@@ -310,7 +310,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 <CodeGroup>
 
 ```bash 外扩画面
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -323,7 +323,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash 向右接图
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -336,7 +336,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash 局部重绘（两步）
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -346,7 +346,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
     "index": 1
   }'
 
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{

@@ -1,7 +1,7 @@
 ---
 title: "Get usage"
 description: "OpenAI-compatible cumulative usage lookup"
-api: "GET https://www.qingbo.dev/v1/dashboard/billing/usage"
+api: "GET https://api.qingbo.ai/v1/dashboard/billing/usage"
 ---
 
 Returns the account's **cumulative usage** in the same shape as OpenAI's `/dashboard/billing/usage`, so existing credit-checking tools work against it unchanged.
@@ -12,7 +12,7 @@ Two things catch people out: `total_usage` is in **cents** (USD × 100), not dol
 
 <RequestExample>
 ```bash cURL
-curl https://www.qingbo.dev/v1/dashboard/billing/usage \
+curl https://api.qingbo.ai/v1/dashboard/billing/usage \
   -H "Authorization: Bearer $WAVE_API_KEY"
 ```
 </RequestExample>

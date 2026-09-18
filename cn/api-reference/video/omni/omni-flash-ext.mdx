@@ -1,7 +1,7 @@
 ---
 title: "Omni-Flash-Ext"
 description: "固定时长档的 Omni 视频模型：文生视频、首帧或三图参考，以及参考视频改写"
-api: "POST https://www.qingbo.dev/v1/tasks"
+api: "POST https://api.qingbo.ai/v1/tasks"
 ---
 
 `omni-flash-ext` 是 Omni 系列里时长可控的一档：`duration` 取 `4` / `6` / `8` / `10` 秒，输出 360p 到 4K，可以只给提示词，也可以用一张首帧图、三张参考图，或一段参考视频作为素材。需要模型自己决定时长、或者要多轮接着改同一段视频时，用 [Gemini Omni Flash](/cn/api-reference/video/omni/gemini-omni-flash)。
@@ -11,7 +11,7 @@ api: "POST https://www.qingbo.dev/v1/tasks"
 <CodeGroup>
 
 ```bash 文生视频
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -H "Idempotency-Key: omni-ext-001" \
@@ -26,7 +26,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash 首帧图生视频
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -42,7 +42,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash 三图参考
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -62,7 +62,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash 参考视频
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -178,8 +178,8 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
   "billing_status": "settled",
   "cost": 67500,
   "urls": {
-    "get": "https://www.qingbo.dev/v1/tasks/{task_id}",
-    "cancel": "https://www.qingbo.dev/v1/tasks/{task_id}/cancel"
+    "get": "https://api.qingbo.ai/v1/tasks/{task_id}",
+    "cancel": "https://api.qingbo.ai/v1/tasks/{task_id}/cancel"
   }
 }
 ```

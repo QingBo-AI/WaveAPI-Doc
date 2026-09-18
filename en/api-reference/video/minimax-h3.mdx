@@ -1,7 +1,7 @@
 ---
 title: "MiniMax H3"
 description: "MiniMax H3 omni-modal video generation: text, reference images, first / last frames, reference video and audio, plus 2K regeneration"
-api: "POST https://www.qingbo.dev/v1/tasks"
+api: "POST https://api.qingbo.ai/v1/tasks"
 ---
 
 MiniMax H3 is MiniMax's omni-modal video model: one endpoint takes text, image, video and audio input and renders a finished clip with its own soundtrack in a single pass. This page covers two models — `minimax-h3` generates, and `minimax-h3-regeneration` turns a completed `minimax-h3` 768P clip into native 2K. For plain text-to-video or first-frame video without multimodal references, the [Hailuo Series](/en/api-reference/video/hailuo) costs less.
@@ -11,7 +11,7 @@ MiniMax H3 is MiniMax's omni-modal video model: one endpoint takes text, image, 
 <CodeGroup>
 
 ```bash Text to video
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -H "Idempotency-Key: h3-demo-001" \
@@ -26,7 +26,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash First and last frame
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -41,7 +41,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash Multimodal reference
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -57,7 +57,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash 2K regeneration
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -188,8 +188,8 @@ An amount is held at submission along those dimensions and settled against the a
   "billing_status": "settled",
   "cost": 144000,
   "urls": {
-    "get": "https://www.qingbo.dev/v1/tasks/task-wave1788783825b950188816",
-    "cancel": "https://www.qingbo.dev/v1/tasks/task-wave1788783825b950188816/cancel"
+    "get": "https://api.qingbo.ai/v1/tasks/task-wave1788783825b950188816",
+    "cancel": "https://api.qingbo.ai/v1/tasks/task-wave1788783825b950188816/cancel"
   }
 }
 ```

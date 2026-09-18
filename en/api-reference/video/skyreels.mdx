@@ -1,7 +1,7 @@
 ---
 title: "SkyReels V4 Series"
 description: "SkyReels V4 Fast and Std: text, image, keyframe, reference-image and reference-video generation with joint video and audio, billed by resolution tier × seconds"
-api: "POST https://www.qingbo.dev/v1/tasks"
+api: "POST https://api.qingbo.ai/v1/tasks"
 ---
 
 SkyReels V4 is a unified multimodal video-and-audio generation model that jointly produces synchronized picture and sound from text, image and video inputs, at 480p to 1080p and 3 to 15 seconds. This page covers `skyreels-v4-fast` and `skyreels-v4-std`: both tiers expose the same action, parameters and value ranges — Fast is the speed-optimized configuration, Std is the default quality configuration — so switching tiers means changing `model`. Every request is submitted asynchronously through `POST /v1/tasks`.
@@ -11,7 +11,7 @@ SkyReels V4 is a unified multimodal video-and-audio generation model that jointl
 <CodeGroup>
 
 ```bash Text to video
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -H "Idempotency-Key: skyreels-demo-001" \
@@ -26,7 +26,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash First and last frame
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -41,7 +41,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash Reference video
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -54,7 +54,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash Reference image (character consistency)
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -195,8 +195,8 @@ You are billed only for a delivered video. Failed and cancelled tasks, and upstr
   "billing_status": "settled",
   "cost": 61875,
   "urls": {
-    "get": "https://www.qingbo.dev/v1/tasks/task-wave1775285160b950328499",
-    "cancel": "https://www.qingbo.dev/v1/tasks/task-wave1775285160b950328499/cancel"
+    "get": "https://api.qingbo.ai/v1/tasks/task-wave1775285160b950328499",
+    "cancel": "https://api.qingbo.ai/v1/tasks/task-wave1775285160b950328499/cancel"
   }
 }
 ```

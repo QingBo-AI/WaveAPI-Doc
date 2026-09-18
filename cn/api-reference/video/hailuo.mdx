@@ -1,7 +1,7 @@
 ---
 title: "Hailuo 系列"
 description: "MiniMax 海螺视频：Hailuo 02、2.3 与 2.3 Fast，文生视频与首帧 / 首尾帧生视频"
-api: "POST https://www.qingbo.dev/v1/tasks"
+api: "POST https://api.qingbo.ai/v1/tasks"
 ---
 
 MiniMax 海螺（Hailuo）视频系列。本页覆盖 `minimax-hailuo-02`、`minimax-hailuo-2.3` 和 `minimax-hailuo-2.3-fast`：三个模型走同一个任务接口，都只有 `generate` 一个动作，从文字或首帧图片生成一段固定时长的视频，换档只改 `model`。需要参考视频、参考音频或原生音轨时用 [MiniMax H3](/cn/api-reference/video/minimax-h3)。
@@ -11,7 +11,7 @@ MiniMax 海螺（Hailuo）视频系列。本页覆盖 `minimax-hailuo-02`、`min
 <CodeGroup>
 
 ```bash 文生视频
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -H "Idempotency-Key: hailuo-demo-001" \
@@ -25,7 +25,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash 首帧生视频
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -39,7 +39,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash 首尾帧
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -54,7 +54,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash 加速档
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -178,8 +178,8 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
   "billing_status": "settled",
   "cost": 58500,
   "urls": {
-    "get": "https://www.qingbo.dev/v1/tasks/task-wave1788773955b950509106",
-    "cancel": "https://www.qingbo.dev/v1/tasks/task-wave1788773955b950509106/cancel"
+    "get": "https://api.qingbo.ai/v1/tasks/task-wave1788773955b950509106",
+    "cancel": "https://api.qingbo.ai/v1/tasks/task-wave1788773955b950509106/cancel"
   }
 }
 ```

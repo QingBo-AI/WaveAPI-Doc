@@ -1,7 +1,7 @@
 ---
 title: "Wan Series"
 description: "Alibaba Tongyi Wanxiang video models: text, image, reference and video editing on one task endpoint, billed by resolution tier × seconds"
-api: "POST https://www.qingbo.dev/v1/tasks"
+api: "POST https://api.qingbo.ai/v1/tasks"
 ---
 
 Wan is Alibaba Tongyi's video model line. This page covers nine video models: `wan2.5-preview`, `wan2.6`, `wan2.6-i2v` and `wan2.6-i2v-flash` handle text- and image-to-video; `wan2.7` and `wan3.0-video` / `wan3.0-video-prime` are multimodal entry points (text, frames, reference assets and video continuation all use one model ID); `wan2.7-r2v` does reference-to-video; `wan2.7-videoedit` does video editing. All nine share `POST /v1/tasks` and switching models means changing `model`, but the parameter set, the media inputs each takes, and the billing dimensions differ. For Wan image models, see [Wan Image Series](/en/api-reference/image/wan-image).
@@ -13,7 +13,7 @@ Wan is Alibaba Tongyi's video model line. This page covers nine video models: `w
 <CodeGroup>
 
 ```bash Text-to-video
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -H "Idempotency-Key: wan-t2v-001" \
@@ -28,7 +28,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash Image-to-video (first frame)
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -42,7 +42,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash First and last frame
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -57,7 +57,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash Video continuation
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -71,7 +71,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash Reference-to-video
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -89,7 +89,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash Multimodal reference
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -105,7 +105,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash Video editing
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -347,8 +347,8 @@ What one call cost: the `cost` field on the task response (integer quota, 500,00
     ]
   },
   "urls": {
-    "get": "https://www.qingbo.dev/v1/tasks/task-wave1775285160b950328499",
-    "cancel": "https://www.qingbo.dev/v1/tasks/task-wave1775285160b950328499/cancel"
+    "get": "https://api.qingbo.ai/v1/tasks/task-wave1775285160b950328499",
+    "cancel": "https://api.qingbo.ai/v1/tasks/task-wave1775285160b950328499/cancel"
   }
 }
 ```

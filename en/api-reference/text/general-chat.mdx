@@ -1,14 +1,14 @@
 ---
 title: "General Chat API"
 description: "Call every text model through one OpenAI-compatible endpoint — switching models means changing `model`"
-api: "POST https://www.qingbo.dev/v1/chat/completions"
+api: "POST https://api.qingbo.ai/v1/chat/completions"
 ---
 
 An OpenAI Chat Completions-compatible endpoint and the default entry for every text model. Switching models means changing `model` — the URL and key stay the same. What each model supports is in the [Text Models Overview](/en/api-reference/text/overview).
 
 <RequestExample>
 ```bash cURL
-curl -X POST https://www.qingbo.dev/v1/chat/completions \
+curl -X POST https://api.qingbo.ai/v1/chat/completions \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -32,7 +32,7 @@ curl -X POST https://www.qingbo.dev/v1/chat/completions \
 from openai import OpenAI
 
 client = OpenAI(
-    base_url="https://www.qingbo.dev/v1",
+    base_url="https://api.qingbo.ai/v1",
     api_key="YOUR_API_KEY"
 )
 
@@ -53,7 +53,7 @@ print(response.choices[0].message.content)
 import OpenAI from 'openai';
 
 const client = new OpenAI({
-  baseURL: 'https://www.qingbo.dev/v1',
+  baseURL: 'https://api.qingbo.ai/v1',
   apiKey: 'YOUR_API_KEY'
 });
 
@@ -93,7 +93,7 @@ func main() {
     }
 
     body, _ := json.Marshal(payload)
-    req, _ := http.NewRequest("POST", "https://www.qingbo.dev/v1/chat/completions", bytes.NewBuffer(body))
+    req, _ := http.NewRequest("POST", "https://api.qingbo.ai/v1/chat/completions", bytes.NewBuffer(body))
     req.Header.Set("Authorization", "Bearer YOUR_API_KEY")
     req.Header.Set("Content-Type", "application/json")
 
@@ -128,7 +128,7 @@ public class Main {
 
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
-            .uri(URI.create("https://www.qingbo.dev/v1/chat/completions"))
+            .uri(URI.create("https://api.qingbo.ai/v1/chat/completions"))
             .header("Authorization", "Bearer YOUR_API_KEY")
             .header("Content-Type", "application/json")
             .POST(HttpRequest.BodyPublishers.ofString(payload))
@@ -257,7 +257,7 @@ public class Main {
 
   Get your API Key:
 
-  Visit the [API Key management page](https://qingbo.dev/dashboard/keys) to obtain your API Key.
+  Visit the [API Key management page](https://wave.qingbo.ai/dashboard/keys) to obtain your API Key.
 
   Add it to the request header:
 
@@ -510,7 +510,7 @@ public class Main {
 Every model ID, what it supports, its long-context tier and how it is billed are in the [Text Models Overview](/en/api-reference/text/overview). Live availability and rates come from the catalog API:
 
 ```bash
-curl https://www.qingbo.dev/v1/models \
+curl https://api.qingbo.ai/v1/models \
   -H "Authorization: Bearer YOUR_API_KEY"
 ```
 

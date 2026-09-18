@@ -1,7 +1,7 @@
 ---
 title: "Query Task Status"
 description: "GET /v1/tasks/{task_id} — Query the status, progress, and final result of an asynchronous task"
-api: "GET https://www.qingbo.dev/v1/tasks/{task_id}"
+api: "GET https://api.qingbo.ai/v1/tasks/{task_id}"
 ---
 
 The core query endpoint for asynchronous tasks. After submitting a task (`POST /v1/tasks`) and receiving a `task_id`, poll this endpoint until `status: completed` to retrieve the final result.
@@ -11,7 +11,7 @@ The core query endpoint for asynchronous tasks. After submitting a task (`POST /
 <CodeGroup>
 
 ```bash Query Task
-curl https://www.qingbo.dev/v1/tasks/task-wave1775285160b950328499 \
+curl https://api.qingbo.ai/v1/tasks/task-wave1775285160b950328499 \
   -H "Authorization: Bearer $WAVE_API_KEY"
 ```
 
@@ -30,8 +30,8 @@ curl https://www.qingbo.dev/v1/tasks/task-wave1775285160b950328499 \
   "progress": "",
   "created_at": 1720000000,
   "urls": {
-    "get": "https://www.qingbo.dev/v1/tasks/task-wave1775285160b950328499",
-    "cancel": "https://www.qingbo.dev/v1/tasks/task-wave1775285160b950328499/cancel"
+    "get": "https://api.qingbo.ai/v1/tasks/task-wave1775285160b950328499",
+    "cancel": "https://api.qingbo.ai/v1/tasks/task-wave1775285160b950328499/cancel"
   }
 }
 ```
@@ -45,8 +45,8 @@ curl https://www.qingbo.dev/v1/tasks/task-wave1775285160b950328499 \
   "progress": "45%",
   "created_at": 1720000000,
   "urls": {
-    "get": "https://www.qingbo.dev/v1/tasks/task-wave1775285160b950328499",
-    "cancel": "https://www.qingbo.dev/v1/tasks/task-wave1775285160b950328499/cancel"
+    "get": "https://api.qingbo.ai/v1/tasks/task-wave1775285160b950328499",
+    "cancel": "https://api.qingbo.ai/v1/tasks/task-wave1775285160b950328499/cancel"
   }
 }
 ```
@@ -70,8 +70,8 @@ curl https://www.qingbo.dev/v1/tasks/task-wave1775285160b950328499 \
     ]
   },
   "urls": {
-    "get": "https://www.qingbo.dev/v1/tasks/task-wave1775285160b950328499",
-    "cancel": "https://www.qingbo.dev/v1/tasks/task-wave1775285160b950328499/cancel"
+    "get": "https://api.qingbo.ai/v1/tasks/task-wave1775285160b950328499",
+    "cancel": "https://api.qingbo.ai/v1/tasks/task-wave1775285160b950328499/cancel"
   }
 }
 ```
@@ -95,8 +95,8 @@ curl https://www.qingbo.dev/v1/tasks/task-wave1775285160b950328499 \
     ]
   },
   "urls": {
-    "get": "https://www.qingbo.dev/v1/tasks/task-wave1775285160b950328499",
-    "cancel": "https://www.qingbo.dev/v1/tasks/task-wave1775285160b950328499/cancel"
+    "get": "https://api.qingbo.ai/v1/tasks/task-wave1775285160b950328499",
+    "cancel": "https://api.qingbo.ai/v1/tasks/task-wave1775285160b950328499/cancel"
   }
 }
 ```
@@ -116,8 +116,8 @@ curl https://www.qingbo.dev/v1/tasks/task-wave1775285160b950328499 \
     "code": "upstream_bad_request"
   },
   "urls": {
-    "get": "https://www.qingbo.dev/v1/tasks/task-wave1775285160b950328499",
-    "cancel": "https://www.qingbo.dev/v1/tasks/task-wave1775285160b950328499/cancel"
+    "get": "https://api.qingbo.ai/v1/tasks/task-wave1775285160b950328499",
+    "cancel": "https://api.qingbo.ai/v1/tasks/task-wave1775285160b950328499/cancel"
   }
 }
 ```

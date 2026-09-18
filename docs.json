@@ -39,6 +39,18 @@
       "display": "simple"
     }
   },
+  "contextual": {
+    "options": [
+      "copy",
+      "view",
+      "chatgpt",
+      "claude",
+      "perplexity",
+      "mcp",
+      "cursor",
+      "vscode"
+    ]
+  },
   "navbar": {
     "primary": {
       "type": "button",

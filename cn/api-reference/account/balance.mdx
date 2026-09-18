@@ -1,7 +1,7 @@
 ---
 title: "查询余额"
 description: "用自己的 API Key 查钱包余额、已用量与总额度"
-api: "GET https://www.qingbo.dev/v1/dashboard/billing/balance"
+api: "GET https://api.qingbo.ai/v1/dashboard/billing/balance"
 ---
 
 用你自己的 WaveAPI Key 查询钱包状况，一次拿到**可用余额、累计已用、总额度**三个数。这是**开发者自助**端点，不需要管理权限。
@@ -12,7 +12,7 @@ api: "GET https://www.qingbo.dev/v1/dashboard/billing/balance"
 
 <RequestExample>
 ```bash cURL
-curl https://www.qingbo.dev/v1/dashboard/billing/balance \
+curl https://api.qingbo.ai/v1/dashboard/billing/balance \
   -H "Authorization: Bearer $WAVE_API_KEY"
 ```
 
@@ -20,14 +20,14 @@ curl https://www.qingbo.dev/v1/dashboard/billing/balance \
 import os, requests
 
 r = requests.get(
-    "https://www.qingbo.dev/v1/dashboard/billing/balance",
+    "https://api.qingbo.ai/v1/dashboard/billing/balance",
     headers={"Authorization": f"Bearer {os.environ['WAVE_API_KEY']}"},
 )
 print(r.json()["total_available_usd"])
 ```
 
 ```javascript JavaScript
-const r = await fetch('https://www.qingbo.dev/v1/dashboard/billing/balance', {
+const r = await fetch('https://api.qingbo.ai/v1/dashboard/billing/balance', {
   headers: { Authorization: `Bearer ${process.env.WAVE_API_KEY}` }
 });
 const data = await r.json();
@@ -60,7 +60,7 @@ console.log(data.total_available_usd);
 ## 鉴权
 
 <ParamField header="Authorization" type="string" required>
-  `Bearer YOUR_API_KEY`，用[控制台](https://qingbo.dev/dashboard/keys)里的任意一把 Key 即可。
+  `Bearer YOUR_API_KEY`，用[控制台](https://wave.qingbo.ai/dashboard/keys)里的任意一把 Key 即可。
 </ParamField>
 
 ## 响应

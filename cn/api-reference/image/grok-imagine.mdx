@@ -1,7 +1,7 @@
 ---
 title: "Grok Imagine 系列"
 description: "xAI Grok Imagine 图像生成与编辑：六个模型共用一套任务接口，全部按张固定价"
-api: "POST https://www.qingbo.dev/v1/tasks"
+api: "POST https://api.qingbo.ai/v1/tasks"
 ---
 
 xAI 的 Grok Imagine 图像线，当前有六个模型 ID，全部通过统一任务接口 `POST /v1/tasks` 提交，也全部按成功出图的固定张价结算——换档只改 `model`。官方线路的 `grok-imagine-image`、`grok-imagine-image-quality` 和 `grok-imagine-image-2.0` 支持参考图编辑、分辨率选择，参考图按张另计；经济版的 `grok-imagine-image-2.0-rev`、`grok-imagine-1.5-rev` 和 `grok-imagine-1.5-edit-rev` 参数更少、输出档位固定、单价更低。视频生成见 [Grok Imagine Video 系列](/cn/api-reference/video/grok-imagine-video)。
@@ -11,7 +11,7 @@ xAI 的 Grok Imagine 图像线，当前有六个模型 ID，全部通过统一�
 <CodeGroup>
 
 ```bash 文生图
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -H "Idempotency-Key: grok-image-001" \
@@ -26,7 +26,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash 参考图编辑
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -H "Idempotency-Key: grok-image-edit-001" \
@@ -41,7 +41,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash 多图参考
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -59,7 +59,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash 选择画质
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -74,7 +74,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash 经济版文生图
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -193,8 +193,8 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
     ]
   },
   "urls": {
-    "get": "https://www.qingbo.dev/v1/tasks/task-wave1775290140a830128812",
-    "cancel": "https://www.qingbo.dev/v1/tasks/task-wave1775290140a830128812/cancel"
+    "get": "https://api.qingbo.ai/v1/tasks/task-wave1775290140a830128812",
+    "cancel": "https://api.qingbo.ai/v1/tasks/task-wave1775290140a830128812/cancel"
   }
 }
 ```

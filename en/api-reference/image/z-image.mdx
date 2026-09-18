@@ -1,7 +1,7 @@
 ---
 title: "Z-Image"
 description: "Z-Image Turbo: a lightweight, fast text-to-image model with bilingual prompts and a fixed price per image"
-api: "POST https://www.qingbo.dev/v1/tasks"
+api: "POST https://api.qingbo.ai/v1/tasks"
 ---
 
 Z-Image Turbo is a 6B-parameter text-to-image model from Tongyi Lab. Its distilled few-step (S3-DiT) architecture generates in near real time, it excels at photorealistic portraits, and it renders both Chinese and English text — a good fit for batch drafts, marketing assets and quick previews. It does text-to-image only: no reference images, one image per request. For reference-based editing use the [Seedream Series](/en/api-reference/image/seedream) or the [Qwen Image Series](/en/api-reference/image/qwen-image).
@@ -11,7 +11,7 @@ Z-Image Turbo is a 6B-parameter text-to-image model from Tongyi Lab. Its distill
 <CodeGroup>
 
 ```bash Text to image
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -H "Idempotency-Key: z-image-demo-001" \
@@ -25,7 +25,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash With prompt rewriting
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -110,8 +110,8 @@ You are only billed for a successfully generated image. Failed and cancelled tas
     ]
   },
   "urls": {
-    "get": "https://www.qingbo.dev/v1/tasks/task-wave1789004688b950049238",
-    "cancel": "https://www.qingbo.dev/v1/tasks/task-wave1789004688b950049238/cancel"
+    "get": "https://api.qingbo.ai/v1/tasks/task-wave1789004688b950049238",
+    "cancel": "https://api.qingbo.ai/v1/tasks/task-wave1789004688b950049238/cancel"
   },
   "billing_status": "settled",
   "cost": 5625

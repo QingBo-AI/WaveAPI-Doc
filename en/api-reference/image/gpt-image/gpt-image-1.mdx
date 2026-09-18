@@ -1,7 +1,7 @@
 ---
 title: "GPT Image 1 and 1.5 Official"
 description: "Text-to-image, reference editing and masked inpainting, billed from token usage"
-api: "POST https://www.qingbo.dev/v1/tasks"
+api: "POST https://api.qingbo.ai/v1/tasks"
 ---
 
 `gpt-image-1` and `gpt-image-1.5` are two generations of image model on the official OpenAI API line, covering text-to-image, editing with up to 15 reference images, and masked inpainting. Their actions, parameters, value sets and limits are identical — switching between them only changes the `model` field. Every operation uses the unified `POST /v1/tasks` endpoint.
@@ -15,7 +15,7 @@ Neither model accepts `resolution`, and the aspect ratios are limited to `1:1`, 
 <CodeGroup>
 
 ```bash Generate an image
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -H "Idempotency-Key: image-gi15-001" \
@@ -30,7 +30,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash Edit a reference image
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -H "Idempotency-Key: image-gi1-edit-001" \
@@ -46,7 +46,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash Inpaint with a mask
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{

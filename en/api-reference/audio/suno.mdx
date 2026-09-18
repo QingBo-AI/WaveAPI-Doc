@@ -1,7 +1,7 @@
 ---
 title: "Suno Music Generation"
 description: "32 music actions on one task endpoint: write, extend, cover, split stems, edit and export"
-api: "POST https://www.qingbo.dev/v1/tasks"
+api: "POST https://api.qingbo.ai/v1/tasks"
 ---
 
 `suno` is an action-based model: the model ID is fixed and the `action` field decides what a call does. Start a song from scratch with `generate`, then keep working on the same track — extend it, cover it, split its stems, edit it, export it — across 32 actions in total. Every action is submitted through the unified task endpoint `POST /v1/tasks`.
@@ -11,7 +11,7 @@ api: "POST https://www.qingbo.dev/v1/tasks"
 <CodeGroup>
 
 ```bash Inspiration mode
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -23,7 +23,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash Custom mode (your own lyrics)
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -39,7 +39,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash Instrumental
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -51,7 +51,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash Lyrics only
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -263,8 +263,8 @@ Only a successful result is billed. Failed and cancelled tasks, and tasks that r
     ]
   },
   "urls": {
-    "get": "https://www.qingbo.dev/v1/tasks/task-wave1789004688b950049238",
-    "cancel": "https://www.qingbo.dev/v1/tasks/task-wave1789004688b950049238/cancel"
+    "get": "https://api.qingbo.ai/v1/tasks/task-wave1789004688b950049238",
+    "cancel": "https://api.qingbo.ai/v1/tasks/task-wave1789004688b950049238/cancel"
   },
   "billing_status": "settled",
   "cost": 28125
@@ -292,8 +292,8 @@ Only a successful result is billed. Failed and cancelled tasks, and tasks that r
     }
   },
   "urls": {
-    "get": "https://www.qingbo.dev/v1/tasks/task-wave1789004688b950049238",
-    "cancel": "https://www.qingbo.dev/v1/tasks/task-wave1789004688b950049238/cancel"
+    "get": "https://api.qingbo.ai/v1/tasks/task-wave1789004688b950049238",
+    "cancel": "https://api.qingbo.ai/v1/tasks/task-wave1789004688b950049238/cancel"
   },
   "billing_status": "settled",
   "cost": 4500
@@ -313,7 +313,7 @@ To keep working on the same song, take the `task_id` from `generate` and pass it
 <CodeGroup>
 
 ```bash Extend
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -326,7 +326,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash Cover in another style
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -339,7 +339,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash Separate the lead vocal
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -352,7 +352,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash Export WAV
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{

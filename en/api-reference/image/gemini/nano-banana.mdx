@@ -1,7 +1,7 @@
 ---
 title: "Nano Banana Official"
 description: "Nano Banana (Gemini Image) official routes: text-to-image and multi-reference editing billed from actual token usage"
-api: "POST https://www.qingbo.dev/v1/tasks"
+api: "POST https://api.qingbo.ai/v1/tasks"
 ---
 
 This page covers the **three official API routes** of Nano Banana: a flagship, a fast and a lightest tier. They share one set of request parameters and one billing model (billed from actual token usage) and differ only in aspect ratios, resolutions and line-specific parameters — switching tiers means changing `model` and nothing else. When the price of an image has to be known before submission, use [Nano Banana Economy](/en/api-reference/image/gemini/nano-banana-rev).
@@ -15,7 +15,7 @@ The official and economy lines never switch automatically: the model ID selects 
 <CodeGroup>
 
 ```bash Text to image
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -H "Idempotency-Key: nb-official-001" \
@@ -30,7 +30,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash Edit with a reference
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -H "Idempotency-Key: nb-official-edit-001" \
@@ -46,7 +46,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash Multiple references
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -63,7 +63,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash Grounded in web search
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -184,8 +184,8 @@ You are only billed for a successfully generated image. Failed and cancelled tas
     ]
   },
   "urls": {
-    "get": "https://www.qingbo.dev/v1/tasks/task-wave1789004688b950049238",
-    "cancel": "https://www.qingbo.dev/v1/tasks/task-wave1789004688b950049238/cancel"
+    "get": "https://api.qingbo.ai/v1/tasks/task-wave1789004688b950049238",
+    "cancel": "https://api.qingbo.ai/v1/tasks/task-wave1789004688b950049238/cancel"
   }
 }
 ```

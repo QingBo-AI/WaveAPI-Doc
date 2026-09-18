@@ -11,7 +11,7 @@ An OpenAI-compatible unified API endpoint. Call GPT-4o, Claude, Gemini, Sora, VE
 from openai import OpenAI
 
 client = OpenAI(
-    base_url="https://www.qingbo.dev/v1",
+    base_url="https://api.qingbo.ai/v1",
     api_key="your-api-key"
 )
 
@@ -27,7 +27,7 @@ print(response.choices[0].message.content)
 import OpenAI from 'openai';
 
 const client = new OpenAI({
-  baseURL: 'https://www.qingbo.dev/v1',
+  baseURL: 'https://api.qingbo.ai/v1',
   apiKey: 'your-api-key'
 });
 
@@ -40,7 +40,7 @@ console.log(response.choices[0].message.content);
 ```
 
 ```bash cURL
-curl https://www.qingbo.dev/v1/chat/completions \
+curl https://api.qingbo.ai/v1/chat/completions \
   -H "Authorization: Bearer your-api-key" \
   -H "Content-Type: application/json" \
   -d '{
@@ -124,10 +124,10 @@ Access a full range of AI models through QWave API.
 
 <Steps>
   <Step title="Get an API Key">
-    Sign up and grab your API key at the [Dashboard](https://qingbo.dev/dashboard/keys)
+    Sign up and grab your API key at the [Dashboard](https://wave.qingbo.ai/dashboard/keys)
   </Step>
   <Step title="Swap the Base URL">
-    Point your OpenAI SDK at `https://www.qingbo.dev/v1`
+    Point your OpenAI SDK at `https://api.qingbo.ai/v1`
   </Step>
   <Step title="Pick a Model and Call It">
     Specify the model you want via the `model` parameter and send your request

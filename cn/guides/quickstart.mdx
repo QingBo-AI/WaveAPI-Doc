@@ -5,7 +5,7 @@ description: "5 分钟快速上手 清波 API"
 
 ## 前置要求
 
-- 一个 清波 API 账户（[注册](https://qingbo.dev/login)）
+- 一个 清波 API 账户（[注册](https://wave.qingbo.ai/login)）
 - API 密钥
 - 基础的编程知识
 
@@ -13,7 +13,7 @@ description: "5 分钟快速上手 清波 API"
 
 <Steps>
   <Step title="登录控制台">
-    访问 [Dashboard](https://qingbo.dev/dashboard/keys) 并登录
+    访问 [Dashboard](https://wave.qingbo.ai/dashboard/keys) 并登录
   </Step>
   <Step title="创建密钥">
     在密钥管理页面点击"创建新密钥"
@@ -37,7 +37,7 @@ description: "5 分钟快速上手 清波 API"
 from openai import OpenAI
 
 client = OpenAI(
-    base_url="https://www.qingbo.dev/v1",
+    base_url="https://api.qingbo.ai/v1",
     api_key="YOUR_API_KEY"
 )
 
@@ -55,7 +55,7 @@ print(response.choices[0].message.content)
 import OpenAI from 'openai';
 
 const client = new OpenAI({
-  baseURL: 'https://www.qingbo.dev/v1',
+  baseURL: 'https://api.qingbo.ai/v1',
   apiKey: 'YOUR_API_KEY'
 });
 
@@ -70,7 +70,7 @@ console.log(response.choices[0].message.content);
 ```
 
 ```bash cURL
-curl https://www.qingbo.dev/v1/chat/completions \
+curl https://api.qingbo.ai/v1/chat/completions \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -d '{

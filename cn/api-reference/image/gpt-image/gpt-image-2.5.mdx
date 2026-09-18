@@ -1,7 +1,7 @@
 ---
 title: "GPT Image 2.5"
 description: "五档画质的文生图与参考图编辑，Flare 与 Sunburst 两条线路，按 token 用量计费"
-api: "POST https://www.qingbo.dev/v1/tasks"
+api: "POST https://api.qingbo.ai/v1/tasks"
 ---
 
 GPT Image 2.5 是 GPT Image 官方线路的新一代，在 GPT Image 2 的动作和参数之上把画质从三档扩到五档，并对同名档位重新标定了输出用量。它提供 `gpt-image-2.5`（Flare 线）与 `gpt-image-2.5-sunburst`（Sunburst 线）两个模型，请求形状、取值范围和计费方式完全相同，只在出图速度与编辑精度之间取舍，选型只改 `model` 字段。
@@ -22,7 +22,7 @@ GPT Image 2.5 是 GPT Image 官方线路的新一代，在 GPT Image 2 的动作
 <CodeGroup>
 
 ```bash 文生图
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -H "Idempotency-Key: image25-demo-001" \
@@ -38,7 +38,7 @@ curl -X POST https://www.qingbo.dev/v1/tasks \
 ```
 
 ```bash 参考图编辑
-curl -X POST https://www.qingbo.dev/v1/tasks \
+curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -H "Idempotency-Key: image25-edit-001" \

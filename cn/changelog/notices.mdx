@@ -9,7 +9,7 @@ title: "运营公告"
 
 **新在哪里**
 
-- **门户与控制台**：首页、模型目录（[/explore](https://qingbo.dev/explore)）、价目（[/pricing](https://qingbo.dev/pricing)）、榜单与控制台全部重做；英文站在 `/`，中文站在 `/zh-Hans-CN`。旧路径 `/v2`、`/zh` 自动跳转。
+- **门户与控制台**：首页、模型目录（[/explore](https://wave.qingbo.ai/explore)）、价目（[/pricing](https://wave.qingbo.ai/pricing)）、榜单与控制台全部重做；英文站在 `/`，中文站在 `/zh-Hans-CN`。旧路径 `/v2`、`/zh` 自动跳转。
 - **模型目录**：媒体类 92 个模型组（图像 34 · 视频 52 · 音频 6）与全部文本模型，每个模型的每一档价格、支持的动作与参数都在目录页公开，起价可比、可按供应商与任务筛选。
 - **统一任务接口**：图像、视频、音频统一走 `POST /v1/tasks`，用 `action` 区分生成、编辑、延长等动作，链式动作用 `ref_task_id` 引用上一个任务；文本模型仍是 OpenAI 兼容的 `/v1/chat/completions`。
 - **计费口径**：全部按美元计价；提交任务时按报价冻结，上游失败、超时或内容拒绝时自动释放；按 token 用量结算的模型（Nano Banana 官方版、GPT Image 官方版、Gemini Omni 等）完成后按实际用量多退少补。每一次冻结与释放都能在控制台的调用日志里核对。
