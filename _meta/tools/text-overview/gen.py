@@ -112,25 +112,23 @@ VENDOR_NOTES = {
 "en": """Besides the OpenAI-compatible endpoint, these models can also be called on the Gemini native endpoint: `gemini-2.5-flash-lite`, `gemini-2.5-pro`, `gemini-3-flash-preview`, `gemini-3.1-pro-preview`, `gemini-3.5-flash`, `gemini-3.6-flash`, `gemini-3.7-flash`, `gemini-3.8-flash` (`gemini-3.5-flash-lite` is Chat-only). The native entry is `POST /v1beta/models/{model}:generateContent` (streaming: `:streamGenerateContent?alt=sse`), see [Gemini native API](/en/api-reference/text/gemini-native). Native responses report usage in `usageMetadata` without `usage.cost`; `candidatesTokenCount` and `thoughtsTokenCount` are reported separately and billed output is their sum. The Pro models (`gemini-2.5-pro` / `gemini-3.1-pro-preview`) have a 200K long-context tier that switches the whole request above 200,000 total input. 3.6 / 3.7 / 3.8 Flash have an implicit cache-read rate whose hits are decided upstream; the other models bill two rates. The whole Gemini line supports automatic caching only; explicit caching (`cache_control` / `cachedContent`) returns 400, as do built-in tools, `web_search_options` and any `service_tier` other than `standard` / `default`.""",
 },
 "deepseek": {
-"cn": """V4 Pro / Flash 按**请求开始时刻的 UTC 时段**计价（北京时间加 8 小时）。价格在请求开始时确定，响应费用与最终结算都用这一份，即使响应跨过时段边界也不重新选价。传 `thinking: {"type": "disabled"}` 可关闭思考。V4 缓存命中价替代对应输入，不提供独立缓存写入。V3.x / R1 两项计价；`deepseek-v3.2-exp` 与 `deepseek-v3.1-terminus` 不提供严格 JSON Schema，需要 schema 约束时用 `deepseek-v3.2` 或 `deepseek-r1-0528`。
+"cn": """V4 系列（Pro / Flash / 4.1 Flash）按**请求开始时刻的 UTC 时段**计价（北京时间加 8 小时）。价格在请求开始时确定，响应费用与最终结算都用这一份，即使响应跨过时段边界也不重新选价。传 `thinking: {"type": "disabled"}` 可关闭思考。V4 缓存命中价替代对应输入，不提供独立缓存写入。V3.x / R1 两项计价；`deepseek-v3.2-exp` 与 `deepseek-v3.1-terminus` 不提供严格 JSON Schema，需要 schema 约束时用 `deepseek-v3.2` 或 `deepseek-r1-0528`。
 
 | 时段（UTC，含开始不含结束） | 档位 |
 |---|---|
-| 周一至周五 01:00–04:00、06:00–10:00 | 高价档 |
-| 每天 00:00–14:00 内除上述时段 | 标准档 |
+| 每天 00:00–14:00 | 高价档 |
 | 每天 14:00–24:00 | 低价档（最便宜） |
 
-北京时间加 8 小时。Pro 与 Flash 各时段的输入 / 输出 / 缓存读单价，见公开模型详情
+北京时间加 8 小时。各模型每个时段的输入 / 输出 / 缓存读单价，见公开模型详情
 `GET /v1/models` 的 `price_config.text_schedule`——该字段是完整的时段价表，也是结算依据。""",
-"en": """V4 Pro / Flash are priced by the **UTC time slot at request start** (Beijing time = UTC+8). The rate is fixed when the request begins and is used for both the response cost and the final settlement, even if the response crosses a slot boundary. Pass `thinking: {"type": "disabled"}` to turn thinking off. V4 cache-hit rates replace the matching input charge; there is no separate cache write. V3.x / R1 bill two rates; `deepseek-v3.2-exp` and `deepseek-v3.1-terminus` offer no strict JSON Schema — use `deepseek-v3.2` or `deepseek-r1-0528` when you need schema guarantees.
+"en": """The V4 line (Pro / Flash / 4.1 Flash) is priced by the **UTC time slot at request start** (Beijing time = UTC+8). The rate is fixed when the request begins and is used for both the response cost and the final settlement, even if the response crosses a slot boundary. Pass `thinking: {"type": "disabled"}` to turn thinking off. V4 cache-hit rates replace the matching input charge; there is no separate cache write. V3.x / R1 bill two rates; `deepseek-v3.2-exp` and `deepseek-v3.1-terminus` offer no strict JSON Schema — use `deepseek-v3.2` or `deepseek-r1-0528` when you need schema guarantees.
 
 | Slot (UTC, start inclusive, end exclusive) | Tier |
 |---|---|
-| Mon–Fri 01:00–04:00, 06:00–10:00 | peak |
-| Daily 00:00–14:00 outside the slots above | standard |
+| Daily 00:00–14:00 | peak |
 | Daily 14:00–24:00 | off-peak (cheapest) |
 
-Beijing time is UTC+8. The per-slot input / output / cache-read rates for Pro and Flash are in
+Beijing time is UTC+8. The per-slot input / output / cache-read rates for each model are in
 `price_config.text_schedule` on `GET /v1/models` — that is the complete table and the basis for settlement.""",
 },
 "qwen": {

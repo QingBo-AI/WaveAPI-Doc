@@ -269,15 +269,14 @@ OpenAI 兼容接口之外，下列模型还可以走 Gemini 原生接口：`gemi
 - `deepseek-v3.2-exp` — 不提供严格 JSON Schema；与 `deepseek-v3.2` 是两个独立模型（2025-09-29 实验版）
 - `deepseek-v3.1-terminus` — 不提供严格 JSON Schema；官方主 API 已不再列出该版本
 
-V4 Pro / Flash 按**请求开始时刻的 UTC 时段**计价（北京时间加 8 小时）。价格在请求开始时确定，响应费用与最终结算都用这一份，即使响应跨过时段边界也不重新选价。传 `thinking: {"type": "disabled"}` 可关闭思考。V4 缓存命中价替代对应输入，不提供独立缓存写入。V3.x / R1 两项计价；`deepseek-v3.2-exp` 与 `deepseek-v3.1-terminus` 不提供严格 JSON Schema，需要 schema 约束时用 `deepseek-v3.2` 或 `deepseek-r1-0528`。
+V4 系列（Pro / Flash / 4.1 Flash）按**请求开始时刻的 UTC 时段**计价（北京时间加 8 小时）。价格在请求开始时确定，响应费用与最终结算都用这一份，即使响应跨过时段边界也不重新选价。传 `thinking: {"type": "disabled"}` 可关闭思考。V4 缓存命中价替代对应输入，不提供独立缓存写入。V3.x / R1 两项计价；`deepseek-v3.2-exp` 与 `deepseek-v3.1-terminus` 不提供严格 JSON Schema，需要 schema 约束时用 `deepseek-v3.2` 或 `deepseek-r1-0528`。
 
 | 时段（UTC，含开始不含结束） | 档位 |
 |---|---|
-| 周一至周五 01:00–04:00、06:00–10:00 | 高价档 |
-| 每天 00:00–14:00 内除上述时段 | 标准档 |
+| 每天 00:00–14:00 | 高价档 |
 | 每天 14:00–24:00 | 低价档（最便宜） |
 
-北京时间加 8 小时。Pro 与 Flash 各时段的输入 / 输出 / 缓存读单价，见公开模型详情
+北京时间加 8 小时。各模型每个时段的输入 / 输出 / 缓存读单价，见公开模型详情
 `GET /v1/models` 的 `price_config.text_schedule`——该字段是完整的时段价表，也是结算依据。
 
 ### Qwen（阿里云）
