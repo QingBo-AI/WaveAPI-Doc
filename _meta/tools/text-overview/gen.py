@@ -119,7 +119,7 @@ VENDOR_NOTES = {
 | 每天 00:00–14:00 | 高价档 |
 | 每天 14:00–24:00 | 低价档（最便宜） |
 
-北京时间加 8 小时。各模型每个时段的输入 / 输出 / 缓存读单价，见公开模型详情
+北京时间加 8 小时。各模型每个时段的输入 / 输出 / 缓存读单价，见模型详情
 `GET /v1/models` 的 `price_config.text_schedule`——该字段是完整的时段价表，也是结算依据。""",
 "en": """The V4 line (Pro / Flash / 4.1 Flash) is priced by the **UTC time slot at request start** (Beijing time = UTC+8). The rate is fixed when the request begins and is used for both the response cost and the final settlement, even if the response crosses a slot boundary. Pass `thinking: {"type": "disabled"}` to turn thinking off. V4 cache-hit rates replace the matching input charge; there is no separate cache write. V3.x / R1 bill two rates; `deepseek-v3.2-exp` and `deepseek-v3.1-terminus` offer no strict JSON Schema — use `deepseek-v3.2` or `deepseek-r1-0528` when you need schema guarantees.
 

@@ -148,7 +148,7 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
 
 同一画幅下，`high` 档的预计输出 token 约是 `low` 档的 **15 倍**。`quality` 是影响成本最大的参数，默认值为 `auto`；不传 `quality` 时按 `auto` 计，而 `auto` 与 `high` 的预估口径相同。画幅也有影响：同一画质下，`2:3` 和 `3:2` 的输出 token 高于 `1:1`。
 
-各画幅 / 画质组合的预估输出 token，见公开模型详情 `GET /v1/models` 的 `price_config.image_usage_reservation`。
+各画幅 / 画质组合的预估输出 token，见模型详情 `GET /v1/models` 的 `price_config.image_usage_reservation`。
 
 只有成功出图才计费。任务失败、取消，或没有返回可用图片时，全额退款。完整字段说明见[任务状态](/cn/api-reference/task/status)。
 

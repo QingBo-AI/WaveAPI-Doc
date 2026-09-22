@@ -2,7 +2,7 @@
 
 文本类已收敛完毕。真相源是**模型组**，不是任何一份手写清单：
 
-- 公开目录 `GET /v1/models`（无需 Key）—— 模型 ID、`tags`、`price_config`
+- 模型目录 `GET /v1/models`（需 Key）—— 模型 ID、`tags`、`price_config`
 - 管理端 `GET /admin/waveapi/model-groups`（后台会话）—— `capabilities`
   （`supported_protocols` / `streaming` / `tool_calling` / `structured_output` /
   `input_token_limit` / `output_token_limit`）

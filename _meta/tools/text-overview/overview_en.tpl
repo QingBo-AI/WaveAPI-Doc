@@ -159,7 +159,7 @@ Each model serves only the protocols it supports (Chat / Responses / Claude Mess
 Live availability, price configuration and capability flags come from the catalog API:
 
 ```bash
-curl https://www.qingbo.dev/v1/models \
+curl https://api.qingbo.ai/v1/models \
   -H "Authorization: Bearer $WAVE_API_KEY"
 ```
 
