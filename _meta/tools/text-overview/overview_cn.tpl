@@ -157,7 +157,7 @@ Chat 响应里 `usage.prompt_tokens_details.cached_tokens` 是命中量；原生
 模型的实时可用性、价格配置与能力字段以目录接口为准：
 
 ```bash
-curl https://www.qingbo.dev/v1/models \
+curl https://api.qingbo.ai/v1/models \
   -H "Authorization: Bearer $WAVE_API_KEY"
 ```
 

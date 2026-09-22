@@ -38,7 +38,7 @@
 
 | 来源 | 取什么 | 备注 |
 |---|---|---|
-| `GET /v1/models`（公开，无需 Key） | 已启用模型的 `id` / `tags` / `price_config` / `description` | 与 C 端看到的完全一致 |
+| `GET /v1/models`（需 Key） | 已启用模型的 `id` / `tags` / `price_config` / `description` | 与 C 端看到的完全一致 |
 | `GET /v1/models/{id}` | 单个模型；**注意它能解析到"停用"组**，判断是否上架要以列表为准 | |
 | 管理端 `GET /admin/waveapi/model-groups?modality=image&page_size=500` | `capabilities` 全量（`supported_actions` / `supported_common_params` / `specific_parameters` / `constraints` / `aspect_ratios` / `resolutions` / `qualities` / `max_image_inputs` / `default_*`）、`active_route_count`、`enable` | 后台会话下调用 |
 
