@@ -2,6 +2,16 @@
 title: "运营公告"
 ---
 
+<Update label="2026-09-22" description="接口变更">
+**模型列表 `GET /v1/models` 需要 API Key**
+
+`GET /v1/models` 与 `GET /v1/models/{model}` 此前不带 Key 也能访问，现在与其他 `/v1` 接口一致：需要带 API Key，否则返回 `401`。
+
+- 用 SDK 列模型的不受影响：OpenAI、Anthropic、Gemini 三家 SDK 列模型时本来就带 Key，`Authorization: Bearer`、`x-api-key`、`x-goog-api-key` 与 `?key=` 都能用。
+- 返回的列表按这把 Key 可用的模型过滤：Key 限定了模型时，只列出允许的模型。Key 已禁用、过期或额度用尽时同样返回 `401`。
+- 不带 Key 浏览模型与价格，请用[模型目录](https://wave.qingbo.ai/explore)。
+</Update>
+
 <Update label="2026-09-10" description="重要公告 · 新版上线（暂定）">
 **清波 API 新版门户、目录与计费口径正式上线**
 

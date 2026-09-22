@@ -2,6 +2,16 @@
 title: "Service Notices"
 ---
 
+<Update label="2026-09-22" description="API change">
+**Listing models with `GET /v1/models` now requires an API key**
+
+`GET /v1/models` and `GET /v1/models/{model}` used to answer without a key. They now work like every other `/v1` endpoint: send your API key, or the request returns `401`.
+
+- SDK model listing is unaffected: the OpenAI, Anthropic and Gemini SDKs already send a key, and `Authorization: Bearer`, `x-api-key`, `x-goog-api-key` and `?key=` are all accepted.
+- The list is filtered to the models the key may use: a key restricted to certain models only lists those. A disabled, expired or exhausted key also gets `401`.
+- To browse models and prices without a key, use the [model catalog](https://wave.qingbo.ai/explore).
+</Update>
+
 <Update label="2026-09-10" description="Important · New release (tentative)">
 **The new QWave API portal, catalog and billing rules are live**
 
