@@ -3,6 +3,24 @@ title: "模型列表"
 description: "查看可用模型与定价信息"
 ---
 
+## 模型 ID 怎么写
+
+请求里的 `model` 填的是**模型 ID**，不是产品名。两者经常对不上：产品名写作「Claude Opus 4.8」，模型 ID 是 `claude-opus-4-8`。
+
+模型 ID 沿用各厂商官方写法，我们不做统一改写，所以分隔符本来就不一致：
+
+| 厂商 | 版本号写法 | 示例 |
+|------|-----------|------|
+| Anthropic | 连字符 | `claude-opus-4-8` · `claude-sonnet-4-6` |
+| OpenAI | 点 | `gpt-5.2` · `gpt-4.1-mini` |
+| Google | 点 | `gemini-3.6-flash` · `gemini-2.5-pro` |
+| DeepSeek / 智谱 / 月之暗面 | 点 | `deepseek-v3.2` · `glm-4.7` · `kimi-k2.6` |
+
+另有两条约定：
+
+- **不带日期后缀。** 上游的 `claude-opus-4-5-20251101`，在这里就是 `claude-opus-4-5`。
+- **以 `/v1/models` 为准。** 文档和变更日志可能滞后，接口返回的 `id` 才是当前能调的写法。
+
 ## 查询可用模型
 
 ```bash
