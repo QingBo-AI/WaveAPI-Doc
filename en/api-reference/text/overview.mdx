@@ -188,8 +188,8 @@ Each model serves only the protocols it supports (Chat / Responses / Claude Mess
 
 **Model notes**
 
-- `gpt-6-sol` — 272K long-context tier; has a separate cache-write rate; max input 922K, max output 128K; function calling requires `reasoning_effort: "none"`; when `reasoning_effort` is not `none`, `temperature`, `top_p` and `logprobs` are not accepted
-- `gpt-6-luna` — 272K long-context tier; has a separate cache-write rate; max input 922K, max output 128K; function calling requires `reasoning_effort: "none"`; when `reasoning_effort` is not `none`, `temperature`, `top_p` and `logprobs` are not accepted
+- `gpt-6-sol` — 272K long-context tier; has a separate cache-write rate; max input 922K, max output 128K; function calling requires `reasoning_effort: "none"`; when `reasoning_effort` is not `none`, `temperature`, `top_p` and `logprobs` are not supported
+- `gpt-6-luna` — 272K long-context tier; has a separate cache-write rate; max input 922K, max output 128K; function calling requires `reasoning_effort: "none"`; when `reasoning_effort` is not `none`, `temperature`, `top_p` and `logprobs` are not supported
 - `gpt-6-astra` — 272K long-context tier; has a separate cache-write rate; max input 922K, max output 12.8K; tool calling is not supported; use `reasoning_effort: "low"`; `"none"` is unsupported, and `temperature`, `top_p` and `logprobs` are not supported
 - `gpt-5.6-luna` — 272K long-context tier; has a separate cache-write rate; max input 922K, max output 128K; supports automatic cache hits
 - `gpt-5.6-terra` — 272K long-context tier; has a separate cache-write rate; max input 922K, max output 12.8K

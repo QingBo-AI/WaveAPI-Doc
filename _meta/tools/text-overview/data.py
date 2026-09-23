@@ -15,8 +15,8 @@ T256 = dict(th="256K", op=">")
 
 MODELS = [
  # ---------- OpenAI ----------
- m("gpt-6-sol","openai",1.8,9,cr=0.18,cw=2.25,tier=dict(T272,inp=3.6,out=15,cr=0.36,cw=4.5),ver="TSJF",limits=("922K","128K"),notes=["函数调用需 `reasoning_effort: \"none\"`","`reasoning_effort` 不为 `none` 时不接受 `temperature`、`top_p`、`logprobs`"],notes_en=["function calling requires `reasoning_effort: \"none\"`","when `reasoning_effort` is not `none`, `temperature`, `top_p` and `logprobs` are not accepted"]),
- m("gpt-6-luna","openai",0.09,0.45,cr=0.009,cw=0.1125,tier=dict(T272,inp=0.18,out=0.675,cr=0.018,cw=0.225),ver="TSJF",limits=("922K","128K"),notes=["函数调用需 `reasoning_effort: \"none\"`","`reasoning_effort` 不为 `none` 时不接受 `temperature`、`top_p`、`logprobs`"],notes_en=["function calling requires `reasoning_effort: \"none\"`","when `reasoning_effort` is not `none`, `temperature`, `top_p` and `logprobs` are not accepted"]),
+ m("gpt-6-sol","openai",1.8,9,cr=0.18,cw=2.25,tier=dict(T272,inp=3.6,out=15,cr=0.36,cw=4.5),ver="TSJF",limits=("922K","128K"),notes=["函数调用需 `reasoning_effort: \"none\"`","`reasoning_effort` 不为 `none` 时不接受 `temperature`、`top_p`、`logprobs`"],notes_en=["function calling requires `reasoning_effort: \"none\"`","when `reasoning_effort` is not `none`, `temperature`, `top_p` and `logprobs` are not supported"]),
+ m("gpt-6-luna","openai",0.09,0.45,cr=0.009,cw=0.1125,tier=dict(T272,inp=0.18,out=0.675,cr=0.018,cw=0.225),ver="TSJF",limits=("922K","128K"),notes=["函数调用需 `reasoning_effort: \"none\"`","`reasoning_effort` 不为 `none` 时不接受 `temperature`、`top_p`、`logprobs`"],notes_en=["function calling requires `reasoning_effort: \"none\"`","when `reasoning_effort` is not `none`, `temperature`, `top_p` and `logprobs` are not supported"]),
  m("gpt-6-astra","openai",9,45,cr=0.9,cw=11.25,tier=dict(T272,inp=18,out=67.5,cr=1.8,cw=22.5),ver="TSJ",limits=("922K","12.8K"),
    notes=["不支持工具调用","`reasoning_effort` 用 `\"low\"`，不支持 `\"none\"`；不接受 `temperature`、`top_p`、`logprobs`",],
    notes_en=["tool calling is not supported","use `reasoning_effort: \"low\"`; `\"none\"` is unsupported, and `temperature`, `top_p` and `logprobs` are not supported",]),
