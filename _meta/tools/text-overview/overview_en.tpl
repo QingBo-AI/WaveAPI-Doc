@@ -12,7 +12,7 @@ All text models are served through the OpenAI-compatible Chat Completions endpoi
     `POST /v1/chat/completions`. The default entry; every model on this page is called here, except the Responses-only models.
   </Card>
   <Card title="Responses" icon="layer-group" href="/en/api-reference/text/openai-multimodal">
-    `POST /v1/responses`. GPT Pro / Codex / o3-pro models accept only this entry.
+    `POST /v1/responses`. Text models from OpenAI, Qwen, DeepSeek and xAI can also be called here (except `deepseek-v3.1-terminus`), which is what clients such as Codex use; GPT Pro / Codex / o3-pro models accept only this entry.
   </Card>
   <Card title="Claude Messages" icon="message" href="/en/api-reference/text/claude-messages">
     `POST /v1/messages`. Native envelope kept for apps already built on the Anthropic SDK.

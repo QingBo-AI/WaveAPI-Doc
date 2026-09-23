@@ -12,7 +12,7 @@ All text models are served through the OpenAI-compatible Chat Completions endpoi
     `POST /v1/chat/completions`. The default entry; every model on this page is called here, except the Responses-only models.
   </Card>
   <Card title="Responses" icon="layer-group" href="/en/api-reference/text/openai-multimodal">
-    `POST /v1/responses`. GPT Pro / Codex / o3-pro models accept only this entry.
+    `POST /v1/responses`. Text models from OpenAI, Qwen, DeepSeek and xAI can also be called here (except `deepseek-v3.1-terminus`), which is what clients such as Codex use; GPT Pro / Codex / o3-pro models accept only this entry.
   </Card>
   <Card title="Claude Messages" icon="message" href="/en/api-reference/text/claude-messages">
     `POST /v1/messages`. Native envelope kept for apps already built on the Anthropic SDK.
@@ -160,7 +160,7 @@ Each model serves only the protocols it supports (Chat / Responses / Claude Mess
 |---|---|:---:|
 | `gpt-6-sol` | + cache read/write | ✓ / ✓ |
 | `gpt-6-luna` | + cache read/write | ✓ / ✓ |
-| `gpt-6-astra` | + cache read/write | ✓ / — |
+| `gpt-6-astra` | + cache read/write | ✓ / ✓ |
 | `gpt-5.6-luna` | + cache read/write | ✓ / ✓ |
 | `gpt-5.6-terra` | + cache read/write | ✓ / ✓ |
 | `gpt-5.6-sol` | + cache read/write | ✓ / ✓ |
@@ -190,7 +190,7 @@ Each model serves only the protocols it supports (Chat / Responses / Claude Mess
 
 - `gpt-6-sol` — 272K long-context tier; has a separate cache-write rate; max input 922K, max output 128K; function calling requires `reasoning_effort: "none"`; when `reasoning_effort` is not `none`, `temperature`, `top_p` and `logprobs` are not supported
 - `gpt-6-luna` — 272K long-context tier; has a separate cache-write rate; max input 922K, max output 128K; function calling requires `reasoning_effort: "none"`; when `reasoning_effort` is not `none`, `temperature`, `top_p` and `logprobs` are not supported
-- `gpt-6-astra` — 272K long-context tier; has a separate cache-write rate; max input 922K, max output 12.8K; tool calling is not supported; use `reasoning_effort: "low"`; `"none"` is unsupported, and `temperature`, `top_p` and `logprobs` are not supported
+- `gpt-6-astra` — 272K long-context tier; has a separate cache-write rate; max input 922K, max output 12.8K; function calling works only through `/v1/responses`; use `reasoning_effort: "low"`; `"none"` is unsupported, and `temperature`, `top_p` and `logprobs` are not supported
 - `gpt-5.6-luna` — 272K long-context tier; has a separate cache-write rate; max input 922K, max output 128K; supports automatic cache hits
 - `gpt-5.6-terra` — 272K long-context tier; has a separate cache-write rate; max input 922K, max output 12.8K
 - `gpt-5.6-sol` — 272K long-context tier; has a separate cache-write rate; max input 922K, max output 12.8K
@@ -350,7 +350,7 @@ Kimi K3 supports automatic caching. Use `tool_choice: "auto"`, and give function
 | Model ID | Billing | JSON / Tools |
 |---|---|:---:|
 | `grok-4.7` | + cache read | ✓ / ✓ |
-| `grok-4.6` | + cache read | ✓ / — |
+| `grok-4.6` | + cache read | ✓ / ✓ |
 | `grok-4.5` | input + output | ✓ / — |
 | `grok-4.3` | input + output | ✓ / ✓ |
 | `grok-4.20-0309-reasoning` | input + output | ✓ / ✓ |
@@ -360,7 +360,7 @@ Kimi K3 supports automatic caching. Use `tool_choice: "auto"`, and give function
 **Model notes**
 
 - `grok-4.7` — 200K long-context tier; supports automatic cache hits
-- `grok-4.6` — 200K long-context tier; max input 500K, max output 12.8K; supports automatic cache hits; tool calling is not supported; `max_tokens` is not a hard cap; reasoning can push completion_tokens past it
+- `grok-4.6` — 200K long-context tier; max input 500K, max output 12.8K; supports automatic cache hits; function calling works only through `/v1/responses`; `max_tokens` is not a hard cap; reasoning can push completion_tokens past it
 - `grok-4.5` — 200K long-context tier; tool calling is not supported
 - `grok-4.3` — 200K long-context tier
 - `grok-4.20-0309-reasoning` — 200K long-context tier

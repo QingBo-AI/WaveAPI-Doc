@@ -2,6 +2,15 @@
 title: "模型动态"
 ---
 
+<Update label="2026-09-23" description="能力更新">
+**45 个文本模型支持 Responses 接口**
+
+- OpenAI（`gpt-4.1` / `gpt-5` / `gpt-5.x` / `gpt-6` 系列、`o1` / `o3` / `o3-mini` / `o4-mini`）、Qwen、DeepSeek、xAI 的文本模型现在也可以通过 `POST /v1/responses` 调用，支持流式与函数调用，Codex 等客户端可以直接使用。`deepseek-v3.1-terminus` 暂不支持。
+- `gpt-6-astra`、`grok-4.6` 开放函数调用，需走 `/v1/responses`。
+- 计费与 Chat 接口相同。
+- **文档**：[文本模型总览](/cn/api-reference/text/overview)
+</Update>
+
 <Update label="2026-09-23" description="模型上架">
 **文本模型 · 10 个新模型（OpenAI / Anthropic / xAI / Qwen / Z.ai）**
 

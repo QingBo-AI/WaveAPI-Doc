@@ -12,7 +12,7 @@ description: "全部文本模型的目录：支持的能力、计费方式与调
     `POST /v1/chat/completions`。默认入口，本页所有模型都从这里调用（Responses 专用模型除外）。
   </Card>
   <Card title="Responses" icon="layer-group" href="/cn/api-reference/text/openai-multimodal">
-    `POST /v1/responses`。GPT Pro / Codex / o3-pro 系列只接受这个入口。
+    `POST /v1/responses`。OpenAI、Qwen、DeepSeek、xAI 的文本模型也可从这里调用（`deepseek-v3.1-terminus` 除外），Codex 等客户端走这个入口；GPT Pro / Codex / o3-pro 系列只接受这个入口。
   </Card>
   <Card title="Claude Messages" icon="message" href="/cn/api-reference/text/claude-messages">
     `POST /v1/messages`。为已有 Anthropic SDK 的应用保留的原生信封。
