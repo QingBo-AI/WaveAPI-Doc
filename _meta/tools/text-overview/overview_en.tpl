@@ -71,8 +71,8 @@ Caching is graded per model by which cache rates that model has configured. Cach
 |---|---|---|
 | No cache discount | `cache_billing: "input_output"` | every other model in the catalog; any cache statistics in the response bill at the ordinary input rate |
 | Cache read only | has `cache_read` | `gpt-5.5` `gpt-5.4` `gpt-5.4-mini` `gpt-5.4-nano` `gpt-5.2` `gpt-5.1` `gpt-5` `gpt-5-mini` `gpt-5-nano` `gpt-4.1` `gpt-4.1-mini` `gpt-4.1-nano` `o4-mini` `o3-mini` `o1` `grok-4.7` `grok-4.6` `gemini-3.6-flash` `gemini-3.7-flash` `gemini-3.8-flash` `kimi-k3` `glm-5.3` |
-| Cache read + write | also `cache_write` | `gpt-5.6-luna` `gpt-5.6-terra` `gpt-5.6-sol` `gpt-6-astra` `qwen3.8-max` `qwen3.8-max-0902` `qwen3.8-2.4t-a95b` `qwen3.8-27b` `qwen3.8-flash` `qwen3.7-flash` |
-| Cache read + 5-min write + 1-hour write | also `cache_write_1h` | `claude-opus-5` `claude-sonnet-5` `claude-fable-5` `claude-fable-5-1` |
+| Cache read + write | also `cache_write` | `gpt-5.6-luna` `gpt-5.6-terra` `gpt-5.6-sol` `gpt-6-astra` `gpt-6-sol` `gpt-6-luna` `qwen3.8-max` `qwen3.8-max-0902` `qwen3.8-2.4t-a95b` `qwen3.8-27b` `qwen3.8-flash` `qwen3.7-flash` |
+| Cache read + 5-min write + 1-hour write | also `cache_write_1h` | `claude-opus-5-5` `claude-opus-5` `claude-sonnet-5` `claude-fable-5` `claude-fable-5-1` |
 | Time-of-day cache rate | `cache_read` inside each `text_schedule` window | `deepseek-v4-pro` `deepseek-v4-flash` |
 
 ### Automatic vs explicit caching
@@ -84,7 +84,7 @@ Caching is graded per model by which cache rates that model has configured. Cach
 
 | Models | Explicit `cache_control` |
 |---|---|
-| `claude-opus-5` `claude-sonnet-5` `claude-fable-5` `claude-fable-5-1` | ✅ Allowed; all three cache rates configured (read / 5-minute write / 1-hour write) |
+| `claude-opus-5-5` `claude-opus-5` `claude-sonnet-5` `claude-fable-5` `claude-fable-5-1` | ✅ Allowed; all three cache rates configured (read / 5-minute write / 1-hour write) |
 | `qwen3.8-*`, `qwen3.7-flash` | ✅ Allowed; writes are billed at the cache-write rate, explicit hits at the cache-read rate |
 | every `gemini-*` | Upstream caches automatically, so `cache_control` has no effect; `cachedContent` on the native API is not supported and returns 400 |
 | two-rate models | ❌ No cache billing; sending `cache_control` returns 400 |

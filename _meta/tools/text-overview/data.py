@@ -15,6 +15,8 @@ T256 = dict(th="256K", op=">")
 
 MODELS = [
  # ---------- OpenAI ----------
+ m("gpt-6-sol","openai",1.8,9,cr=0.18,cw=2.25,tier=dict(T272,inp=3.6,out=15,cr=0.36,cw=4.5),ver="TSJF",limits=("922K","128K"),notes=["函数调用需 `reasoning_effort: \"none\"`","`reasoning_effort` 不为 `none` 时不接受 `temperature`、`top_p`、`logprobs`"],notes_en=["function calling requires `reasoning_effort: \"none\"`","when `reasoning_effort` is not `none`, `temperature`, `top_p` and `logprobs` are not accepted"]),
+ m("gpt-6-luna","openai",0.09,0.45,cr=0.009,cw=0.1125,tier=dict(T272,inp=0.18,out=0.675,cr=0.018,cw=0.225),ver="TSJF",limits=("922K","128K"),notes=["函数调用需 `reasoning_effort: \"none\"`","`reasoning_effort` 不为 `none` 时不接受 `temperature`、`top_p`、`logprobs`"],notes_en=["function calling requires `reasoning_effort: \"none\"`","when `reasoning_effort` is not `none`, `temperature`, `top_p` and `logprobs` are not accepted"]),
  m("gpt-6-astra","openai",9,45,cr=0.9,cw=11.25,tier=dict(T272,inp=18,out=67.5,cr=1.8,cw=22.5),ver="TSJ",limits=("922K","12.8K"),
    notes=["不支持工具调用","`reasoning_effort` 用 `\"low\"`，不支持 `\"none\"`；不接受 `temperature`、`top_p`、`logprobs`",],
    notes_en=["tool calling is not supported","use `reasoning_effort: \"low\"`; `\"none\"` is unsupported, and `temperature`, `top_p` and `logprobs` are not supported",]),
@@ -53,6 +55,7 @@ MODELS = [
  m("claude-fable-5","anthropic",9,45,cr=0.9,cw5=11.25,cw1=18,ver="TSF",limits=("1M","128K"),
    notes=["不支持 JSON Schema 结构化输出","`tool_choice` 只接受 `\"auto\"`"],
    notes_en=["JSON Schema structured output is not supported","`tool_choice` accepts only `\"auto\"`"]),
+ m("claude-opus-5-5","anthropic",3.6,18,cr=0.18,cw5=4.5,cw1=7.2,ver="TSFN",notes=["不支持 JSON Schema 与 `json_object`","可用原生 `/v1/messages` 接口","`tool_choice` 用 `\"auto\"`，不支持 `any` / `tool`","始终进行思考，不能关闭"],notes_en=["JSON Schema and `json_object` are not supported","the native `/v1/messages` endpoint is available","use `tool_choice: \"auto\"`; `any` and `tool` are not supported","thinking is always on and cannot be disabled"]),
  m("claude-opus-5","anthropic",4.50,22.50,cr=0.45,cw5=5.625,cw1=9.00,ver="TSFN",limits=("128K","16K"),
    notes=["不支持 JSON Schema 与 `json_object`","可用原生 `/v1/messages` 接口"],
    notes_en=["JSON Schema and `json_object` are not supported","the native `/v1/messages` endpoint is available"]),
@@ -87,12 +90,12 @@ MODELS = [
  # ---------- Qwen ----------
  m("qwen3.8-max","qwen",1.485,4.4559,cr=0.1854,cw=1.8567,ver="TSJFC",limits=("983K","131K"),notes=["`tool_choice` 用 `\"auto\"`"],notes_en=["use `tool_choice: \"auto\"`"]),
  m("qwen3.8-max-0902","qwen",1.485,4.4559,cr=0.1854,cw=1.8567,ver="TSJFC",limits=("983K","131K"),notes=["`tool_choice` 用 `\"auto\"`"],notes_en=["use `tool_choice: \"auto\"`"]),
- m("qwen3.8-2.4t-a95b","qwen",1.485,4.4559,cr=0.1854,cw=1.8567,ver="TSJF",notes=["`tool_choice` 用 `\"auto\"`"],notes_en=["use `tool_choice: \"auto\"`"]),
- m("qwen3.8-27b","qwen",0.3816,1.5264,cr=0.0765,cw=0.477,ver="TSF",notes=["`tool_choice` 用 `\"auto\"`"],notes_en=["use `tool_choice: \"auto\"`"]),
- m("qwen3.8-flash","qwen",0.1017,0.3438,cr=0.0126,cw=0.1593,ver="TSJF",notes=["`tool_choice` 用 `\"auto\"`"],notes_en=["use `tool_choice: \"auto\"`"]),
+ m("qwen3.8-2.4t-a95b","qwen",1.485,4.4559,cr=0.1854,cw=1.8567,ver="TSJFC",notes=["`tool_choice` 用 `\"auto\"`"],notes_en=["use `tool_choice: \"auto\"`"]),
+ m("qwen3.8-27b","qwen",0.3816,1.5264,cr=0.0765,cw=0.477,ver="TSFC",notes=["`tool_choice` 用 `\"auto\"`"],notes_en=["use `tool_choice: \"auto\"`"]),
+ m("qwen3.8-flash","qwen",0.1017,0.3438,cr=0.0126,cw=0.1593,ver="TSJFC",notes=["`tool_choice` 用 `\"auto\"`"],notes_en=["use `tool_choice: \"auto\"`"]),
  m("qwen3.7-max","qwen",1.485,4.4559,ver="TSJF"),
  m("qwen3.7-plus","qwen",0.2208,0.8808,tier=dict(T256,inp=0.59472,out=2.37672),ver="TSJF"),
- m("qwen3.7-flash","qwen",0.0252,0.099,cr=0.0054,cw=0.0306,tier=dict(th="32K",op=">",inp=0.0747,out=0.297,cr=0.0153,cw=0.0927),ver="TSJF"),
+ m("qwen3.7-flash","qwen",0.0252,0.099,cr=0.0054,cw=0.0306,tier=dict(th="32K",op=">",inp=0.0747,out=0.297,cr=0.0153,cw=0.0927),ver="TSJFC"),
  m("qwen3.6-plus","qwen",0.2484,1.4859,tier=dict(T256,inp=0.9909,out=5.9418),ver="TSF"),
  m("qwen3.6-flash","qwen",0.1485,0.891,tier=dict(T256,inp=0.594,out=3.5649),ver="TSF"),
  # ---------- MiniMax ----------

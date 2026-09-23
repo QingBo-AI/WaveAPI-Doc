@@ -3,8 +3,10 @@ title: "Model Updates"
 ---
 
 <Update label="2026-09-23" description="Model launch">
-**Text models · 7 new models (xAI / Qwen / Z.ai)**
+**Text models · 10 new models (OpenAI / Anthropic / xAI / Qwen / Z.ai)**
 
+- **OpenAI**: `gpt-6-sol` · `gpt-6-luna` — the mid and low-cost tiers of GPT-6, about 1M-token context, image input, JSON Schema structured output and function calling (function calling requires `reasoning_effort: "none"`); prompts over 272K tokens are billed at the long-context tier.
+- **Anthropic**: `claude-opus-5-5` — the first Claude 5.5 model, 1M-token context, always thinks, supports function calling and the native `/v1/messages` endpoint, priced below `claude-opus-5`.
 - **xAI**: `grok-4.7` — 500K-token context, image input and function calling, always reasons; prompts of 200K tokens or more are billed at the long-context tier.
 - **Qwen**: `qwen3.8-max-0902` (upgraded snapshot of `qwen3.8-max`, released 2 September) · `qwen3.8-2.4t-a95b` (open-weight flagship, text input only) · `qwen3.8-flash` · `qwen3.8-27b` · `qwen3.7-flash` (long-context tier above 32K input).
 - **Z.ai**: `glm-5.3` — always reasons, supports function calling.
