@@ -1,10 +1,10 @@
 ---
 title: "Seedream 系列"
-description: "字节跳动 Seedream 图像模型：文生图与单图参考编辑，按张固定价"
+description: "字节跳动 Seedream 图像模型：文生图与参考图编辑，按张固定价"
 api: "POST https://api.qingbo.ai/v1/tasks"
 ---
 
-Seedream 是字节跳动的图像生成与编辑模型系列。本页覆盖当前可用的四个模型，它们共用同一套请求参数、同一个任务接口和同一种计费方式（按成功出图的固定张价），差别在分辨率档、画幅数量和各自的专有参数——换模型只改 `model`。
+Seedream 是字节跳动的图像生成与编辑模型系列。本页覆盖当前可用的五个模型，它们共用同一套请求参数、同一个任务接口和同一种计费方式（按成功出图的固定张价），差别在分辨率档、画幅数量和各自的专有参数——换模型只改 `model`。
 
 ## 快速开始
 
@@ -56,6 +56,23 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
   }'
 ```
 
+```bash 多图参考（Flash）
+curl -X POST https://api.qingbo.ai/v1/tasks \
+  -H "Authorization: Bearer $WAVE_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "seedream-5.0-flash",
+    "action": "edit",
+    "prompt": "把图 1 的人物换上图 2 的外套，背景用图 3 的街景",
+    "image_urls": [
+      "https://cdn.example.com/person.jpg",
+      "https://cdn.example.com/coat.jpg",
+      "https://cdn.example.com/street.jpg"
+    ],
+    "resolution": "1.5k"
+  }'
+```
+
 </CodeGroup>
 
 提交成功后返回 `task_id`。用 [`GET /v1/tasks/{task_id}`](/cn/api-reference/task/status) 查询结果，也可以用 [`Prefer: wait`](/cn/api-reference/task/submit#请求内等待prefer-wait) 在一次调用里等待，或配置 Webhook。
@@ -63,7 +80,7 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
 ## 请求参数
 
 <ParamField body="model" type="string" required>
-  四选一：`seedream-4.0`、`seedream-4.5`、`seedream-5.0-lite` 或 `seedream-5.0-pro`。
+  五选一：`seedream-4.0`、`seedream-4.5`、`seedream-5.0-lite`、`seedream-5.0-pro` 或 `seedream-5.0-flash`。
 </ParamField>
 
 <ParamField body="action" type="string" default="generate">
@@ -76,15 +93,15 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
 </ParamField>
 
 <ParamField body="image_urls" type="string[]">
-  参考图片 URL 数组。`edit` 时必填，最多 1 张；`generate` 不接受参考图。
+  参考图片 URL 数组。`edit` 时必填：`seedream-5.0-flash` 最多 10 张，其余模型最多 1 张；`generate` 不接受参考图。
 </ParamField>
 
 <ParamField body="aspect_ratio" type="string" default="1:1">
-  画面比例。四个模型共通 10 种：`1:1`、`4:3`、`3:4`、`16:9`、`9:16`、`3:2`、`2:3`、`2:1`、`1:2`、`21:9`。
+  画面比例。五个模型共通 10 种：`1:1`、`4:3`、`3:4`、`16:9`、`9:16`、`3:2`、`2:3`、`2:1`、`1:2`、`21:9`。
 
   `seedream-4.0` 与 `seedream-4.5` 额外支持 `9:21`。
 
-  `auto` 表示由模型决定比例。`seedream-5.0-pro` 的默认值是 `auto`，其余三个模型默认 `1:1`，且只在 `edit` 下接受 `auto`。
+  `auto` 表示由模型决定比例。`seedream-5.0-pro` 与 `seedream-5.0-flash` 的默认值是 `auto`，两个动作都接受；其余三个模型默认 `1:1`，且只在 `edit` 下接受 `auto`。
 </ParamField>
 
 <ParamField body="resolution" type="string" default="2k">
@@ -94,10 +111,11 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
   - `seedream-4.5`：`2k`、`4k`
   - `seedream-5.0-lite`：`2k`、`3k`、`4k`
   - `seedream-5.0-pro`：`1k`、`1.5k`、`2k`，默认 `1.5k`
+  - `seedream-5.0-flash`：`1k`、`1.5k`、`2k`，默认 `1k`
 </ParamField>
 
 <ParamField body="n" type="integer" default="1">
-  生成数量。`seedream-4.0` 与 `seedream-4.5` 的文生图每次只出 1 张，编辑时参考图张数 + `n` 不超过 15（带 1 张参考图时 `n` 最多 14）；`seedream-5.0-lite` 文生图取 `1`–`15`，编辑时同样是参考图张数 + `n` 不超过 15；`seedream-5.0-pro` 取值 `1`。
+  生成数量。`seedream-4.0` 与 `seedream-4.5` 的文生图每次只出 1 张，编辑时参考图张数 + `n` 不超过 15（带 1 张参考图时 `n` 最多 14）；`seedream-5.0-lite` 文生图取 `1`–`15`，编辑时同样是参考图张数 + `n` 不超过 15；`seedream-5.0-pro` 与 `seedream-5.0-flash` 取值 `1`。
 
   `n` 大于 1 时进入组图模式：`n` 是本次最多生成的张数，实际返回可能少于 `n`，按实际返回的张数计费。
 </ParamField>
@@ -116,11 +134,11 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
 </ParamField>
 
 <ParamField body="output_format" type="string" default="jpeg">
-  输出图片格式，`jpeg` 或 `png`。只有 `seedream-5.0-lite` 与 `seedream-5.0-pro` 支持。
+  输出图片格式，`jpeg` 或 `png`。只有 `seedream-5.0-lite`、`seedream-5.0-pro` 与 `seedream-5.0-flash` 支持。
 </ParamField>
 
 <ParamField body="background" type="string" default="opaque">
-  背景：`opaque` 不透明 / `transparent` 透明。只有 `seedream-5.0-pro` 支持，且透明背景仅在单张带 alpha 通道的输入图做图生图、同时 `output_format` 为 `png` 时可用。
+  背景：`opaque` 不透明 / `transparent` 透明。只有 `seedream-5.0-pro` 与 `seedream-5.0-flash` 支持，且透明背景仅在单张带 alpha 通道的输入图做图生图、同时 `output_format` 为 `png` 时可用。
 </ParamField>
 
 通用的 `callback_url`、`callback_events`、`Prefer: wait`、`Idempotency-Key` 和费用上限请求头见[提交任务](/cn/api-reference/task/submit)。
@@ -133,17 +151,17 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
 |---|---|
 | `seedream-4.0` / `seedream-4.5` / `seedream-5.0-lite` | 必须提供提示词；每次请求最多 15 张，参考图计入这 15 张。 |
 | `seedream-4.0` / `seedream-4.5`，`action: "generate"` | 文生图每次只生成 1 张；多张输出需要带参考图（编辑）。 |
-| `seedream-5.0-pro` | 必须提供提示词，且每次请求生成 1 张图片 |
+| `seedream-5.0-pro` / `seedream-5.0-flash` | 必须提供提示词，且每次请求生成 1 张图片 |
 | `action: "generate"` | 不接受参考图 |
-| `action: "edit"` | 必须提供 1 张参考图 |
-| 参考图张数 | 最多 1 张 |
+| `action: "edit"` | 必须提供参考图：`seedream-5.0-flash` 1 至 10 张，其余模型 1 张 |
+| 参考图张数 | `seedream-5.0-flash` 最多 10 张，其余模型最多 1 张 |
 | `aspect_ratio: "auto"` | `seedream-4.0`、`seedream-4.5`、`seedream-5.0-lite` 只在 `edit` 下可用 |
 | `optimize_prompt_options` | 仅 `seedream-4.0`（字符串）与 `seedream-4.5`（对象） |
-| `output_format` / `background` | `output_format` 仅 5.0 两档；`background` 仅 `seedream-5.0-pro` |
+| `output_format` / `background` | `output_format` 仅 5.0 三档；`background` 仅 `seedream-5.0-pro` 与 `seedream-5.0-flash` |
 
 ## 计费
 
-按成功出图的**固定张价**结算。`seedream-4.0`、`seedream-4.5`、`seedream-5.0-lite` 三个模型的各档分辨率同价，`seedream-5.0-pro` 的 `2k` 比 `1k` / `1.5k` 贵一档。
+按成功出图的**固定张价**结算。`seedream-4.0`、`seedream-4.5`、`seedream-5.0-lite`、`seedream-5.0-flash` 四个模型的各档分辨率同价，`seedream-5.0-pro` 的 `2k` 比 `1k` / `1.5k` 贵一档。
 
 单价见 `GET /v1/models` 返回的 `price_config`，或控制台「模型市场」。单次调用的实际花费见任务响应里的 `cost`——整数 quota，**500,000 quota = 1 USD**，不是美元。
 
@@ -189,12 +207,13 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
 | `seedream-4.5` | `2k` `4k`（同价） | 11 种 + `auto` | `optimize_prompt_options`（对象） |
 | `seedream-5.0-lite` | `2k` `3k` `4k`（同价） | 10 种 + `auto` | `output_format` |
 | `seedream-5.0-pro` | `1k` `1.5k` `2k`（`2k` 更贵） | 10 种 + `auto` | `output_format`、`background` |
+| `seedream-5.0-flash` | `1k` `1.5k` `2k`（同价） | 10 种 + `auto` | `output_format`、`background` |
 
-四个模型都支持文生图与单张参考图编辑，都接受 `watermark`；除 `seedream-5.0-pro` 外都可以一次出多张（见 `n`）。
+五个模型都支持文生图与参考图编辑，都接受 `watermark`。`seedream-5.0-flash` 编辑时最多接受 10 张参考图，其余模型 1 张；`seedream-4.0`、`seedream-4.5`、`seedream-5.0-lite` 可以一次出多张（见 `n`）。
 
 - **10 种共通画幅**：`1:1` `4:3` `3:4` `16:9` `9:16` `3:2` `2:3` `2:1` `1:2` `21:9`
 - **`seedream-4.0` 与 `seedream-4.5` 额外支持 `9:21`**
-- **`auto` 由模型按输入决定画幅**：`seedream-4.0`、`seedream-4.5`、`seedream-5.0-lite` 只在 `edit` 下接受它；`seedream-5.0-pro` 两个动作都接受，且它的默认画幅就是 `auto`
+- **`auto` 由模型按输入决定画幅**：`seedream-4.0`、`seedream-4.5`、`seedream-5.0-lite` 只在 `edit` 下接受它；`seedream-5.0-pro` 与 `seedream-5.0-flash` 两个动作都接受，且默认画幅就是 `auto`
 
 ## 相关文档
 
