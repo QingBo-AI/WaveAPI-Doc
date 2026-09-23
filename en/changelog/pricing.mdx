@@ -7,6 +7,12 @@ This page lists, newest first, each model's launch pricing and the price changes
 </Note>
 
 <Update label="2026-09-23" description="Pricing change">
+**Explicit caching enabled on `qwen3.8-max`**
+
+Requests can mark a reusable prefix with `cache_control` (previously rejected with 400). Writes are billed at the cache-write rate of \$1.8567 and hits at the cache-read rate of \$0.1854 (per 1M tokens); input, output and automatic cache-hit rates are unchanged.
+</Update>
+
+<Update label="2026-09-23" description="Pricing change">
 **Cache hits on 13 OpenAI models now billed at the cache-read rate**
 
 Input tokens served from the automatic cache were previously billed at the regular input rate; they are now billed at the cache-read rate. Input and output rates are unchanged. Cache-read rates (per 1M tokens):
@@ -39,11 +45,11 @@ The number of cached tokens is reported in `usage.prompt_tokens_details.cached_t
 |---|---|
 | `glm-5.3` | input \$1.26 · output \$3.96 · cache read \$0.234 (per 1M tokens) |
 | `grok-4.7` | input \$1.8 · output \$5.4 · cache read \$0.45; above 200K input tokens: input \$3.6 / output \$10.8 (per 1M tokens) |
-| `qwen3.7-flash` | input \$0.0252 · output \$0.099; above 32K input tokens: input \$0.0747 / output \$0.297 (per 1M tokens) |
-| `qwen3.8-2.4t-a95b` | input \$1.485 · output \$4.4559 (per 1M tokens) |
-| `qwen3.8-27b` | input \$0.3816 · output \$1.5264 (per 1M tokens) |
-| `qwen3.8-flash` | input \$0.1017 · output \$0.3438 (per 1M tokens) |
-| `qwen3.8-max-0902` | input \$1.485 · output \$4.4559 · cache read \$0.1854 (per 1M tokens) |
+| `qwen3.7-flash` | input \$0.0252 · output \$0.099 · cache read \$0.0054 · cache write \$0.0306; above 32K input tokens: input \$0.0747 / output \$0.297 (per 1M tokens) |
+| `qwen3.8-2.4t-a95b` | input \$1.485 · output \$4.4559 · cache read \$0.1854 · cache write \$1.8567 (per 1M tokens) |
+| `qwen3.8-27b` | input \$0.3816 · output \$1.5264 · cache read \$0.0765 · cache write \$0.477 (per 1M tokens) |
+| `qwen3.8-flash` | input \$0.1017 · output \$0.3438 · cache read \$0.0126 · cache write \$0.1593 (per 1M tokens) |
+| `qwen3.8-max-0902` | input \$1.485 · output \$4.4559 · cache read \$0.1854 · cache write \$1.8567 (per 1M tokens) |
 
 </Update>
 
@@ -307,7 +313,7 @@ Changes take effect **immediately** and apply only to calls made afterwards. Liv
 
 | Model ID | Price (USD) |
 |---|---|
-| `qwen3.8-max` | input \$1.485 · output \$4.4559 · cache read \$0.1854 (per 1M tokens) |
+| `qwen3.8-max` | input \$1.485 · output \$4.4559 · cache read \$0.1854 · cache write \$1.8567 (per 1M tokens) |
 
 </Update>
 
