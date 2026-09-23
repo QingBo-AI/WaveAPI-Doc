@@ -5,7 +5,7 @@ api: "POST https://api.qingbo.ai/v1/tasks"
 ---
 
 <Warning>
-**上游停用预告**：OpenAI 已公告 Sora 2 系列与 Videos API 于 **2026-09-24** 关闭，清波 API `sora-2` / `sora-2-pro` 同日下架，此后提交的任务会被拒绝且不计费。替代模型与说明见 [运营公告](/cn/changelog/notices)。
+`sora-2` 与 `sora-2-pro` 已于 2026-09-24 下架（OpenAI 关停 Sora 2 全部模型与 Videos API），本页仅作存档，调用将返回错误。视频生成请改用 [Veo 3.1 系列](/cn/api-reference/video/veo) 或 [视频模型总览](/cn/api-reference/video/overview) 中的其他模型
 </Warning>
 
 OpenAI Sora 2 生成物理表现稳定、自带同步音轨（对白、音效与环境声）的写实视频，多镜头一致性强。本页覆盖 `sora-2` 与 `sora-2-pro`：两个模型的动作、参数集合和取值范围完全相同，只有可选分辨率不同，换档只改 `model`。生成请求统一走 `POST /v1/tasks` 异步提交。
