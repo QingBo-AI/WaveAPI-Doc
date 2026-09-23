@@ -70,7 +70,7 @@ Caching is graded per model by which cache rates that model has configured. Cach
 | Grade | Test | Models |
 |---|---|---|
 | No cache discount | `cache_billing: "input_output"` | every other model in the catalog; any cache statistics in the response bill at the ordinary input rate |
-| Cache read only | has `cache_read` | `gpt-5.5` `gpt-5.4` `grok-4.6` `gemini-3.6-flash` `gemini-3.7-flash` `gemini-3.8-flash` `kimi-k3` `qwen3.8-max` |
+| Cache read only | has `cache_read` | `gpt-5.5` `gpt-5.4` `gpt-5.4-mini` `gpt-5.4-nano` `gpt-5.2` `gpt-5.1` `gpt-5` `gpt-5-mini` `gpt-5-nano` `gpt-4.1` `gpt-4.1-mini` `gpt-4.1-nano` `o4-mini` `o3-mini` `o1` `grok-4.7` `grok-4.6` `gemini-3.6-flash` `gemini-3.7-flash` `gemini-3.8-flash` `kimi-k3` `qwen3.8-max` `qwen3.8-max-0902` `glm-5.3` |
 | Cache read + write | also `cache_write` | `gpt-5.6-luna` `gpt-5.6-terra` `gpt-5.6-sol` `gpt-6-astra` |
 | Cache read + 5-min write + 1-hour write | also `cache_write_1h` | `claude-opus-5` `claude-sonnet-5` `claude-fable-5` `claude-fable-5-1` |
 | Time-of-day cache rate | `cache_read` inside each `text_schedule` window | `deepseek-v4-pro` `deepseek-v4-flash` |
@@ -85,9 +85,9 @@ Caching is graded per model by which cache rates that model has configured. Cach
 | Models | Explicit `cache_control` |
 |---|---|
 | `claude-opus-5` `claude-sonnet-5` `claude-fable-5` `claude-fable-5-1` | ✅ Allowed; all three cache rates configured (read / 5-minute write / 1-hour write) |
-| every `gemini-*`, and `qwen3.8-max` | ❌ Automatic caching only; sending `cache_control` returns 400 |
+| every `gemini-*`, `qwen3.8-max` and `qwen3.8-max-0902` | ❌ Automatic caching only; sending `cache_control` returns 400 |
 | two-rate models | ❌ No cache billing; sending `cache_control` returns 400 |
-| everything else (`gpt-5.4/5.5/5.6-*`, `gpt-6-astra`, `grok-4.6`, `kimi-k3`, `deepseek-v4-*`) | Upstream caches automatically; `cache_control` is neither needed nor used |
+| everything else (`gpt-4.1*`, `gpt-5*`, `gpt-6-astra`, `o1`, `o3-mini`, `o4-mini`, `grok-4.6`, `grok-4.7`, `glm-5.3`, `kimi-k3`, `deepseek-v4-*`) | Upstream caches automatically; `cache_control` is neither needed nor used |
 
 Unsupported requests return `400` and are not billed.
 

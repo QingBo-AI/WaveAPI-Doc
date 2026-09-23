@@ -70,7 +70,7 @@ Caching is graded per model by which cache rates that model has configured. Cach
 | Grade | Test | Models |
 |---|---|---|
 | No cache discount | `cache_billing: "input_output"` | every other model in the catalog; any cache statistics in the response bill at the ordinary input rate |
-| Cache read only | has `cache_read` | `gpt-5.5` `gpt-5.4` `grok-4.6` `gemini-3.6-flash` `gemini-3.7-flash` `gemini-3.8-flash` `kimi-k3` `qwen3.8-max` |
+| Cache read only | has `cache_read` | `gpt-5.5` `gpt-5.4` `gpt-5.4-mini` `gpt-5.4-nano` `gpt-5.2` `gpt-5.1` `gpt-5` `gpt-5-mini` `gpt-5-nano` `gpt-4.1` `gpt-4.1-mini` `gpt-4.1-nano` `o4-mini` `o3-mini` `o1` `grok-4.7` `grok-4.6` `gemini-3.6-flash` `gemini-3.7-flash` `gemini-3.8-flash` `kimi-k3` `qwen3.8-max` `qwen3.8-max-0902` `glm-5.3` |
 | Cache read + write | also `cache_write` | `gpt-5.6-luna` `gpt-5.6-terra` `gpt-5.6-sol` `gpt-6-astra` |
 | Cache read + 5-min write + 1-hour write | also `cache_write_1h` | `claude-opus-5` `claude-sonnet-5` `claude-fable-5` `claude-fable-5-1` |
 | Time-of-day cache rate | `cache_read` inside each `text_schedule` window | `deepseek-v4-pro` `deepseek-v4-flash` |
@@ -85,9 +85,9 @@ Caching is graded per model by which cache rates that model has configured. Cach
 | Models | Explicit `cache_control` |
 |---|---|
 | `claude-opus-5` `claude-sonnet-5` `claude-fable-5` `claude-fable-5-1` | ✅ Allowed; all three cache rates configured (read / 5-minute write / 1-hour write) |
-| every `gemini-*`, and `qwen3.8-max` | ❌ Automatic caching only; sending `cache_control` returns 400 |
+| every `gemini-*`, `qwen3.8-max` and `qwen3.8-max-0902` | ❌ Automatic caching only; sending `cache_control` returns 400 |
 | two-rate models | ❌ No cache billing; sending `cache_control` returns 400 |
-| everything else (`gpt-5.4/5.5/5.6-*`, `gpt-6-astra`, `grok-4.6`, `kimi-k3`, `deepseek-v4-*`) | Upstream caches automatically; `cache_control` is neither needed nor used |
+| everything else (`gpt-4.1*`, `gpt-5*`, `gpt-6-astra`, `o1`, `o3-mini`, `o4-mini`, `grok-4.6`, `grok-4.7`, `glm-5.3`, `kimi-k3`, `deepseek-v4-*`) | Upstream caches automatically; `cache_control` is neither needed nor used |
 
 Unsupported requests return `400` and are not billed.
 
@@ -164,24 +164,24 @@ Each model serves only the protocols it supports (Chat / Responses / Claude Mess
 | `gpt-5.5` | + cache read | ✓ / ✓ |
 | `gpt-5.4` | + cache read | ✓ / ✓ |
 | `gpt-5.4-pro` | input + output | — / — |
-| `gpt-5.4-mini` | input + output | ✓ / ✓ |
-| `gpt-5.4-nano` | input + output | ✓ / ✓ |
+| `gpt-5.4-mini` | + cache read | ✓ / ✓ |
+| `gpt-5.4-nano` | + cache read | ✓ / ✓ |
 | `gpt-5.3-codex` | input + output | — / — |
-| `gpt-5.2` | input + output | ✓ / ✓ |
+| `gpt-5.2` | + cache read | ✓ / ✓ |
 | `gpt-5.2-pro` | input + output | — / — |
-| `gpt-5.1` | input + output | ✓ / ✓ |
-| `gpt-5` | input + output | — / ✓ |
-| `gpt-5-mini` | input + output | ✓ / ✓ |
-| `gpt-5-nano` | input + output | ✓ / ✓ |
+| `gpt-5.1` | + cache read | ✓ / ✓ |
+| `gpt-5` | + cache read | — / ✓ |
+| `gpt-5-mini` | + cache read | ✓ / ✓ |
+| `gpt-5-nano` | + cache read | ✓ / ✓ |
 | `gpt-5-pro` | input + output | — / — |
-| `gpt-4.1` | input + output | ✓ / ✓ |
-| `gpt-4.1-mini` | input + output | ✓ / ✓ |
-| `gpt-4.1-nano` | input + output | ✓ / ✓ |
+| `gpt-4.1` | + cache read | ✓ / ✓ |
+| `gpt-4.1-mini` | + cache read | ✓ / ✓ |
+| `gpt-4.1-nano` | + cache read | ✓ / ✓ |
 | `o3` | input + output | ✓ / ✓ |
 | `o3-pro` | input + output | — / — |
-| `o4-mini` | input + output | ✓ / ✓ |
-| `o3-mini` | input + output | ✓ / ✓ |
-| `o1` | input + output | ✓ / ✓ |
+| `o4-mini` | + cache read | ✓ / ✓ |
+| `o3-mini` | + cache read | ✓ / ✓ |
+| `o1` | + cache read | ✓ / ✓ |
 
 **Model notes**
 
@@ -192,10 +192,23 @@ Each model serves only the protocols it supports (Chat / Responses / Claude Mess
 - `gpt-5.5` — 272K long-context tier; max input 1M, max output 12.8K; no separate cache-write rate
 - `gpt-5.4` — 272K long-context tier; max input 1M, max output 12.8K; no separate cache-write rate
 - `gpt-5.4-pro` — 272K long-context tier; `/v1/responses` only
+- `gpt-5.4-mini` — supports automatic cache hits
+- `gpt-5.4-nano` — supports automatic cache hits
 - `gpt-5.3-codex` — `/v1/responses` only
+- `gpt-5.2` — supports automatic cache hits
 - `gpt-5.2-pro` — `/v1/responses` only
+- `gpt-5.1` — supports automatic cache hits
+- `gpt-5` — supports automatic cache hits
+- `gpt-5-mini` — supports automatic cache hits
+- `gpt-5-nano` — supports automatic cache hits
 - `gpt-5-pro` — `/v1/responses` only
+- `gpt-4.1` — supports automatic cache hits
+- `gpt-4.1-mini` — supports automatic cache hits
+- `gpt-4.1-nano` — supports automatic cache hits
 - `o3-pro` — `/v1/responses` only
+- `o4-mini` — supports automatic cache hits
+- `o3-mini` — supports automatic cache hits
+- `o1` — supports automatic cache hits
 
 GPT-5 and later use `max_completion_tokens` to cap output and `reasoning_effort` to pick a reasoning tier (GPT-6 Astra supports `"low"` only). `max_tokens` is rejected. `gpt-5-pro`, `gpt-5.2-pro`, `gpt-5.4-pro`, `gpt-5.3-codex` and `o3-pro` are served only on the [Responses API](/en/api-reference/text/openai-multimodal) and return 400 on Chat. The 272K tier is judged on **total input**: exactly 272,000 stays on the base rate, anything above moves the whole request (cache and output included) to the long-context rate. GPT-5.6 cache writes cost 1.25× the tier's input rate and replace the ordinary input charge rather than adding to it; GPT-5.4 / 5.5 have no separate cache-write rate.
 
@@ -286,15 +299,25 @@ Beijing time is UTC+8. The per-slot input / output / cache-read rates for each m
 | Model ID | Billing | JSON / Tools |
 |---|---|:---:|
 | `qwen3.8-max` | + cache read | ✓ / ✓ |
+| `qwen3.8-max-0902` | + cache read | ✓ / ✓ |
+| `qwen3.8-2.4t-a95b` | input + output | ✓ / ✓ |
+| `qwen3.8-27b` | input + output | — / ✓ |
+| `qwen3.8-flash` | input + output | ✓ / ✓ |
 | `qwen3.7-max` | input + output | ✓ / ✓ |
 | `qwen3.7-plus` | input + output | ✓ / ✓ |
+| `qwen3.7-flash` | input + output | ✓ / ✓ |
 | `qwen3.6-plus` | input + output | — / ✓ |
 | `qwen3.6-flash` | input + output | — / ✓ |
 
 **Model notes**
 
 - `qwen3.8-max` — max input 983K, max output 131K; supports automatic cache hits; explicit `cache_control` is not supported; use `tool_choice: "auto"`
+- `qwen3.8-max-0902` — max input 983K, max output 131K; supports automatic cache hits; explicit `cache_control` is not supported; use `tool_choice: "auto"`
+- `qwen3.8-2.4t-a95b` — use `tool_choice: "auto"`
+- `qwen3.8-27b` — use `tool_choice: "auto"`
+- `qwen3.8-flash` — use `tool_choice: "auto"`
 - `qwen3.7-plus` — 256K long-context tier
+- `qwen3.7-flash` — 32K long-context tier
 - `qwen3.6-plus` — 256K long-context tier
 - `qwen3.6-flash` — 256K long-context tier
 
@@ -319,6 +342,7 @@ Kimi K3 supports automatic caching. Use `tool_choice: "auto"`, and give function
 
 | Model ID | Billing | JSON / Tools |
 |---|---|:---:|
+| `grok-4.7` | + cache read | ✓ / ✓ |
 | `grok-4.6` | + cache read | ✓ / — |
 | `grok-4.5` | input + output | ✓ / — |
 | `grok-4.3` | input + output | ✓ / ✓ |
@@ -328,6 +352,7 @@ Kimi K3 supports automatic caching. Use `tool_choice: "auto"`, and give function
 
 **Model notes**
 
+- `grok-4.7` — 200K long-context tier; supports automatic cache hits
 - `grok-4.6` — 200K long-context tier; max input 500K, max output 12.8K; supports automatic cache hits; tool calling is not supported; `max_tokens` is not a hard cap; reasoning can push completion_tokens past it
 - `grok-4.5` — 200K long-context tier; tool calling is not supported
 - `grok-4.3` — 200K long-context tier
@@ -341,11 +366,16 @@ The whole Grok line has a 200K tier: once total input (cache included) reaches 2
 
 | Model ID | Billing | JSON / Tools |
 |---|---|:---:|
+| `glm-5.3` | + cache read | — / ✓ |
 | `glm-5.2` | input + output | — / ✓ |
 | `glm-5.1` | input + output | — / ✓ |
 | `glm-5` | input + output | ✓ / ✓ |
 | `glm-4.7` | input + output | ✓ / ✓ |
 | `glm-4.6` | input + output | — / ✓ |
+
+**Model notes**
+
+- `glm-5.3` — supports automatic cache hits
 
 Input and output are the only two rates; `cache_control` is not supported.
 

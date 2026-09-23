@@ -70,7 +70,7 @@ quota      = 费用（USD） × 500,000，向下取整，最低 1
 | 档 | 判据 | 模型 |
 |---|---|---|
 | 无缓存优惠 | `cache_billing: "input_output"` | 目录中其余全部模型；响应里若带缓存统计，一律按普通输入价计 |
-| 只有缓存读 | 配了 `cache_read` | `gpt-5.5` `gpt-5.4` `grok-4.6` `gemini-3.6-flash` `gemini-3.7-flash` `gemini-3.8-flash` `kimi-k3` `qwen3.8-max` |
+| 只有缓存读 | 配了 `cache_read` | `gpt-5.5` `gpt-5.4` `gpt-5.4-mini` `gpt-5.4-nano` `gpt-5.2` `gpt-5.1` `gpt-5` `gpt-5-mini` `gpt-5-nano` `gpt-4.1` `gpt-4.1-mini` `gpt-4.1-nano` `o4-mini` `o3-mini` `o1` `grok-4.7` `grok-4.6` `gemini-3.6-flash` `gemini-3.7-flash` `gemini-3.8-flash` `kimi-k3` `qwen3.8-max` `qwen3.8-max-0902` `glm-5.3` |
 | 缓存读 + 写 | 再配 `cache_write` | `gpt-5.6-luna` `gpt-5.6-terra` `gpt-5.6-sol` `gpt-6-astra` |
 | 缓存读 + 5 分钟写 + 1 小时写 | 再配 `cache_write_1h` | `claude-opus-5` `claude-sonnet-5` `claude-fable-5` `claude-fable-5-1` |
 | 时段缓存价 | `text_schedule` 各时段带 `cache_read` | `deepseek-v4-pro` `deepseek-v4-flash` |
@@ -85,9 +85,9 @@ quota      = 费用（USD） × 500,000，向下取整，最低 1
 | 模型 | 显式 `cache_control` |
 |---|---|
 | `claude-opus-5` `claude-sonnet-5` `claude-fable-5` `claude-fable-5-1` | ✅ 放行，三档缓存价齐备（读 / 5 分钟写 / 1 小时写） |
-| 所有 `gemini-*`、`qwen3.8-max` | ❌ 只支持自动缓存，传 `cache_control` 返回 400 |
+| 所有 `gemini-*`、`qwen3.8-max`、`qwen3.8-max-0902` | ❌ 只支持自动缓存，传 `cache_control` 返回 400 |
 | 两项计价模型 | ❌ 没有缓存计费，传 `cache_control` 返回 400 |
-| 其余（`gpt-5.4/5.5/5.6-*`、`gpt-6-astra`、`grok-4.6`、`kimi-k3`、`deepseek-v4-*`） | 上游只有自动缓存，不需要也不用传 `cache_control` |
+| 其余（`gpt-4.1*`、`gpt-5*`、`gpt-6-astra`、`o1`、`o3-mini`、`o4-mini`、`grok-4.6`、`grok-4.7`、`glm-5.3`、`kimi-k3`、`deepseek-v4-*`） | 上游只有自动缓存，不需要也不用传 `cache_control` |
 
 不支持的请求返回 `400`，不计费。
 
@@ -162,24 +162,24 @@ Chat 响应里 `usage.prompt_tokens_details.cached_tokens` 是命中量；原生
 | `gpt-5.5` | 含缓存读 | ✓ / ✓ |
 | `gpt-5.4` | 含缓存读 | ✓ / ✓ |
 | `gpt-5.4-pro` | 输入输出两项 | — / — |
-| `gpt-5.4-mini` | 输入输出两项 | ✓ / ✓ |
-| `gpt-5.4-nano` | 输入输出两项 | ✓ / ✓ |
+| `gpt-5.4-mini` | 含缓存读 | ✓ / ✓ |
+| `gpt-5.4-nano` | 含缓存读 | ✓ / ✓ |
 | `gpt-5.3-codex` | 输入输出两项 | — / — |
-| `gpt-5.2` | 输入输出两项 | ✓ / ✓ |
+| `gpt-5.2` | 含缓存读 | ✓ / ✓ |
 | `gpt-5.2-pro` | 输入输出两项 | — / — |
-| `gpt-5.1` | 输入输出两项 | ✓ / ✓ |
-| `gpt-5` | 输入输出两项 | — / ✓ |
-| `gpt-5-mini` | 输入输出两项 | ✓ / ✓ |
-| `gpt-5-nano` | 输入输出两项 | ✓ / ✓ |
+| `gpt-5.1` | 含缓存读 | ✓ / ✓ |
+| `gpt-5` | 含缓存读 | — / ✓ |
+| `gpt-5-mini` | 含缓存读 | ✓ / ✓ |
+| `gpt-5-nano` | 含缓存读 | ✓ / ✓ |
 | `gpt-5-pro` | 输入输出两项 | — / — |
-| `gpt-4.1` | 输入输出两项 | ✓ / ✓ |
-| `gpt-4.1-mini` | 输入输出两项 | ✓ / ✓ |
-| `gpt-4.1-nano` | 输入输出两项 | ✓ / ✓ |
+| `gpt-4.1` | 含缓存读 | ✓ / ✓ |
+| `gpt-4.1-mini` | 含缓存读 | ✓ / ✓ |
+| `gpt-4.1-nano` | 含缓存读 | ✓ / ✓ |
 | `o3` | 输入输出两项 | ✓ / ✓ |
 | `o3-pro` | 输入输出两项 | — / — |
-| `o4-mini` | 输入输出两项 | ✓ / ✓ |
-| `o3-mini` | 输入输出两项 | ✓ / ✓ |
-| `o1` | 输入输出两项 | ✓ / ✓ |
+| `o4-mini` | 含缓存读 | ✓ / ✓ |
+| `o3-mini` | 含缓存读 | ✓ / ✓ |
+| `o1` | 含缓存读 | ✓ / ✓ |
 
 **模型备注**
 
@@ -190,10 +190,23 @@ Chat 响应里 `usage.prompt_tokens_details.cached_tokens` 是命中量；原生
 - `gpt-5.5` — 272K 长上下文分档；最大输入 1M、最大输出 12.8K；无独立缓存写入价
 - `gpt-5.4` — 272K 长上下文分档；最大输入 1M、最大输出 12.8K；无独立缓存写入价
 - `gpt-5.4-pro` — 272K 长上下文分档；仅 `/v1/responses`
+- `gpt-5.4-mini` — 支持自动缓存命中
+- `gpt-5.4-nano` — 支持自动缓存命中
 - `gpt-5.3-codex` — 仅 `/v1/responses`
+- `gpt-5.2` — 支持自动缓存命中
 - `gpt-5.2-pro` — 仅 `/v1/responses`
+- `gpt-5.1` — 支持自动缓存命中
+- `gpt-5` — 支持自动缓存命中
+- `gpt-5-mini` — 支持自动缓存命中
+- `gpt-5-nano` — 支持自动缓存命中
 - `gpt-5-pro` — 仅 `/v1/responses`
+- `gpt-4.1` — 支持自动缓存命中
+- `gpt-4.1-mini` — 支持自动缓存命中
+- `gpt-4.1-nano` — 支持自动缓存命中
 - `o3-pro` — 仅 `/v1/responses`
+- `o4-mini` — 支持自动缓存命中
+- `o3-mini` — 支持自动缓存命中
+- `o1` — 支持自动缓存命中
 
 GPT-5 及之后的模型用 `max_completion_tokens` 限制输出、用 `reasoning_effort` 选推理档位（GPT-6 Astra 只支持 `"low"`）。`max_tokens` 会被拒绝。`gpt-5-pro` / `gpt-5.2-pro` / `gpt-5.4-pro` / `gpt-5.3-codex` / `o3-pro` 只能走 [Responses 接口](/cn/api-reference/text/openai-multimodal)，发到 Chat 会返回 400。272K 分档以**输入总量**判断：恰好 272,000 用普通档，超过则整单（含缓存与输出）切到长上下文档。GPT-5.6 的缓存写入价是本档输入价的 1.25 倍，替代普通输入计费而不是叠加；GPT-5.4 / 5.5 没有独立缓存写入价。
 
@@ -284,15 +297,25 @@ V4 系列（Pro / Flash / 4.1 Flash）按**请求开始时刻的 UTC 时段**计
 | 模型 ID | 计费方式 | JSON / 工具 |
 |---|---|:---:|
 | `qwen3.8-max` | 含缓存读 | ✓ / ✓ |
+| `qwen3.8-max-0902` | 含缓存读 | ✓ / ✓ |
+| `qwen3.8-2.4t-a95b` | 输入输出两项 | ✓ / ✓ |
+| `qwen3.8-27b` | 输入输出两项 | — / ✓ |
+| `qwen3.8-flash` | 输入输出两项 | ✓ / ✓ |
 | `qwen3.7-max` | 输入输出两项 | ✓ / ✓ |
 | `qwen3.7-plus` | 输入输出两项 | ✓ / ✓ |
+| `qwen3.7-flash` | 输入输出两项 | ✓ / ✓ |
 | `qwen3.6-plus` | 输入输出两项 | — / ✓ |
 | `qwen3.6-flash` | 输入输出两项 | — / ✓ |
 
 **模型备注**
 
 - `qwen3.8-max` — 最大输入 983K、最大输出 131K；支持自动缓存命中；不支持显式 `cache_control`；`tool_choice` 用 `"auto"`
+- `qwen3.8-max-0902` — 最大输入 983K、最大输出 131K；支持自动缓存命中；不支持显式 `cache_control`；`tool_choice` 用 `"auto"`
+- `qwen3.8-2.4t-a95b` — `tool_choice` 用 `"auto"`
+- `qwen3.8-27b` — `tool_choice` 用 `"auto"`
+- `qwen3.8-flash` — `tool_choice` 用 `"auto"`
 - `qwen3.7-plus` — 256K 长上下文分档
+- `qwen3.7-flash` — 32K 长上下文分档
 - `qwen3.6-plus` — 256K 长上下文分档
 - `qwen3.6-flash` — 256K 长上下文分档
 
@@ -317,6 +340,7 @@ Kimi K3 支持自动缓存；`tool_choice` 用 `"auto"`，函数调用需要足�
 
 | 模型 ID | 计费方式 | JSON / 工具 |
 |---|---|:---:|
+| `grok-4.7` | 含缓存读 | ✓ / ✓ |
 | `grok-4.6` | 含缓存读 | ✓ / — |
 | `grok-4.5` | 输入输出两项 | ✓ / — |
 | `grok-4.3` | 输入输出两项 | ✓ / ✓ |
@@ -326,6 +350,7 @@ Kimi K3 支持自动缓存；`tool_choice` 用 `"auto"`，函数调用需要足�
 
 **模型备注**
 
+- `grok-4.7` — 200K 长上下文分档；支持自动缓存命中
 - `grok-4.6` — 200K 长上下文分档；最大输入 500K、最大输出 12.8K；支持自动缓存命中；不支持工具调用；`max_tokens` 不是硬上限，思考可使 completion_tokens 超出
 - `grok-4.5` — 200K 长上下文分档；不支持工具调用
 - `grok-4.3` — 200K 长上下文分档
@@ -339,11 +364,16 @@ Grok 全系 200K 分档：输入总量（含缓存）达到 200,000 时，输入
 
 | 模型 ID | 计费方式 | JSON / 工具 |
 |---|---|:---:|
+| `glm-5.3` | 含缓存读 | — / ✓ |
 | `glm-5.2` | 输入输出两项 | — / ✓ |
 | `glm-5.1` | 输入输出两项 | — / ✓ |
 | `glm-5` | 输入输出两项 | ✓ / ✓ |
 | `glm-4.7` | 输入输出两项 | ✓ / ✓ |
 | `glm-4.6` | 输入输出两项 | — / ✓ |
+
+**模型备注**
+
+- `glm-5.3` — 支持自动缓存命中
 
 只有输入 / 输出两项计价，不支持 `cache_control`。
 

@@ -6,6 +6,47 @@ title: "Pricing Updates"
 This page lists, newest first, each model's launch pricing and the price changes that followed. Launch entries show the model's **current** unit price (earlier prices are in the corresponding "Price change" entries); retired models are kept and marked with their retirement date. Pricing changes apply only to calls made **after** the change takes effect; historical calls are unaffected. Each model's live unit price is shown in the [Models overview](/en/docs/models) and the console "Model Market"; check each call's cost fields and units against [Request & Response Format](/en/docs/request-response) and the relevant endpoint documentation.
 </Note>
 
+<Update label="2026-09-23" description="Pricing change">
+**Cache hits on 13 OpenAI models now billed at the cache-read rate**
+
+Input tokens served from the automatic cache were previously billed at the regular input rate; they are now billed at the cache-read rate. Input and output rates are unchanged. Cache-read rates (per 1M tokens):
+
+| Model | Cache read |
+|---|---|
+| `gpt-5.4-mini` | \$0.0675 |
+| `gpt-5.4-nano` | \$0.018 |
+| `gpt-5.2` | \$0.1575 |
+| `gpt-5.1` | \$0.1125 |
+| `gpt-5` | \$0.1125 |
+| `gpt-5-mini` | \$0.0225 |
+| `gpt-5-nano` | \$0.0045 |
+| `gpt-4.1` | \$0.45 |
+| `gpt-4.1-mini` | \$0.09 |
+| `gpt-4.1-nano` | \$0.0225 |
+| `o4-mini` | \$0.2475 |
+| `o3-mini` | \$0.495 |
+| `o1` | \$6.75 |
+
+The number of cached tokens is reported in `usage.prompt_tokens_details.cached_tokens`.
+</Update>
+
+<Update label="2026-09-23" description="Model launch">
+**7 models launched · pricing**
+
+**Text**
+
+| Model ID | Price (USD) |
+|---|---|
+| `glm-5.3` | input \$1.26 · output \$3.96 · cache read \$0.234 (per 1M tokens) |
+| `grok-4.7` | input \$1.8 · output \$5.4 · cache read \$0.45; above 200K input tokens: input \$3.6 / output \$10.8 (per 1M tokens) |
+| `qwen3.7-flash` | input \$0.0252 · output \$0.099; above 32K input tokens: input \$0.0747 / output \$0.297 (per 1M tokens) |
+| `qwen3.8-2.4t-a95b` | input \$1.485 · output \$4.4559 (per 1M tokens) |
+| `qwen3.8-27b` | input \$0.3816 · output \$1.5264 (per 1M tokens) |
+| `qwen3.8-flash` | input \$0.1017 · output \$0.3438 (per 1M tokens) |
+| `qwen3.8-max-0902` | input \$1.485 · output \$4.4559 · cache read \$0.1854 (per 1M tokens) |
+
+</Update>
+
 <Update label="2026-09-19" description="Pricing change">
 **Three DeepSeek V4 models repriced; the schedule drops from three tiers to two**
 
@@ -725,8 +766,8 @@ Effective **immediately**; applies only to calls made after the change. Current 
 
 | Model ID | Price (USD) |
 |---|---|
-| `gpt-5.4-mini` | input \$0.675 · output \$4.05 (per 1M tokens) |
-| `gpt-5.4-nano` | input \$0.18 · output \$1.125 (per 1M tokens) |
+| `gpt-5.4-mini` | input \$0.675 · output \$4.05 · cache read \$0.0675 (per 1M tokens) |
+| `gpt-5.4-nano` | input \$0.18 · output \$1.125 · cache read \$0.018 (per 1M tokens) |
 
 </Update>
 
@@ -1006,7 +1047,7 @@ Effective **immediately**; applies only to calls made after the change. Current 
 
 | Model ID | Price (USD) |
 |---|---|
-| `gpt-5.2` | input \$1.575 · output \$12.6 (per 1M tokens) |
+| `gpt-5.2` | input \$1.575 · output \$12.6 · cache read \$0.1575 (per 1M tokens) |
 | `gpt-5.2-chat-latest` (retired) | input \$1.575 · output \$12.6 (per 1M tokens) |
 | `gpt-5.2-pro` | input \$18.9 · output \$151.2 (per 1M tokens) |
 
@@ -1113,7 +1154,7 @@ Effective **immediately**; applies only to calls made after the change. Current 
 
 | Model ID | Price (USD) |
 |---|---|
-| `gpt-5.1` | input \$1.125 · output \$9 (per 1M tokens) |
+| `gpt-5.1` | input \$1.125 · output \$9 · cache read \$0.1125 (per 1M tokens) |
 | `gpt-5.1-2025-11-13` (retired) | input \$1.125 · output \$9 (per 1M tokens) |
 | `gpt-5.1-chat-latest` (retired) | input \$1.125 · output \$9 (per 1M tokens) |
 | `gpt-5.1-codex` (retired) | input \$1.125 · output \$9 (per 1M tokens) |
@@ -1290,12 +1331,12 @@ Effective **immediately**; applies only to calls made after the change. Current 
 
 | Model ID | Price (USD) |
 |---|---|
-| `gpt-5` | input \$1.125 · output \$9 (per 1M tokens) |
+| `gpt-5` | input \$1.125 · output \$9 · cache read \$0.1125 (per 1M tokens) |
 | `gpt-5-2025-08-07` (retired) | input \$1.125 · output \$9 (per 1M tokens) |
 | `gpt-5-chat-latest` (retired) | input \$1.125 · output \$9 (per 1M tokens) |
-| `gpt-5-mini` | input \$0.225 · output \$1.8 (per 1M tokens) |
+| `gpt-5-mini` | input \$0.225 · output \$1.8 · cache read \$0.0225 (per 1M tokens) |
 | `gpt-5-mini-2025-08-07` (retired) | input \$0.225 · output \$1.8 (per 1M tokens) |
-| `gpt-5-nano` | input \$0.045 · output \$0.36 (per 1M tokens) |
+| `gpt-5-nano` | input \$0.045 · output \$0.36 · cache read \$0.0045 (per 1M tokens) |
 | `gpt-5-nano-2025-08-07` (retired) | input \$0.045 · output \$0.36 (per 1M tokens) |
 
 </Update>
@@ -1402,7 +1443,7 @@ Effective **immediately**; applies only to calls made after the change. Current 
 |---|---|
 | `o3` | input \$1.8 · output \$7.2 (per 1M tokens) |
 | `o3-2025-04-16` (retired) | input \$1.8 · output \$7.2 (per 1M tokens) |
-| `o4-mini` | input \$0.99 · output \$3.96 (per 1M tokens) |
+| `o4-mini` | input \$0.99 · output \$3.96 · cache read \$0.2475 (per 1M tokens) |
 | `o4-mini-2025-04-16` (retired) | input \$0.99 · output \$3.96 (per 1M tokens) |
 
 </Update>
@@ -1414,11 +1455,11 @@ Effective **immediately**; applies only to calls made after the change. Current 
 
 | Model ID | Price (USD) |
 |---|---|
-| `gpt-4.1` | input \$1.8 · output \$7.2 (per 1M tokens) |
+| `gpt-4.1` | input \$1.8 · output \$7.2 · cache read \$0.45 (per 1M tokens) |
 | `gpt-4.1-2025-04-14` (retired) | input \$1.8 · output \$7.2 (per 1M tokens) |
-| `gpt-4.1-mini` | input \$0.36 · output \$1.44 (per 1M tokens) |
+| `gpt-4.1-mini` | input \$0.36 · output \$1.44 · cache read \$0.09 (per 1M tokens) |
 | `gpt-4.1-mini-2025-04-14` (retired) | input \$0.36 · output \$1.44 (per 1M tokens) |
-| `gpt-4.1-nano` | input \$0.09 · output \$0.36 (per 1M tokens) |
+| `gpt-4.1-nano` | input \$0.09 · output \$0.36 · cache read \$0.0225 (per 1M tokens) |
 | `gpt-4.1-nano-2025-04-14` (retired) | input \$0.09 · output \$0.36 (per 1M tokens) |
 
 </Update>
@@ -1461,7 +1502,7 @@ Effective **immediately**; applies only to calls made after the change. Current 
 
 | Model ID | Price (USD) |
 |---|---|
-| `o3-mini` | input \$0.99 · output \$3.96 (per 1M tokens) |
+| `o3-mini` | input \$0.99 · output \$3.96 · cache read \$0.495 (per 1M tokens) |
 | `o3-mini-2025-01-31` (retired) | input \$0.99 · output \$3.96 (per 1M tokens) |
 
 </Update>
@@ -1473,7 +1514,7 @@ Effective **immediately**; applies only to calls made after the change. Current 
 
 | Model ID | Price (USD) |
 |---|---|
-| `o1` | input \$13.5 · output \$54 (per 1M tokens) |
+| `o1` | input \$13.5 · output \$54 · cache read \$6.75 (per 1M tokens) |
 | `o1-2024-12-17` (retired) | input \$13.5 · output \$54 (per 1M tokens) |
 
 </Update>
