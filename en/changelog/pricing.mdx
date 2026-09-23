@@ -7,6 +7,44 @@ This page lists, newest first, each model's launch pricing and the price changes
 </Note>
 
 <Update label="2026-09-23" description="Pricing change">
+**Video: SkyReels default-resolution pricing, source seconds on Wan 2.7 video editing, reference images on Grok Imagine Video**
+
+| Model | Change |
+|---|---|
+| `skyreels-v4-fast` / `skyreels-v4-std` | Without `resolution`, calls are billed at the **`1080p`** tier (the resolution actually rendered); previously the `720p` tier. With a reference video, pass `480p` or `720p` explicitly |
+| `wan2.7-videoedit` | The source video's seconds are **billed separately**: `720p` \$0.09 per second, `1080p` \$0.135 per second, on top of output seconds (6-second minimum). This matches the "reference seconds + output seconds" rule announced on 2026-09-04 |
+| `grok-imagine-video` | Reference images are billed per image: **\$0.0018 per image** |
+
+Changes take effect **immediately** and apply only to calls made afterwards.
+</Update>
+
+<Update label="2026-09-23" description="Pricing change">
+**Images: two economy lines cut; multi-image requests settle by images returned**
+
+| Model | Change |
+|---|---|
+| `gemini-3.1-flash-lite-image-rev` | `1k` \$0.015626 → **\$0.0140625** per image |
+| `grok-imagine-image-2.0-rev` | \$0.01875 → **\$0.016875** per image |
+| `grok-imagine-image-2.0` | The \$0.009 per-reference-image fee is now **charged once per request**, no longer repeated for each output image |
+
+When one request asks for several images (`n` above 1), it settles by the **number of images actually returned**; if fewer than `n` come back, the excess frozen quota is refunded when the task completes.
+
+Changes take effect **immediately** and apply only to calls made afterwards.
+</Update>
+
+<Update label="2026-09-23" description="Model launch">
+**2 models launched · pricing**
+
+**Image**
+
+| Model ID | Unit price (USD) |
+|---|---|
+| `gpt-image-2.5-flare-rev` | Per image: 1k \$0.0095625 · 2k \$0.01575 · 4k \$0.023625 |
+| `gpt-image-2.5-sunburst-rev` | Per image: 1k \$0.0095625 · 2k \$0.01575 · 4k \$0.023625 |
+
+</Update>
+
+<Update label="2026-09-23" description="Pricing change">
 **Explicit caching enabled on `qwen3.8-max`**
 
 Requests can mark a reusable prefix with `cache_control` (previously rejected with 400). Writes are billed at the cache-write rate of \$1.8567 and hits at the cache-read rate of \$0.1854 (per 1M tokens); input, output and automatic cache-hit rates are unchanged.
@@ -280,7 +318,7 @@ Changes take effect **immediately** and apply only to calls made afterwards. Liv
 | Model ID | Price (USD) |
 |---|---|
 | `grok-imagine-image-2.0` | Per image: 1k \$0.054 · 2k \$0.072; reference image \$0.009 each |
-| `grok-imagine-image-2.0-rev` | Per image: \$0.01875 |
+| `grok-imagine-image-2.0-rev` | Per image: \$0.01688 |
 
 </Update>
 
@@ -433,7 +471,7 @@ Effective **immediately**; applies only to calls made after the change. Current 
 | Model ID | Price (USD) |
 |---|---|
 | `gemini-3.1-flash-lite-image` | By actual token usage: image input \$0.225 · image output \$27 · text input \$0.225 · text output \$1.35 (per 1M tokens) |
-| `gemini-3.1-flash-lite-image-rev` | Per image: 1k \$0.01563 |
+| `gemini-3.1-flash-lite-image-rev` | Per image: 1k \$0.01406 |
 
 **Video**
 
@@ -944,7 +982,7 @@ Effective **immediately**; applies only to calls made after the change. Current 
 
 | Model ID | Price (USD) |
 |---|---|
-| `grok-imagine-1.0-video-rev` | Per second: 480p \$0.01148 · 720p \$0.02151/s |
+| `grok-imagine-1.0-video-rev` (retired 2026-09-23) | Per second: 480p \$0.01148 · 720p \$0.02151/s |
 
 </Update>
 

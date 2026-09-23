@@ -108,7 +108,7 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
 </ParamField>
 
 <ParamField body="n" type="integer" default="1">
-  出图张数。`grok-imagine-image`、`grok-imagine-image-quality`、`grok-imagine-1.5-rev` 和 `grok-imagine-1.5-edit-rev` 取 `1`–`10`；`grok-imagine-image` 在 `edit` 下只出 1 张。`grok-imagine-image-2.0` 和 `grok-imagine-image-2.0-rev` 取值 `1`。
+  出图张数。`grok-imagine-image`、`grok-imagine-image-quality`、`grok-imagine-image-2.0`、`grok-imagine-1.5-rev` 和 `grok-imagine-1.5-edit-rev` 取 `1`–`10`；`grok-imagine-image` 在 `edit` 下只出 1 张。`grok-imagine-image-2.0-rev` 取 `1`–`12`。
 </ParamField>
 
 <ParamField body="aspect_ratio" type="string" default="auto">
@@ -143,11 +143,11 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
 | `grok-imagine-image-quality` | 每次请求 | 每次请求可生成 1 至 10 张图片 |
 | `grok-imagine-image-quality` | `action: "generate"` | 文生图不接收参考图，请使用编辑动作 |
 | `grok-imagine-image-quality` | `action: "edit"` | 编辑需要 1–3 张参考图（1 张为单图编辑，多张为多图参考） |
-| `grok-imagine-image-2.0` | 每次请求 | 首发阶段每次生成 1 张 |
+| `grok-imagine-image-2.0` | 每次请求 | 每次请求可生成 1 至 10 张图片 |
 | `grok-imagine-image-2.0` | `action: "generate"` | 文生图不接收参考图，请使用编辑动作 |
 | `grok-imagine-image-2.0` | `action: "edit"` | 编辑需要 1 到 3 张参考图 |
 | `grok-imagine-image-2.0` | `action: "edit"` | 带参考图编辑时不能选择画质 |
-| `grok-imagine-image-2.0-rev` | 每次请求 | 首发阶段每次生成 1 张 |
+| `grok-imagine-image-2.0-rev` | 每次请求 | 每次请求可生成 1 至 12 张图片 |
 | `grok-imagine-image-2.0-rev` | `action: "generate"` | 该线路仅支持文生图 |
 | `grok-imagine-1.5-rev` | 每次请求 | 一次最多出 10 张 |
 | `grok-imagine-1.5-edit-rev` | 每次请求 | 一次最多出 10 张 |
@@ -160,12 +160,12 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
 |---|---|
 | `grok-imagine-image` | 单一张价，`1k` 与 `2k` 同价；参考图按张另计 |
 | `grok-imagine-image-quality` | 按分辨率分档，`2k` 高于 `1k`；参考图按张另计 |
-| `grok-imagine-image-2.0` | 按分辨率 × 画质分档（`1k` / `2k` × `low` / `medium`）；不传 `quality` 时按分辨率档计；参考图按张另计 |
+| `grok-imagine-image-2.0` | 按分辨率 × 画质分档（`1k` / `2k` × `low` / `medium`）；不传 `quality` 时按分辨率档计；参考图按张另计，每次请求只计一次 |
 | `grok-imagine-image-2.0-rev` | 单一张价 |
 | `grok-imagine-1.5-rev` | 单一张价；参考图不加价 |
 | `grok-imagine-1.5-edit-rev` | 单一张价；参考图不加价 |
 
-带参考图时，单次费用 =（分辨率档价 + 每张参考图单价 × 参考图张数）× 出图张数。`resolution` 不在该模型支持的档位内时，按兜底价结算（等于 `1k` 档）。
+带参考图时，`grok-imagine-image` 和 `grok-imagine-image-quality` 的单次费用 =（分辨率档价 + 每张参考图单价 × 参考图张数）× 出图张数；`grok-imagine-image-2.0` 的参考图费用不随出图张数重复，单次费用 = 分辨率档价 × 出图张数 + 每张参考图单价 × 参考图张数。`resolution` 不在该模型支持的档位内时，按兜底价结算（等于 `1k` 档）。
 
 单价见 `GET /v1/models` 返回的 `price_config`，或控制台「模型市场」。单次调用的实际花费见任务响应里的 `cost`——整数 quota，**500,000 quota = 1 USD**，不是美元。
 

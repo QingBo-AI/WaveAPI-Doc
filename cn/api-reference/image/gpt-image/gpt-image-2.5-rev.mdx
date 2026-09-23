@@ -1,0 +1,159 @@
+---
+title: "GPT Image 2.5 逆向版"
+description: "GPT Image 2.5 Flare 与 Sunburst 的文生图与参考图编辑，按输出分辨率固定张价"
+api: "POST https://api.qingbo.ai/v1/tasks"
+---
+
+GPT Image 2.5 逆向版通过聚合供应商提供 GPT Image 2.5 的文生图和参考图编辑，覆盖 `gpt-image-2.5-flare-rev`（Flare，出图更快）与 `gpt-image-2.5-sunburst-rev`（Sunburst，偏重编辑精度）两个模型。两者的请求参数、取值范围和单价完全相同，按输出分辨率固定计费，适合按固定预算生成日常配图、视觉草稿与商品素材；选型只改 `model` 字段。
+
+<Warning>
+这是逆向线路，并非 OpenAI 官方 API。需要画质档位、掩码、透明背景或输出格式控制时，请使用 [GPT Image 2.5 官方版](/cn/api-reference/image/gpt-image/gpt-image-2.5)。平台不会在两条线路之间自动切换。
+</Warning>
+
+## 快速开始
+
+<CodeGroup>
+
+```bash 文生图
+curl -X POST https://api.qingbo.ai/v1/tasks \
+  -H "Authorization: Bearer $WAVE_API_KEY" \
+  -H "Content-Type: application/json" \
+  -H "Idempotency-Key: image25-rev-001" \
+  -d '{
+    "model": "gpt-image-2.5-flare-rev",
+    "action": "generate",
+    "prompt": "未来城市里的空中花园，清晨薄雾，建筑摄影",
+    "aspect_ratio": "16:9",
+    "resolution": "2k",
+    "n": 1
+  }'
+```
+
+```bash 参考图编辑
+curl -X POST https://api.qingbo.ai/v1/tasks \
+  -H "Authorization: Bearer $WAVE_API_KEY" \
+  -H "Content-Type: application/json" \
+  -H "Idempotency-Key: image25-rev-edit-001" \
+  -d '{
+    "model": "gpt-image-2.5-sunburst-rev",
+    "action": "edit",
+    "prompt": "保留产品与包装文字，把背景换成柔和的米白影棚底，并补一层自然阴影",
+    "image_urls": ["https://cdn.example.com/source.png"],
+    "aspect_ratio": "1:1",
+    "resolution": "1k",
+    "n": 1
+  }'
+```
+
+</CodeGroup>
+
+提交成功后返回 `task_id`。用 [`GET /v1/tasks/{task_id}`](/cn/api-reference/task/status) 查询结果，也可以用 [`Prefer: wait`](/cn/api-reference/task/submit#请求内等待prefer-wait) 在一次调用里等待，或配置 Webhook。
+
+## 请求参数
+
+<ParamField body="model" type="string" required>
+  `gpt-image-2.5-flare-rev` 或 `gpt-image-2.5-sunburst-rev`。
+</ParamField>
+
+<ParamField body="action" type="string" default="generate">
+  - `generate`：根据文字生成图片
+  - `edit`：编辑参考图；必须提供 `image_urls`
+</ParamField>
+
+<ParamField body="prompt" type="string" required>
+  图片描述或编辑指令。
+</ParamField>
+
+<ParamField body="image_urls" type="string[]">
+  参考图片 URL。`edit` 时必填，最多 16 张。参考图不额外收费。
+</ParamField>
+
+<ParamField body="aspect_ratio" type="string" default="1:1">
+  支持 `auto`、`1:1`、`16:9`、`9:16`、`4:3`、`3:4`、`3:2`、`2:3`、`5:4`、`4:5`、`21:9`。`auto` 表示由模型根据内容决定画面比例。
+</ParamField>
+
+<ParamField body="resolution" type="string" default="1k">
+  输出分辨率：`1k`、`2k` 或 `4k`。
+</ParamField>
+
+<ParamField body="n" type="integer" default="1">
+  生成数量，取值 `1`。每次请求返回一张图。
+</ParamField>
+
+通用的 `callback_url`、`callback_events`、`Prefer: wait`、`Idempotency-Key` 和费用上限请求头见[提交任务](/cn/api-reference/task/submit)。
+
+逆向版不支持 `quality`、`mask_url`、`background`、`output_format`、`output_compression` 和 `moderation`，这些只在官方版提供；也不支持 `seed`。以上之外的参数会返回 `400`，不计费。
+
+## 限制
+
+| 条件 | 限制 |
+|---|---|
+| 每次请求 | 只出 1 张 |
+| `action: "edit"` | 必须提供至少一张参考图 |
+| 参考图张数 | 最多 16 张 |
+
+## 计费
+
+按成功生成的图片**固定张价**收费，`1k` / `2k` / `4k` 三档价格不同，两个模型单价相同。
+
+单价见 `GET /v1/models` 返回的 `price_config`，或控制台「模型市场」。单次调用的实际花费见任务响应里的 `cost`——整数 quota，**500,000 quota = 1 USD**，不是美元。
+
+`generate` 与 `edit` 同价，参考图不加价，画幅与提示词长度都不影响单张价格——**分辨率是唯一的计费维度，提交前即可确定单次费用**。不传 `resolution` 时按默认的 `1k` 出图，并按 `1k` 档计费。
+
+只有成功出图才计费。任务失败、取消，或没有返回可用图片时，全额退款。
+
+## 响应
+
+```json 任务完成
+{
+  "task_id": "task-wave1789004688b950049238",
+  "model": "gpt-image-2.5-flare-rev",
+  "action": "generate",
+  "status": "completed",
+  "progress": "100%",
+  "result": {
+    "images": [
+      {
+        "url": ["https://cdn.example.com/result.png"],
+        "expires_at": 1789568757
+      }
+    ]
+  },
+  "billing_status": "settled",
+  "cost": 4781
+}
+```
+
+`result.images` 返回生成的图片，`expires_at` 是该链接的删除时刻（产物保留 7 天）。完整字段说明见[任务状态](/cn/api-reference/task/status)。
+
+## 可用模型
+
+| 模型 ID | 取舍 | 适合 | 计费 |
+|---|---|---|---|
+| `gpt-image-2.5-flare-rev` | Flare，出图更快 | 日常配图、批量视觉草稿 | 按分辨率固定张价 |
+| `gpt-image-2.5-sunburst-rev` | Sunburst，编辑精度优先 | 商品素材、细节修改 | 按分辨率固定张价 |
+
+两个模型的参数、取值范围和单价相同，差别只在生成结果本身；本页的每一节对两者都适用。
+
+## 与官方线路的区别
+
+| | 逆向版 | [官方版](/cn/api-reference/image/gpt-image/gpt-image-2.5) |
+|---|---|---|
+| 模型 ID | `gpt-image-2.5-flare-rev` `gpt-image-2.5-sunburst-rev` | `gpt-image-2.5-flare` `gpt-image-2.5-sunburst` |
+| 接入 | 聚合供应商逆向线路 | 官方 API 线路 |
+| 计费 | 按分辨率固定张价 | 按实际 token 用量 |
+| 文生图 / 参考图编辑 | 支持，最多 16 张参考图 | 支持，最多 16 张参考图 |
+| 画幅 | `auto` 与 10 种 | 15 种，含 `2:1` `1:2` `3:1` `1:3` `9:21`，无 `auto` |
+| 画质档位 | 不支持 | `low` / `medium` / `high` / `xhigh` / `max` |
+| 掩码局部重绘 | 不支持 | 支持 |
+| 背景和输出格式 | 不支持 | 支持 |
+| 每次输出 | 1 张 | 1 张 |
+
+## 相关文档
+
+- [GPT Image 系列](/cn/api-reference/image/gpt-image/overview)
+- [GPT Image 2.5 官方版](/cn/api-reference/image/gpt-image/gpt-image-2.5)
+- [GPT Image 2 逆向版](/cn/api-reference/image/gpt-image/gpt-image-2-rev)
+- [提交任务](/cn/api-reference/task/submit)
+- [查询任务状态](/cn/api-reference/task/status)
+- [任务系统](/cn/docs/task-system)

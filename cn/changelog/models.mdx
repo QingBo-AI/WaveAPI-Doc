@@ -3,6 +3,28 @@ title: "模型动态"
 ---
 
 <Update label="2026-09-23" description="能力更新">
+**视频模型：SkyReels 默认分辨率、Wan 2.7 视频编辑计费、Gemini Omni 时长、Grok Imagine Video 参考图**
+
+- `skyreels-v4-fast` / `skyreels-v4-std`：`resolution` 默认值改为 `1080p`（与实际出片一致）；带参考视频（`video_urls`）时须显式传 `480p` 或 `720p`，否则返回 `400`。
+- `wan2.7-videoedit`：除输出秒数外，源视频秒数另计一笔。
+- `gemini-omni-1.1-flash` / `gemini-omni-flash-preview`：`duration` 只能不传或传 `0`，时长由模型决定（3–10 秒）。
+- `grok-imagine-video`：参考图（`image_urls`）改为按张另计。
+- `grok-imagine-1.0-video-rev` 下架，调用将返回错误；请改用 `grok-imagine-video-1.5-rev`。
+- **文档**：[SkyReels](/cn/api-reference/video/skyreels) · [万相 Wan 系列](/cn/api-reference/video/wan) · [Gemini Omni Flash](/cn/api-reference/video/omni/gemini-omni-flash) · [Grok Imagine Video](/cn/api-reference/video/grok-imagine-video)
+</Update>
+
+<Update label="2026-09-23" description="能力更新">
+**图像模型：GPT Image 2.5 改用官方模型 ID 并上架逆向版；多个模型放开多张输出**
+
+- **`gpt-image-2.5` 改名为 `gpt-image-2.5-flare`**，与 OpenAI 官方模型 ID 一致，参数与单价不变。旧 ID 已停用，调用会返回模型不存在，请把 `model` 改成 `gpt-image-2.5-flare`。
+- **GPT Image 2.5 支持局部重绘**：`gpt-image-2.5-flare` 与 `gpt-image-2.5-sunburst` 接受 `mask_url`（带透明通道的 PNG，需同时提供 `image_urls`）。
+- **新增 GPT Image 2.5 逆向版**：`gpt-image-2.5-flare-rev`　·　`gpt-image-2.5-sunburst-rev`，文生图与参考图编辑，`1k` / `2k` / `4k`，每次 1 张，按分辨率档的固定张价结算。
+- **放开多张输出**：`grok-imagine-image-2.0` 每次 1–10 张，`grok-imagine-image-2.0-rev` 1–12 张，`qwen-image-3.0` / `qwen-image-3.0-pro` 1–6 张，`seedream-5.0-lite` 最多 15 张，`seedream-4.0` / `seedream-4.5` 编辑时参考图与输出合计最多 15 张。多张输出按实际返回的张数计费。
+- **`z-image-turbo` 不再接受 `prompt_extend`**，传入会返回 `400`，不计费。
+- **文档**：[GPT Image 系列](/cn/api-reference/image/gpt-image/overview) · [GPT Image 2.5 逆向版](/cn/api-reference/image/gpt-image/gpt-image-2.5-rev) · [Grok Imagine](/cn/api-reference/image/grok-imagine) · [Qwen Image](/cn/api-reference/image/qwen-image) · [Seedream](/cn/api-reference/image/seedream)
+</Update>
+
+<Update label="2026-09-23" description="能力更新">
 **45 个文本模型支持 Responses 接口**
 
 - OpenAI（`gpt-4.1` / `gpt-5` / `gpt-5.x` / `gpt-6` 系列、`o1` / `o3` / `o3-mini` / `o4-mini`）、Qwen、DeepSeek、xAI 的文本模型现在也可以通过 `POST /v1/responses` 调用，支持流式与函数调用，Codex 等客户端可以直接使用。`deepseek-v3.1-terminus` 暂不支持。
