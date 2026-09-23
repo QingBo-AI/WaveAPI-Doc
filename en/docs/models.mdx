@@ -3,24 +3,6 @@ title: "Models"
 description: "Browse available models and pricing"
 ---
 
-## How Model IDs Are Written
-
-The `model` field takes a **model ID**, not a product name. The two often differ: the product is "Claude Opus 4.8", the model ID is `claude-opus-4-8`.
-
-Model IDs follow each vendor's own official form — we do not normalize them — so separators are inconsistent by design:
-
-| Vendor | Version separator | Examples |
-|--------|-------------------|----------|
-| Anthropic | hyphen | `claude-opus-4-8` · `claude-sonnet-4-6` |
-| OpenAI | dot | `gpt-5.2` · `gpt-4.1-mini` |
-| Google | dot | `gemini-3.6-flash` · `gemini-2.5-pro` |
-| DeepSeek / Zhipu / Moonshot | dot | `deepseek-v3.2` · `glm-4.7` · `kimi-k2.6` |
-
-Two further conventions:
-
-- **No date suffix.** Upstream's `claude-opus-4-5-20251101` is simply `claude-opus-4-5` here.
-- **`/v1/models` is authoritative.** Docs and changelogs can lag; the `id` returned by the endpoint is what you can call today.
-
 ## List Available Models
 
 ```bash
