@@ -7,6 +7,18 @@ This page lists, newest first, each model's launch pricing and the price changes
 </Note>
 
 <Update label="2026-09-23" description="Pricing change">
+**Video: SkyReels default-resolution pricing, source seconds on Wan 2.7 video editing, reference images on Grok Imagine Video**
+
+| Model | Change |
+|---|---|
+| `skyreels-v4-fast` / `skyreels-v4-std` | Without `resolution`, calls are billed at the **`1080p`** tier (the resolution actually rendered); previously the `720p` tier. With a reference video, pass `480p` or `720p` explicitly |
+| `wan2.7-videoedit` | The source video's seconds are **billed separately**: `720p` \$0.09 per second, `1080p` \$0.135 per second, on top of output seconds (6-second minimum). This matches the "reference seconds + output seconds" rule announced on 2026-09-04 |
+| `grok-imagine-video` | Reference images are billed per image: **\$0.0018 per image** |
+
+Changes take effect **immediately** and apply only to calls made afterwards.
+</Update>
+
+<Update label="2026-09-23" description="Pricing change">
 **Images: two economy lines cut; multi-image requests settle by images returned**
 
 | Model | Change |
@@ -970,7 +982,7 @@ Effective **immediately**; applies only to calls made after the change. Current 
 
 | Model ID | Price (USD) |
 |---|---|
-| `grok-imagine-1.0-video-rev` | Per second: 480p \$0.01148 · 720p \$0.02151/s |
+| `grok-imagine-1.0-video-rev` (retired 2026-09-23) | Per second: 480p \$0.01148 · 720p \$0.02151/s |
 
 </Update>
 

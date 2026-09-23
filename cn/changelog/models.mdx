@@ -3,6 +3,17 @@ title: "模型动态"
 ---
 
 <Update label="2026-09-23" description="能力更新">
+**视频模型：SkyReels 默认分辨率、Wan 2.7 视频编辑计费、Gemini Omni 时长、Grok Imagine Video 参考图**
+
+- `skyreels-v4-fast` / `skyreels-v4-std`：`resolution` 默认值改为 `1080p`（与实际出片一致）；带参考视频（`video_urls`）时须显式传 `480p` 或 `720p`，否则返回 `400`。
+- `wan2.7-videoedit`：除输出秒数外，源视频秒数另计一笔。
+- `gemini-omni-1.1-flash` / `gemini-omni-flash-preview`：`duration` 只能不传或传 `0`，时长由模型决定（3–10 秒）。
+- `grok-imagine-video`：参考图（`image_urls`）改为按张另计。
+- `grok-imagine-1.0-video-rev` 下架，调用将返回错误；请改用 `grok-imagine-video-1.5-rev`。
+- **文档**：[SkyReels](/cn/api-reference/video/skyreels) · [万相 Wan 系列](/cn/api-reference/video/wan) · [Gemini Omni Flash](/cn/api-reference/video/omni/gemini-omni-flash) · [Grok Imagine Video](/cn/api-reference/video/grok-imagine-video)
+</Update>
+
+<Update label="2026-09-23" description="能力更新">
 **图像模型：GPT Image 2.5 改用官方模型 ID 并上架逆向版；多个模型放开多张输出**
 
 - **`gpt-image-2.5` 改名为 `gpt-image-2.5-flare`**，与 OpenAI 官方模型 ID 一致，参数与单价不变。旧 ID 已停用，调用会返回模型不存在，请把 `model` 改成 `gpt-image-2.5-flare`。

@@ -104,6 +104,10 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
   文生视频时是场景描述；图生视频与视频改写时是动作、风格或修改指令。改写时用短句，只改一处时可以补一句「其余保持不变」。
 </ParamField>
 
+<ParamField body="duration" type="integer" default="0">
+  只能不传或传 `0`。视频时长由模型按内容自行决定（3–10 秒），需要控制节奏时在 `prompt` 里用自然语言描述。传其他值返回 `400`，不计费。
+</ParamField>
+
 <ParamField body="resolution" type="string" default="720p">
   输出分辨率，大小写不敏感。
 
@@ -158,19 +162,20 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
 
 通用的 `callback_url`、`callback_events`、`Prefer: wait`、`Idempotency-Key` 和费用上限请求头见[提交任务](/cn/api-reference/task/submit)。
 
-两个模型都不接受 `duration`：时长由模型按内容决定，通常 3–10 秒，需要控制节奏时在 `prompt` 里用自然语言描述。`seed` 同样不支持。以上之外的参数会返回 `400`，不计费。
+`seed` 不支持。以上之外的参数会返回 `400`，不计费。
 
 ## 限制
 
 - 每次任务只生成一个视频；参考视频最多 1 条。
 - 参考视频与 `ref_task_id` 互斥。
+- 该模型的视频时长由模型自行决定（3–10 秒），不能指定 duration；不传或传 0。
 
 | 项目 | `gemini-omni-1.1-flash` | `gemini-omni-flash-preview` |
 |---|---|---|
 | 分辨率 | `360p` / `720p` / `1080p` / `4k` | 仅 `720p` |
 | 参考图 | 合计 10 张（含首尾帧） | 16 张 |
 | 参考视频 | 最多 1 条，最长 10 秒 | 最多 1 条，最长 24 秒 |
-| 时长 | 由模型决定，3–10 秒 | 由模型决定，3–10 秒 |
+| 时长 | 由模型决定，3–10 秒；`duration` 只能不传或传 `0` | 由模型决定，3–10 秒；`duration` 只能不传或传 `0` |
 | 画面比例 | `16:9` / `9:16` | `16:9` / `9:16` |
 
 ## 计费
