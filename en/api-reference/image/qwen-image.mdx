@@ -4,7 +4,7 @@ description: "Alibaba Qwen image models: unified text-to-image and reference edi
 api: "POST https://api.qingbo.ai/v1/tasks"
 ---
 
-Qwen Image is the image foundation model line from Alibaba's Qwen team. It unifies text-to-image generation and image editing behind one interface and is strongest at bilingual (Chinese and English) typography, infographics and text inside posters. This page covers the four models available today, in two generations: the 2.0 generation returns up to six images per request at a single per-image price, while the 3.0 generation adds multi-reference editing and prompt expansion and prices reference images separately.
+Qwen Image is the image foundation model line from Alibaba's Qwen team. It unifies text-to-image generation and image editing behind one interface and is strongest at bilingual (Chinese and English) typography, infographics and text inside posters. This page covers the four models available today, in two generations, both returning one to six images per request: the 2.0 generation settles at a single per-image price, while the 3.0 generation adds multi-reference editing and prompt expansion and prices reference images separately.
 
 ## Quick start
 
@@ -90,7 +90,7 @@ A successful submission returns a `task_id`. Retrieve the result with [`GET /v1/
 </ParamField>
 
 <ParamField body="n" type="integer" default="1">
-  Number of images to generate. `qwen-image-2.0` and `qwen-image-2.0-pro` accept `1`–`6`; `qwen-image-3.0` and `qwen-image-3.0-pro` accept `1`.
+  Number of images to generate; all four models accept `1`–`6`.
 </ParamField>
 
 <ParamField body="negative_prompt" type="string">
@@ -115,7 +115,7 @@ This series does not accept `seed`, `quality`, `watermark` or `mask_url`. Any ot
 |---|---|
 | `qwen-image-2.0` / `qwen-image-2.0-pro` | Up to 6 images per request |
 | `action: "edit"` (both 2.0 models) | Image editing requires at least one reference image |
-| `qwen-image-3.0` / `qwen-image-3.0-pro` | A prompt is required and each request generates one image |
+| `qwen-image-3.0` / `qwen-image-3.0-pro` | A prompt is required; 1 to 6 images per request. |
 | `action: "generate"` (both 3.0 models) | Text-to-image does not take reference images; use `edit` |
 | `action: "edit"` (both 3.0 models) | Image editing requires 1 to 3 reference images |
 | `prompt_extend_mode` | Requires `prompt_extend=true` |
@@ -130,9 +130,9 @@ Rates are in `price_config` on `GET /v1/models` and in the console's Model Marke
 The billing dimensions differ by generation:
 
 - **`qwen-image-2.0` / `qwen-image-2.0-pro`** — one per-image price; `1k` and `2k` cost the same, and neither aspect ratio nor prompt length affects it. The total is that price times `n`.
-- **`qwen-image-3.0`** — `1k` and `2k` cost the same.
-- **`qwen-image-3.0-pro`** — `2k` costs more than `1k`.
-- **Reference images on both 3.0 models** — each reference image in the request adds its own per-image fee on top of the output image. `generate` carries no reference images and no such fee.
+- **`qwen-image-3.0`** — `1k` and `2k` cost the same; the output part is the per-image price × `n`.
+- **`qwen-image-3.0-pro`** — `2k` costs more than `1k`; the output part is the per-image price × `n`.
+- **Reference images on both 3.0 models** — each reference image in the request adds its own per-image fee on top of the output images, charged once per request and not repeated for each of the `n` outputs. `generate` carries no reference images and no such fee.
 
 A `resolution` outside the tiers a model supports settles at its fallback price, equal to that model's base tier.
 
@@ -174,8 +174,8 @@ Generated images come back in `result.images`, and `expires_at` is when that lin
 |---|---|---|---|---|
 | `qwen-image-2.0` | `1k` `2k` (same price) | 1–6 | Supplied on `edit` | `negative_prompt` |
 | `qwen-image-2.0-pro` | `1k` `2k` (same price) | 1–6 | Supplied on `edit` | `negative_prompt` |
-| `qwen-image-3.0` | `1k` `2k` (same price) | `1` | 1–3, billed separately | `negative_prompt` `prompt_extend` `prompt_extend_mode` |
-| `qwen-image-3.0-pro` | `1k` `2k` (`2k` costs more) | `1` | 1–3, billed separately | `negative_prompt` `prompt_extend` `prompt_extend_mode` |
+| `qwen-image-3.0` | `1k` `2k` (same price) | 1–6 | 1–3, billed separately | `negative_prompt` `prompt_extend` `prompt_extend_mode` |
+| `qwen-image-3.0-pro` | `1k` `2k` (`2k` costs more) | 1–6 | 1–3, billed separately | `negative_prompt` `prompt_extend` `prompt_extend_mode` |
 
 All four support `generate` and `edit` and share the same aspect ratios: `1:1`, `16:9`, `9:16`, `4:3`, `3:4`, `3:2`, `2:3`.
 

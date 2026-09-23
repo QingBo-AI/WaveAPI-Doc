@@ -95,8 +95,8 @@ A successful submission returns a `task_id`. Retrieve the result with [`GET /v1/
   Video length in seconds, an integer from `3` to `15`. Ignored when `video_urls` is present — the output follows the reference video.
 </ParamField>
 
-<ParamField body="resolution" type="string">
-  Output resolution: `480p`, `720p` or `1080p`. Only `480p` and `720p` are available when `video_urls` is present.
+<ParamField body="resolution" type="string" default="1080p">
+  Output resolution: `480p`, `720p` or `1080p`; defaults to `1080p`. Only `480p` and `720p` are available when `video_urls` is present, and you must send one of them explicitly: without it the request falls back to the `1080p` default and returns `400`, not billed.
 </ParamField>
 
 <ParamField body="aspect_ratio" type="string">
@@ -104,7 +104,7 @@ A successful submission returns a `task_id`. Retrieve the result with [`GET /v1/
 </ParamField>
 
 <ParamField body="video_urls" type="string[]">
-  Reference video URLs, used as motion and subject reference. The Nth entry gets the tag `@video_N`, which the prompt must reference (for example `Follow the camera motion in @video_1`); without it the upstream rejects the request and nothing is billed.
+  Reference video URLs, used as motion and subject reference. The Nth entry gets the tag `@video_N`, which the prompt must reference (for example `Follow the camera motion in @video_1`); without it the upstream rejects the request and nothing is billed. With a reference video, also send `resolution` (`480p` or `720p`).
 </ParamField>
 
 <ParamField body="first_frame_image" type="string">
@@ -148,7 +148,7 @@ Any other parameter returns `400` and is not billed.
 | Item | Limit |
 |---|---|
 | Duration `duration` | 3 to 15 seconds; follows the reference video, capped at 10 seconds, when `video_urls` is present |
-| Resolution `resolution` | `480p` / `720p` / `1080p`; only `480p` / `720p` when `video_urls` is present |
+| Resolution `resolution` | `480p` / `720p` / `1080p`, default `1080p`; only `480p` / `720p` when `video_urls` is present, sent explicitly |
 | Reference video `video_urls` | 1 clip, 1 to 10 seconds, MP4 / MOV |
 | Mid keyframes `mid_frame_images` | Up to 6 entries |
 | Reference images `ref_images` | `type: image`: 1 to 3 entries with 1 to 5 images each; `type: grid`: 1 entry with 1 image |
@@ -158,9 +158,9 @@ All input material must be publicly downloadable over HTTP(S).
 
 ## Pricing
 
-Billing is **resolution tier × output seconds**, where the seconds come from the `duration` you send. The three resolutions are priced separately, and every `skyreels-v4-std` tier sits above the matching `skyreels-v4-fast` tier.
+Billing is **resolution tier × output seconds**, where the seconds come from the `duration` you send; without `resolution` the default `1080p` tier applies. The three resolutions are priced separately, and every `skyreels-v4-std` tier sits above the matching `skyreels-v4-fast` tier.
 
-Sending `video_urls` switches tiers: the output seconds settle at the **reference-video tier**, which is above the ordinary tier at the same resolution, and the reference video's own length is not billed on top. In this mode the output length follows the reference video (capped at 10 seconds) and only `480p` and `720p` are available.
+Sending `video_urls` switches tiers: the output seconds settle at the **reference-video tier**, which is above the ordinary tier at the same resolution, and the reference video's own length is not billed on top. In this mode the output length follows the reference video (capped at 10 seconds), only `480p` and `720p` are available, and `resolution` must be sent explicitly.
 
 Reference images (`ref_images`), keyframe images and prompt length carry no separate charge.
 

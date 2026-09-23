@@ -95,8 +95,8 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
   视频时长（秒），`3`–`15` 的整数。带 `video_urls` 时输出时长跟随参考视频，该参数不生效。
 </ParamField>
 
-<ParamField body="resolution" type="string">
-  输出分辨率：`480p`、`720p` 或 `1080p`。带 `video_urls` 时只支持 `480p` 与 `720p`。
+<ParamField body="resolution" type="string" default="1080p">
+  输出分辨率：`480p`、`720p` 或 `1080p`，默认 `1080p`。带 `video_urls` 时只支持 `480p` 与 `720p`，必须显式传入其中一档：不传会按默认的 `1080p` 处理，请求返回 `400`，不计费。
 </ParamField>
 
 <ParamField body="aspect_ratio" type="string">
@@ -104,7 +104,7 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
 </ParamField>
 
 <ParamField body="video_urls" type="string[]">
-  参考视频 URL 数组，作为运动与主体参考。传入的第 N 段对应标签 `@video_N`，提示词里必须引用（例如 `复刻 @video_1 的镜头运动`），未引用时上游拒绝请求，不计费。
+  参考视频 URL 数组，作为运动与主体参考。传入的第 N 段对应标签 `@video_N`，提示词里必须引用（例如 `复刻 @video_1 的镜头运动`），未引用时上游拒绝请求，不计费。带参考视频时须同时传 `resolution`（`480p` 或 `720p`）。
 </ParamField>
 
 <ParamField body="first_frame_image" type="string">
@@ -148,7 +148,7 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
 | 项目 | 上限 |
 |---|---|
 | 时长 `duration` | 3–15 秒整数；带 `video_urls` 时跟随参考视频，上限 10 秒 |
-| 分辨率 `resolution` | `480p` / `720p` / `1080p`；带 `video_urls` 时只有 `480p` / `720p` |
+| 分辨率 `resolution` | `480p` / `720p` / `1080p`，默认 `1080p`；带 `video_urls` 时只有 `480p` / `720p`，须显式传入 |
 | 参考视频 `video_urls` | 1 段，单段 1–10 秒，MP4 / MOV |
 | 中间关键帧 `mid_frame_images` | 最多 6 项 |
 | 参考图 `ref_images` | `type` 为 `image` 时 1–3 项、每项 1–5 张；`type` 为 `grid` 时 1 项 1 张 |
@@ -158,9 +158,9 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
 
 ## 计费
 
-按**输出分辨率档 × 输出秒数**计费，秒数取请求里的 `duration`。三档分辨率单价各不相同；`skyreels-v4-std` 的每一档都高于 `skyreels-v4-fast` 的同名档。
+按**输出分辨率档 × 输出秒数**计费，秒数取请求里的 `duration`，不传 `resolution` 时按默认的 `1080p` 档计。三档分辨率单价各不相同；`skyreels-v4-std` 的每一档都高于 `skyreels-v4-fast` 的同名档。
 
-带 `video_urls` 时换一套档位：输出秒数改按**参考视频档**单价结算，参考视频档高于同分辨率的普通档；参考视频本身的时长不另外计秒。此时输出时长跟随参考视频（上限 10 秒），可用分辨率只有 `480p` 与 `720p`。
+带 `video_urls` 时换一套档位：输出秒数改按**参考视频档**单价结算，参考视频档高于同分辨率的普通档；参考视频本身的时长不另外计秒。此时输出时长跟随参考视频（上限 10 秒），可用分辨率只有 `480p` 与 `720p`，需要显式传 `resolution`。
 
 参考图（`ref_images`）、关键帧图与提示词长度都不单独计费。
 

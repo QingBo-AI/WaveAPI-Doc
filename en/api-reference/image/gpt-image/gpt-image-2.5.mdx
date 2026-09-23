@@ -1,20 +1,13 @@
 ---
-title: "GPT Image 2.5"
-description: "Five quality levels for text-to-image and reference editing, on the Flare and Sunburst lines, billed from token usage"
+title: "GPT Image 2.5 Official"
+description: "Five quality levels for text-to-image, reference editing and masked inpainting, on the Flare and Sunburst lines, billed from token usage"
 api: "POST https://api.qingbo.ai/v1/tasks"
 ---
 
-GPT Image 2.5 is the next generation of the official GPT Image line. It keeps the actions and parameters of GPT Image 2, widens quality from three levels to five, and re-scales the output usage of the levels that share a name. Two models are available, `gpt-image-2.5` (the Flare line) and `gpt-image-2.5-sunburst` (the Sunburst line); their request shape, value ranges and billing are identical, and they differ only in the trade-off between speed and editing precision. Switching between them means changing the `model` field alone.
-
-## Available models
-
-| Model ID | Trade-off | Suited to | Billing |
-|---|---|---|---|
-| `gpt-image-2.5` | Flare line, faster output | Everyday high-quality output, batch generation, quick drafts | From actual token usage |
-| `gpt-image-2.5-sunburst` | Sunburst line, editing precision first | Production assets, advertising creative, multi-turn detail work | From actual token usage |
+GPT Image 2.5 is the next generation of the official GPT Image line. It keeps the actions and parameters of GPT Image 2, widens quality from three levels to five, and re-scales the output usage of the levels that share a name. Two models are available, `gpt-image-2.5-flare` (the Flare line) and `gpt-image-2.5-sunburst` (the Sunburst line); their request shape, value ranges and billing are identical, and they differ only in the trade-off between speed and editing precision. Switching between them means changing the `model` field alone.
 
 <Note>
-Both models carry the same rates, so the same set of parameters costs the same on either one; only the generated result differs. QWave never switches between them automatically.
+For a fixed price per image, use [GPT Image 2.5 Reverse](/en/api-reference/image/gpt-image/gpt-image-2.5-rev). Both lines use the same task endpoint, but their model IDs, parameters and billing differ, and QWave never switches between them automatically.
 </Note>
 
 ## Quick start
@@ -27,7 +20,7 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Content-Type: application/json" \
   -H "Idempotency-Key: image25-demo-001" \
   -d '{
-    "model": "gpt-image-2.5",
+    "model": "gpt-image-2.5-flare",
     "action": "generate",
     "prompt": "A hand-thrown celadon teacup on raw linen, single north-facing window light, soft falloff, still life",
     "aspect_ratio": "1:1",
@@ -54,6 +47,23 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
   }'
 ```
 
+```bash Inpaint with a mask
+curl -X POST https://api.qingbo.ai/v1/tasks \
+  -H "Authorization: Bearer $WAVE_API_KEY" \
+  -H "Content-Type: application/json" \
+  -H "Idempotency-Key: image25-mask-001" \
+  -d '{
+    "model": "gpt-image-2.5-sunburst",
+    "action": "edit",
+    "prompt": "Change only the teacup to a deep green glaze and leave everything else unchanged",
+    "image_urls": ["https://cdn.example.com/source.png"],
+    "mask_url": "https://cdn.example.com/mask.png",
+    "resolution": "1k",
+    "quality": "medium",
+    "n": 1
+  }'
+```
+
 </CodeGroup>
 
 A successful submission returns a `task_id`. Retrieve the result with [`GET /v1/tasks/{task_id}`](/en/api-reference/task/status), wait inline with [`Prefer: wait`](/en/api-reference/task/submit#in-request-waiting-prefer-wait), or configure a webhook.
@@ -61,7 +71,7 @@ A successful submission returns a `task_id`. Retrieve the result with [`GET /v1/
 ## Request parameters
 
 <ParamField body="model" type="string" required>
-  `gpt-image-2.5` or `gpt-image-2.5-sunburst`.
+  `gpt-image-2.5-flare` or `gpt-image-2.5-sunburst`.
 </ParamField>
 
 <ParamField body="action" type="string" default="generate">
@@ -77,6 +87,10 @@ A successful submission returns a `task_id`. Retrieve the result with [`GET /v1/
   Reference image URLs. Required for `edit`, up to 16 images.
 </ParamField>
 
+<ParamField body="mask_url" type="string">
+  Inpainting mask image URL: a PNG with an alpha channel whose fully transparent pixels mark the area to edit. Its pixel size must match the first reference image, and `image_urls` is required alongside it.
+</ParamField>
+
 <ParamField body="aspect_ratio" type="string" default="1:1">
   One of `1:1`, `3:2`, `2:3`, `4:3`, `3:4`, `5:4`, `4:5`, `16:9`, `9:16`, `2:1`, `1:2`, `3:1`, `1:3`, `21:9`, `9:21`.
 </ParamField>
@@ -86,7 +100,7 @@ A successful submission returns a `task_id`. Retrieve the result with [`GET /v1/
 </ParamField>
 
 <ParamField body="quality" type="string" default="low">
-  Quality level: `low`, `medium`, `high`, `xhigh` or `max`. `xhigh` and `max` exist only on 2.5; sending them to `gpt-image-2` returns `400` and is not downgraded silently. Quality has the largest effect on cost on this line — see Pricing below.
+  Quality level: `low`, `medium`, `high`, `xhigh` or `max`. `xhigh` and `max` exist only on 2.5; sending them to `gpt-image-2` returns `400` and is not downgraded silently. Quality has the largest effect on cost on this line — see Pricing.
 </ParamField>
 
 <ParamField body="n" type="integer" default="1">
@@ -111,7 +125,7 @@ A successful submission returns a `task_id`. Retrieve the result with [`GET /v1/
 
 The shared `callback_url`, `callback_events`, `Prefer: wait`, `Idempotency-Key` and cost-ceiling headers are documented in [Submit Task](/en/api-reference/task/submit).
 
-This line does not accept `mask_url` or `seed` — for masked inpainting, use [`gpt-image-2`](/en/api-reference/image/gpt-image/gpt-image-2). Any other parameter returns `400` and is not billed.
+The official line does not support `seed`. Any other parameter returns `400` and is not billed.
 
 ## Limits
 
@@ -119,10 +133,11 @@ This line does not accept `mask_url` or `seed` — for masked inpainting, use [`
 |---|---|
 | Per request | One image returned |
 | `action: "edit"` | At least one reference image is required |
+| Using `mask_url` | `image_urls` is required, and the mask must match the first reference image's dimensions |
 | `background: "transparent"` | `output_format` must be `png` or `webp` |
 | Using `output_compression` | `output_format` must be explicitly set to `jpeg` or `webp` |
 | Reference images | Up to 16 |
-| `xhigh` / `max` quality | Accepted only by the two 2.5 models |
+| `xhigh` / `max` quality | Accepted only by `gpt-image-2.5-flare` and `gpt-image-2.5-sunburst` |
 
 ## Pricing
 
@@ -155,7 +170,7 @@ You are only billed for a successfully generated image. Failed and cancelled tas
 ```json Completed task
 {
   "task_id": "task-wave1789004688b950049238",
-  "model": "gpt-image-2.5",
+  "model": "gpt-image-2.5-flare",
   "action": "generate",
   "status": "completed",
   "progress": "100%",
@@ -174,9 +189,19 @@ You are only billed for a successfully generated image. Failed and cancelled tas
 
 Generated images are returned in `result.images`, and `expires_at` is when that link is deleted (artifacts are kept for 7 days — see [Task status](/en/api-reference/task/status)). Failed and cancelled tasks release the hold in full. If an upstream success response contains no deliverable image, QWave marks the task as failed and refunds it.
 
+## Available models
+
+| Model ID | Trade-off | Suited to | Billing |
+|---|---|---|---|
+| `gpt-image-2.5-flare` | Flare line, faster output | Everyday high-quality output, batch generation, quick drafts | From actual token usage |
+| `gpt-image-2.5-sunburst` | Sunburst line, editing precision first | Production assets, advertising creative, multi-turn detail work | From actual token usage |
+
+Both models carry the same rates, so the same set of parameters costs the same on either one; only the generated result differs. Every section of this page applies to both.
+
 ## Related
 
 - [GPT Image Series](/en/api-reference/image/gpt-image/overview)
+- [GPT Image 2.5 Reverse](/en/api-reference/image/gpt-image/gpt-image-2.5-rev)
 - [GPT Image 2 Official](/en/api-reference/image/gpt-image/gpt-image-2)
 - [GPT Image 1 and 1.5 Official](/en/api-reference/image/gpt-image/gpt-image-1)
 - [Submit Task](/en/api-reference/task/submit)

@@ -306,13 +306,16 @@ The whole series is billed by **resolution tier × output seconds**. `price_conf
 | `wan2.5-preview` `wan2.6` `wan2.6-i2v` `wan3.0-video` `wan3.0-video-prime` | Resolution tier × output seconds |
 | `wan2.6-i2v-flash` | Resolution tier × output seconds; audio output uses the sound tier |
 | `wan2.7` `wan2.7-r2v` | Resolution tier × output seconds; a reference video adds a separate charge for its own seconds |
-| `wan2.7-videoedit` | Resolution tier × output seconds, with a six-second floor |
+| `wan2.7-videoedit` | Reference-video tier × output seconds (six-second floor); the source video's seconds are charged separately |
 
 **Sound tier (`wan2.6-i2v-flash`)** — besides `720p` / `1080p`, the price table carries `720p_sound` / `1080p_sound`. Audio generation (`generate_audio: true`, which is this model's default) or a supplied `audio_urls` settles at the sound tier.
 
 **Reference video (`wan2.7` / `wan2.7-r2v`)** — the price table carries two extra key groups, `<resolution>_video_ref` and `<resolution>_video_input_second`. With `video_urls` present, output seconds settle at the `_video_ref` tier, and the reference video's own seconds are charged separately at `_video_input_second`. Total reference-video length is capped at 10 seconds for `wan2.7` and 25 seconds for `wan2.7-r2v`. How input seconds are read, and what happens when they cannot be read, is in [Video Generation Overview](/en/api-reference/video/overview#input-video-duration-and-billing).
 
-**Minimum billed duration (`wan2.7-videoedit`)** — `price_config.min_billing_duration` is `6`, so billed seconds are the larger of the requested duration and 6. `duration: 0` settles on the source video length, also with the six-second floor.
+**Video editing (`wan2.7-videoedit`)** — every edit carries one source video, and the charge has two parts:
+
+- **Output seconds** settle at the `<resolution>_video_ref` tier. `price_config.min_billing_duration` is `6`, so output seconds are the larger of the requested duration and 6; `duration: 0` counts the source video length, also with the six-second floor.
+- **Source video seconds** are charged separately at `<resolution>_video_input_second`, with no six-second floor. If the source video's length cannot be read, the request returns `400` (`input_video_duration_unknown`) and is not billed. How input seconds are read is in [Video Generation Overview](/en/api-reference/video/overview#input-video-duration-and-billing).
 
 **Default tier (`wan3.0-video` / `wan3.0-video-prime`)** — with no `resolution`, the task settles at the `480p` tier.
 

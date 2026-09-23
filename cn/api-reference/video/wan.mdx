@@ -306,13 +306,16 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
 | `wan2.5-preview` `wan2.6` `wan2.6-i2v` `wan3.0-video` `wan3.0-video-prime` | 分辨率档 × 输出秒数 |
 | `wan2.6-i2v-flash` | 分辨率档 × 输出秒数；有声输出走带声档 |
 | `wan2.7` `wan2.7-r2v` | 分辨率档 × 输出秒数；带参考视频时另按参考视频秒数加收一笔 |
-| `wan2.7-videoedit` | 分辨率档 × 输出秒数，最低按 6 秒计 |
+| `wan2.7-videoedit` | 参考视频档 × 输出秒数（最低按 6 秒计）；源视频秒数另计一笔 |
 
 **带声档**（`wan2.6-i2v-flash`）——价表里除 `720p` / `1080p` 外另有 `720p_sound` / `1080p_sound`。开启音频生成（`generate_audio: true`，该模型默认即为 `true`）或传了 `audio_urls` 时按带声档结算。
 
 **参考视频**（`wan2.7` / `wan2.7-r2v`）——价表里另有 `<分辨率>_video_ref` 与 `<分辨率>_video_input_second` 两组键。传了 `video_urls` 时，输出秒数按 `_video_ref` 档结算，参考视频的秒数再按 `_video_input_second` 单独计一笔。参考视频总时长上限：`wan2.7` 10 秒，`wan2.7-r2v` 25 秒。输入视频的秒数怎么读取、读不出来会怎样，见[视频生成概述](/cn/api-reference/video/overview#输入视频的时长与计费)。
 
-**最低计费时长**（`wan2.7-videoedit`）——`price_config.min_billing_duration` 为 `6`，计费秒数取请求时长与 6 秒中的较大值。`duration: 0` 按源视频时长结算，同样不低于 6 秒。
+**视频编辑**（`wan2.7-videoedit`）——每次编辑都带一段源视频，费用由两笔组成：
+
+- **输出秒数**：按 `<分辨率>_video_ref` 档结算。`price_config.min_billing_duration` 为 `6`，输出秒数取请求时长与 6 秒中的较大值；`duration: 0` 按源视频时长计，同样不低于 6 秒。
+- **源视频秒数**：按 `<分辨率>_video_input_second` 单独计一笔，不受 6 秒下限影响。源视频时长读取不到时，请求返回 `400`（`input_video_duration_unknown`），不计费。输入视频的秒数怎么读取，见[视频生成概述](/cn/api-reference/video/overview#输入视频的时长与计费)。
 
 **默认档位**（`wan3.0-video` / `wan3.0-video-prime`）——不传 `resolution` 时按 `480p` 档结算。
 

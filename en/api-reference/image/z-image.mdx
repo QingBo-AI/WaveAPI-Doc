@@ -24,20 +24,6 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
   }'
 ```
 
-```bash With prompt rewriting
-curl -X POST https://api.qingbo.ai/v1/tasks \
-  -H "Authorization: Bearer $WAVE_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "model": "z-image-turbo",
-    "action": "generate",
-    "prompt": "A traditional Chinese teahouse poster",
-    "aspect_ratio": "3:4",
-    "resolution": "1k",
-    "prompt_extend": true
-  }'
-```
-
 </CodeGroup>
 
 A successful submission returns a `task_id`. Retrieve the result with [`GET /v1/tasks/{task_id}`](/en/api-reference/task/status), wait inline with [`Prefer: wait`](/en/api-reference/task/submit#in-request-waiting-prefer-wait), or configure a webhook.
@@ -64,13 +50,9 @@ A successful submission returns a `task_id`. Retrieve the result with [`GET /v1/
   Output resolution, `1k` or `2k`.
 </ParamField>
 
-<ParamField body="prompt_extend" type="boolean" default="false">
-  Automatic prompt rewriting: the model expands the prompt into something more specific before generating.
-</ParamField>
-
 See [Submit a task](/en/api-reference/task/submit) for `callback_url`, `callback_events`, `Prefer: wait`, `Idempotency-Key` and the maximum-cost header.
 
-This model does not accept `image_urls`, `n`, `seed`, `quality`, `negative_prompt` or `mask_url`. Any other parameter returns `400` and is not billed.
+This model does not accept `image_urls`, `n`, `seed`, `quality`, `negative_prompt`, `mask_url` or `prompt_extend`. Any other parameter returns `400` and is not billed.
 
 ## Limits
 

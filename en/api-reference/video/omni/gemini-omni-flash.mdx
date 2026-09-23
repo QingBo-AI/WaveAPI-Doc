@@ -104,6 +104,10 @@ A successful submission returns a `task_id`. Retrieve the result with [`GET /v1/
   A scene description for text-to-video; an action, style or editing instruction for image-to-video and video rework. Keep edit instructions short, and add "keep everything else the same" when changing only one thing.
 </ParamField>
 
+<ParamField body="duration" type="integer" default="0">
+  Omit it or send `0`. The model picks the video length from the content (3–10 seconds); steer pacing with natural language in `prompt`. Any other value returns `400` and is not billed.
+</ParamField>
+
 <ParamField body="resolution" type="string" default="720p">
   Output resolution, case-insensitive.
 
@@ -158,19 +162,20 @@ A successful submission returns a `task_id`. Retrieve the result with [`GET /v1/
 
 See [Submit Task](/en/api-reference/task/submit) for `callback_url`, `callback_events`, `Prefer: wait`, `Idempotency-Key`, and the maximum-cost header.
 
-Neither model takes `duration`: the model decides the length from the content, typically 3–10 seconds, and pacing is steered with natural language in `prompt`. `seed` is not supported either. Any other parameter returns `400` and is not billed.
+`seed` is not supported. Any other parameter returns `400` and is not billed.
 
 ## Limits
 
 - One video per task; at most one reference video.
 - A reference video and `ref_task_id` are mutually exclusive.
+- This model picks the video length itself (3-10 s); duration cannot be set. Omit it or send 0.
 
 | Item | `gemini-omni-1.1-flash` | `gemini-omni-flash-preview` |
 |---|---|---|
 | Resolution | `360p` / `720p` / `1080p` / `4k` | `720p` only |
 | Reference images | 10 in total (frames included) | 16 |
 | Reference video | At most 1, up to 10 seconds | At most 1, up to 24 seconds |
-| Duration | Model-chosen, 3–10 seconds | Model-chosen, 3–10 seconds |
+| Duration | Model-chosen, 3–10 seconds; `duration` omitted or `0` | Model-chosen, 3–10 seconds; `duration` omitted or `0` |
 | Aspect ratio | `16:9` / `9:16` | `16:9` / `9:16` |
 
 ## Pricing

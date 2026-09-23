@@ -20,7 +20,7 @@ For the async flow, see [Task System](/en/docs/task-system) — Submit → Statu
     Three Nano Banana official tiers billed from actual token usage, four economy tiers at a fixed price per image, up to 14 reference images
   </Card>
   <Card title="GPT Image Series" href="/en/api-reference/image/gpt-image/overview">
-    GPT Image 1 / 1.5 / 2 / 2.5 official lines billed from actual token usage, GPT Image 2 reverse line at a fixed price per image
+    GPT Image 1 / 1.5 / 2 / 2.5 official lines billed from actual token usage, GPT Image 2 / 2.5 reverse lines at a fixed price per image
   </Card>
   <Card title="Seedream Series" href="/en/api-reference/image/seedream">
     ByteDance Seedream 4.0 / 4.5 / 5.0 Lite / 5.0 Pro, text-to-image and reference-image editing
@@ -127,7 +127,7 @@ After receiving the `task_id`, call [`GET /v1/tasks/{task_id}`](/en/api-referenc
 | **Text-to-image (T2I)** | `prompt` only | All |
 | **Image-to-image / multi-image reference** | `+ image_urls` (single or multiple) | Seedream / Gemini / GPT Image / Wan / Qwen / FLUX / Grok |
 | **Image editing (inpainting / lighting changes)** | `+ image_urls + action: edit` | Seedream / Gemini / GPT Image / Wan / Qwen / FLUX / Grok |
-| **Inpainting (with mask)** | `+ image_urls + mask_url + action: edit` | The three [GPT Image official](/en/api-reference/image/gpt-image/overview) models; **not supported** on the Nano Banana economy routes |
+| **Inpainting (with mask)** | `+ image_urls + mask_url + action: edit` | The [GPT Image official](/en/api-reference/image/gpt-image/overview) models; **not supported** on the GPT Image reverse lines or the Nano Banana economy routes |
 | **Sequential image group (thematic set)** | `enable_sequential: true` | Wan Image |
 | **Interactive editing (bbox selection)** | `+ image_urls + bbox_list` | Wan Image |
 

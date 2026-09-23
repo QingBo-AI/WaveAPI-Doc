@@ -1,20 +1,13 @@
 ---
-title: "GPT Image 2.5"
-description: "五档画质的文生图与参考图编辑，Flare 与 Sunburst 两条线路，按 token 用量计费"
+title: "GPT Image 2.5 官方版"
+description: "五档画质的文生图、参考图编辑与掩码局部重绘，Flare 与 Sunburst 两条线路，按 token 用量计费"
 api: "POST https://api.qingbo.ai/v1/tasks"
 ---
 
-GPT Image 2.5 是 GPT Image 官方线路的新一代，在 GPT Image 2 的动作和参数之上把画质从三档扩到五档，并对同名档位重新标定了输出用量。它提供 `gpt-image-2.5`（Flare 线）与 `gpt-image-2.5-sunburst`（Sunburst 线）两个模型，请求形状、取值范围和计费方式完全相同，只在出图速度与编辑精度之间取舍，选型只改 `model` 字段。
-
-## 可用模型
-
-| 模型 ID | 取舍 | 适合 | 计费 |
-|---|---|---|---|
-| `gpt-image-2.5` | Flare 线，出图更快 | 日常高质量出图、批量生成、快速试稿 | 按实际 token 用量 |
-| `gpt-image-2.5-sunburst` | Sunburst 线，编辑精度优先 | 成品素材、广告创意、多轮细节修改 | 按实际 token 用量 |
+GPT Image 2.5 是 GPT Image 官方线路的新一代，在 GPT Image 2 的动作和参数之上把画质从三档扩到五档，并对同名档位重新标定了输出用量。它提供 `gpt-image-2.5-flare`（Flare 线）与 `gpt-image-2.5-sunburst`（Sunburst 线）两个模型，请求形状、取值范围和计费方式完全相同，只在出图速度与编辑精度之间取舍，选型只改 `model` 字段。
 
 <Note>
-两个模型的单价相同，同一组参数的花费也相同，差别只在生成结果本身。模型之间不会自动切换。
+需要按固定张价调用时，可使用 [GPT Image 2.5 逆向版](/cn/api-reference/image/gpt-image/gpt-image-2.5-rev)。两条线路使用相同的任务接口，但模型 ID、参数和计费方式不同，不会自动互相切换。
 </Note>
 
 ## 快速开始
@@ -27,7 +20,7 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Content-Type: application/json" \
   -H "Idempotency-Key: image25-demo-001" \
   -d '{
-    "model": "gpt-image-2.5",
+    "model": "gpt-image-2.5-flare",
     "action": "generate",
     "prompt": "手工青瓷茶杯放在原色亚麻布上，单侧北向自然光，柔和过渡，静物摄影",
     "aspect_ratio": "1:1",
@@ -54,6 +47,23 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
   }'
 ```
 
+```bash 局部重绘
+curl -X POST https://api.qingbo.ai/v1/tasks \
+  -H "Authorization: Bearer $WAVE_API_KEY" \
+  -H "Content-Type: application/json" \
+  -H "Idempotency-Key: image25-mask-001" \
+  -d '{
+    "model": "gpt-image-2.5-sunburst",
+    "action": "edit",
+    "prompt": "只把茶杯改成深绿色釉面，其余区域保持不变",
+    "image_urls": ["https://cdn.example.com/source.png"],
+    "mask_url": "https://cdn.example.com/mask.png",
+    "resolution": "1k",
+    "quality": "medium",
+    "n": 1
+  }'
+```
+
 </CodeGroup>
 
 提交成功后返回 `task_id`。用 [`GET /v1/tasks/{task_id}`](/cn/api-reference/task/status) 查询结果，也可以用 [`Prefer: wait`](/cn/api-reference/task/submit#请求内等待prefer-wait) 在一次调用里等待，或配置 Webhook。
@@ -61,7 +71,7 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
 ## 请求参数
 
 <ParamField body="model" type="string" required>
-  `gpt-image-2.5` 或 `gpt-image-2.5-sunburst`。
+  `gpt-image-2.5-flare` 或 `gpt-image-2.5-sunburst`。
 </ParamField>
 
 <ParamField body="action" type="string" default="generate">
@@ -77,6 +87,10 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
   参考图片 URL。`edit` 时必填，最多 16 张。
 </ParamField>
 
+<ParamField body="mask_url" type="string">
+  局部重绘掩码图 URL：带透明通道的 PNG，全透明区域为重绘区，像素尺寸须与首张参考图一致。必须同时提供 `image_urls`。
+</ParamField>
+
 <ParamField body="aspect_ratio" type="string" default="1:1">
   支持 `1:1`、`3:2`、`2:3`、`4:3`、`3:4`、`5:4`、`4:5`、`16:9`、`9:16`、`2:1`、`1:2`、`3:1`、`1:3`、`21:9`、`9:21`。
 </ParamField>
@@ -86,7 +100,7 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
 </ParamField>
 
 <ParamField body="quality" type="string" default="low">
-  画质档位：`low`、`medium`、`high`、`xhigh` 或 `max`。`xhigh` 与 `max` 是 2.5 独有的档位，发给 `gpt-image-2` 会返回 `400`，不会自动降档。画质是这条线路影响成本最大的参数，见下方「计费」。
+  画质档位：`low`、`medium`、`high`、`xhigh` 或 `max`。`xhigh` 与 `max` 是 2.5 独有的档位，发给 `gpt-image-2` 会返回 `400`，不会自动降档。画质是这条线路影响成本最大的参数，见「计费」。
 </ParamField>
 
 <ParamField body="n" type="integer" default="1">
@@ -111,7 +125,7 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
 
 通用的 `callback_url`、`callback_events`、`Prefer: wait`、`Idempotency-Key` 和费用上限请求头见[提交任务](/cn/api-reference/task/submit)。
 
-本组不接受 `mask_url` 与 `seed`——掩码局部重绘请用 [`gpt-image-2`](/cn/api-reference/image/gpt-image/gpt-image-2)。以上之外的参数会返回 `400`，不计费。
+官方版不支持 `seed`。以上之外的参数会返回 `400`，不计费。
 
 ## 限制
 
@@ -119,10 +133,11 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
 |---|---|
 | 每次请求 | 返回 1 张图 |
 | `action: "edit"` | 必须提供至少一张参考图 |
+| 使用 `mask_url` | 必须同时提供 `image_urls`，且掩码与第一张参考图尺寸一致 |
 | `background: "transparent"` | `output_format` 只能是 `png` 或 `webp` |
 | 使用 `output_compression` | `output_format` 必须显式设为 `jpeg` 或 `webp` |
 | 参考图张数 | 最多 16 张 |
-| `xhigh` / `max` 画质 | 只有 2.5 的两个模型接受 |
+| `xhigh` / `max` 画质 | 只有 `gpt-image-2.5-flare` 与 `gpt-image-2.5-sunburst` 接受 |
 
 ## 计费
 
@@ -155,7 +170,7 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
 ```json 任务完成
 {
   "task_id": "task-wave1789004688b950049238",
-  "model": "gpt-image-2.5",
+  "model": "gpt-image-2.5-flare",
   "action": "generate",
   "status": "completed",
   "progress": "100%",
@@ -174,9 +189,19 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
 
 `result.images` 返回生成图片，`expires_at` 是该链接的删除时刻（产物保留 7 天，见[任务状态](/cn/api-reference/task/status)）。任务失败或取消时冻结额度全额退款；如果上游返回成功但没有可交付图片，任务会按失败处理并退款。
 
+## 可用模型
+
+| 模型 ID | 取舍 | 适合 | 计费 |
+|---|---|---|---|
+| `gpt-image-2.5-flare` | Flare 线，出图更快 | 日常高质量出图、批量生成、快速试稿 | 按实际 token 用量 |
+| `gpt-image-2.5-sunburst` | Sunburst 线，编辑精度优先 | 成品素材、广告创意、多轮细节修改 | 按实际 token 用量 |
+
+两个模型的单价相同，同一组参数的花费也相同，差别只在生成结果本身；本页的每一节对两者都适用。
+
 ## 相关文档
 
 - [GPT Image 系列](/cn/api-reference/image/gpt-image/overview)
+- [GPT Image 2.5 逆向版](/cn/api-reference/image/gpt-image/gpt-image-2.5-rev)
 - [GPT Image 2 官方版](/cn/api-reference/image/gpt-image/gpt-image-2)
 - [GPT Image 1 与 1.5 官方版](/cn/api-reference/image/gpt-image/gpt-image-1)
 - [提交任务](/cn/api-reference/task/submit)
