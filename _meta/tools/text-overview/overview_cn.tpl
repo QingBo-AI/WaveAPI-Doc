@@ -12,7 +12,7 @@ description: "全部文本模型的目录：支持的能力、计费方式与调
     `POST /v1/chat/completions`。默认入口，本页所有模型都从这里调用（Responses 专用模型除外）。
   </Card>
   <Card title="Responses" icon="layer-group" href="/cn/api-reference/text/openai-multimodal">
-    `POST /v1/responses`。GPT Pro / Codex / o3-pro 系列只接受这个入口。
+    `POST /v1/responses`。OpenAI、Qwen、DeepSeek、xAI 的文本模型也可从这里调用（`deepseek-v3.1-terminus` 除外），Codex 等客户端走这个入口；GPT Pro / Codex / o3-pro 系列只接受这个入口。
   </Card>
   <Card title="Claude Messages" icon="message" href="/cn/api-reference/text/claude-messages">
     `POST /v1/messages`。为已有 Anthropic SDK 的应用保留的原生信封。
@@ -70,9 +70,9 @@ quota      = 费用（USD） × 500,000，向下取整，最低 1
 | 档 | 判据 | 模型 |
 |---|---|---|
 | 无缓存优惠 | `cache_billing: "input_output"` | 目录中其余全部模型；响应里若带缓存统计，一律按普通输入价计 |
-| 只有缓存读 | 配了 `cache_read` | `gpt-5.5` `gpt-5.4` `grok-4.6` `gemini-3.6-flash` `gemini-3.7-flash` `gemini-3.8-flash` `kimi-k3` `qwen3.8-max` |
-| 缓存读 + 写 | 再配 `cache_write` | `gpt-5.6-luna` `gpt-5.6-terra` `gpt-5.6-sol` `gpt-6-astra` |
-| 缓存读 + 5 分钟写 + 1 小时写 | 再配 `cache_write_1h` | `claude-opus-5` `claude-sonnet-5` `claude-fable-5` `claude-fable-5-1` |
+| 只有缓存读 | 配了 `cache_read` | `gpt-5.5` `gpt-5.4` `gpt-5.4-mini` `gpt-5.4-nano` `gpt-5.2` `gpt-5.1` `gpt-5` `gpt-5-mini` `gpt-5-nano` `gpt-4.1` `gpt-4.1-mini` `gpt-4.1-nano` `o4-mini` `o3-mini` `o1` `grok-4.7` `grok-4.6` `gemini-3.6-flash` `gemini-3.7-flash` `gemini-3.8-flash` `kimi-k3` `glm-5.3` |
+| 缓存读 + 写 | 再配 `cache_write` | `gpt-5.6-luna` `gpt-5.6-terra` `gpt-5.6-sol` `gpt-6-astra` `gpt-6-sol` `gpt-6-luna` `qwen3.8-max` `qwen3.8-max-0902` `qwen3.8-2.4t-a95b` `qwen3.8-27b` `qwen3.8-flash` `qwen3.7-flash` |
+| 缓存读 + 5 分钟写 + 1 小时写 | 再配 `cache_write_1h` | `claude-opus-5-5` `claude-opus-5` `claude-sonnet-5` `claude-fable-5` `claude-fable-5-1` |
 | 时段缓存价 | `text_schedule` 各时段带 `cache_read` | `deepseek-v4-pro` `deepseek-v4-flash` |
 
 ### 自动缓存与显式缓存
@@ -84,10 +84,11 @@ quota      = 费用（USD） × 500,000，向下取整，最低 1
 
 | 模型 | 显式 `cache_control` |
 |---|---|
-| `claude-opus-5` `claude-sonnet-5` `claude-fable-5` `claude-fable-5-1` | ✅ 放行，三档缓存价齐备（读 / 5 分钟写 / 1 小时写） |
-| 所有 `gemini-*`、`qwen3.8-max` | ❌ 只支持自动缓存，传 `cache_control` 返回 400 |
+| `claude-opus-5-5` `claude-opus-5` `claude-sonnet-5` `claude-fable-5` `claude-fable-5-1` | ✅ 放行，三档缓存价齐备（读 / 5 分钟写 / 1 小时写） |
+| `qwen3.8-*`、`qwen3.7-flash` | ✅ 放行，写入按缓存写入价计，显式命中按缓存读价计 |
+| 所有 `gemini-*` | 上游只有自动缓存，`cache_control` 不生效；原生接口的 `cachedContent` 不支持，传入返回 400 |
 | 两项计价模型 | ❌ 没有缓存计费，传 `cache_control` 返回 400 |
-| 其余（`gpt-5.4/5.5/5.6-*`、`gpt-6-astra`、`grok-4.6`、`kimi-k3`、`deepseek-v4-*`） | 上游只有自动缓存，不需要也不用传 `cache_control` |
+| 其余（`gpt-4.1*`、`gpt-5*`、`gpt-6-astra`、`o1`、`o3-mini`、`o4-mini`、`grok-4.6`、`grok-4.7`、`glm-5.3`、`kimi-k3`、`deepseek-v4-*`） | 上游只有自动缓存，不需要也不用传 `cache_control` |
 
 不支持的请求返回 `400`，不计费。
 

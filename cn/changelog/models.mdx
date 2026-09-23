@@ -2,6 +2,27 @@
 title: "模型动态"
 ---
 
+<Update label="2026-09-23" description="能力更新">
+**45 个文本模型支持 Responses 接口**
+
+- OpenAI（`gpt-4.1` / `gpt-5` / `gpt-5.x` / `gpt-6` 系列、`o1` / `o3` / `o3-mini` / `o4-mini`）、Qwen、DeepSeek、xAI 的文本模型现在也可以通过 `POST /v1/responses` 调用，支持流式与函数调用，Codex 等客户端可以直接使用。`deepseek-v3.1-terminus` 暂不支持。
+- `gpt-6-astra`、`grok-4.6` 开放函数调用，需走 `/v1/responses`。
+- 计费与 Chat 接口相同。
+- **文档**：[文本模型总览](/cn/api-reference/text/overview)
+</Update>
+
+<Update label="2026-09-23" description="模型上架">
+**文本模型 · 10 个新模型（OpenAI / Anthropic / xAI / Qwen / Z.ai）**
+
+- **OpenAI**：`gpt-6-sol`　·　`gpt-6-luna` —— GPT-6 系列的中档与低价档，约 100 万 token 上下文，支持图片输入、JSON Schema 结构化输出与函数调用（函数调用需 `reasoning_effort: "none"`）；单次输入超过 272K token 按长上下文档计费。
+- **Anthropic**：`claude-opus-5-5` —— Claude 5.5 系列首个模型，100 万 token 上下文，始终进行思考，支持函数调用与原生 `/v1/messages` 接口，单价低于 `claude-opus-5`。
+- **xAI**：`grok-4.7` —— 50 万 token 上下文，支持图片输入与函数调用，始终进行推理；单次输入达到 20 万 token 起按长上下文档计费。
+- **Qwen**：`qwen3.8-max-0902`（`qwen3.8-max` 于 9 月 2 日发布的升级快照）　·　`qwen3.8-2.4t-a95b`（开源权重旗舰，仅文本输入）　·　`qwen3.8-flash`　·　`qwen3.8-27b`　·　`qwen3.7-flash`（超过 32K 输入按长上下文档计费）。
+- **Z.ai**：`glm-5.3` —— 始终进行推理，支持函数调用。
+- 全部走 `/v1/chat/completions`，支持流式输出。
+- **文档**：[文本模型总览](/cn/api-reference/text/overview)
+</Update>
+
 <Update label="2026-09-17" description="模型上架">
 **DeepSeek V4.1 Flash 上架**
 

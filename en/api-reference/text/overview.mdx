@@ -12,7 +12,7 @@ All text models are served through the OpenAI-compatible Chat Completions endpoi
     `POST /v1/chat/completions`. The default entry; every model on this page is called here, except the Responses-only models.
   </Card>
   <Card title="Responses" icon="layer-group" href="/en/api-reference/text/openai-multimodal">
-    `POST /v1/responses`. GPT Pro / Codex / o3-pro models accept only this entry.
+    `POST /v1/responses`. Text models from OpenAI, Qwen, DeepSeek and xAI can also be called here (except `deepseek-v3.1-terminus`), which is what clients such as Codex use; GPT Pro / Codex / o3-pro models accept only this entry.
   </Card>
   <Card title="Claude Messages" icon="message" href="/en/api-reference/text/claude-messages">
     `POST /v1/messages`. Native envelope kept for apps already built on the Anthropic SDK.
@@ -70,9 +70,9 @@ Caching is graded per model by which cache rates that model has configured. Cach
 | Grade | Test | Models |
 |---|---|---|
 | No cache discount | `cache_billing: "input_output"` | every other model in the catalog; any cache statistics in the response bill at the ordinary input rate |
-| Cache read only | has `cache_read` | `gpt-5.5` `gpt-5.4` `grok-4.6` `gemini-3.6-flash` `gemini-3.7-flash` `gemini-3.8-flash` `kimi-k3` `qwen3.8-max` |
-| Cache read + write | also `cache_write` | `gpt-5.6-luna` `gpt-5.6-terra` `gpt-5.6-sol` `gpt-6-astra` |
-| Cache read + 5-min write + 1-hour write | also `cache_write_1h` | `claude-opus-5` `claude-sonnet-5` `claude-fable-5` `claude-fable-5-1` |
+| Cache read only | has `cache_read` | `gpt-5.5` `gpt-5.4` `gpt-5.4-mini` `gpt-5.4-nano` `gpt-5.2` `gpt-5.1` `gpt-5` `gpt-5-mini` `gpt-5-nano` `gpt-4.1` `gpt-4.1-mini` `gpt-4.1-nano` `o4-mini` `o3-mini` `o1` `grok-4.7` `grok-4.6` `gemini-3.6-flash` `gemini-3.7-flash` `gemini-3.8-flash` `kimi-k3` `glm-5.3` |
+| Cache read + write | also `cache_write` | `gpt-5.6-luna` `gpt-5.6-terra` `gpt-5.6-sol` `gpt-6-astra` `gpt-6-sol` `gpt-6-luna` `qwen3.8-max` `qwen3.8-max-0902` `qwen3.8-2.4t-a95b` `qwen3.8-27b` `qwen3.8-flash` `qwen3.7-flash` |
+| Cache read + 5-min write + 1-hour write | also `cache_write_1h` | `claude-opus-5-5` `claude-opus-5` `claude-sonnet-5` `claude-fable-5` `claude-fable-5-1` |
 | Time-of-day cache rate | `cache_read` inside each `text_schedule` window | `deepseek-v4-pro` `deepseek-v4-flash` |
 
 ### Automatic vs explicit caching
@@ -84,10 +84,11 @@ Caching is graded per model by which cache rates that model has configured. Cach
 
 | Models | Explicit `cache_control` |
 |---|---|
-| `claude-opus-5` `claude-sonnet-5` `claude-fable-5` `claude-fable-5-1` | ✅ Allowed; all three cache rates configured (read / 5-minute write / 1-hour write) |
-| every `gemini-*`, and `qwen3.8-max` | ❌ Automatic caching only; sending `cache_control` returns 400 |
+| `claude-opus-5-5` `claude-opus-5` `claude-sonnet-5` `claude-fable-5` `claude-fable-5-1` | ✅ Allowed; all three cache rates configured (read / 5-minute write / 1-hour write) |
+| `qwen3.8-*`, `qwen3.7-flash` | ✅ Allowed; writes are billed at the cache-write rate, explicit hits at the cache-read rate |
+| every `gemini-*` | Upstream caches automatically, so `cache_control` has no effect; `cachedContent` on the native API is not supported and returns 400 |
 | two-rate models | ❌ No cache billing; sending `cache_control` returns 400 |
-| everything else (`gpt-5.4/5.5/5.6-*`, `gpt-6-astra`, `grok-4.6`, `kimi-k3`, `deepseek-v4-*`) | Upstream caches automatically; `cache_control` is neither needed nor used |
+| everything else (`gpt-4.1*`, `gpt-5*`, `gpt-6-astra`, `o1`, `o3-mini`, `o4-mini`, `grok-4.6`, `grok-4.7`, `glm-5.3`, `kimi-k3`, `deepseek-v4-*`) | Upstream caches automatically; `cache_control` is neither needed nor used |
 
 Unsupported requests return `400` and are not billed.
 
@@ -157,45 +158,62 @@ Each model serves only the protocols it supports (Chat / Responses / Claude Mess
 
 | Model ID | Billing | JSON / Tools |
 |---|---|:---:|
-| `gpt-6-astra` | + cache read/write | ✓ / — |
+| `gpt-6-sol` | + cache read/write | ✓ / ✓ |
+| `gpt-6-luna` | + cache read/write | ✓ / ✓ |
+| `gpt-6-astra` | + cache read/write | ✓ / ✓ |
 | `gpt-5.6-luna` | + cache read/write | ✓ / ✓ |
 | `gpt-5.6-terra` | + cache read/write | ✓ / ✓ |
 | `gpt-5.6-sol` | + cache read/write | ✓ / ✓ |
 | `gpt-5.5` | + cache read | ✓ / ✓ |
 | `gpt-5.4` | + cache read | ✓ / ✓ |
 | `gpt-5.4-pro` | input + output | — / — |
-| `gpt-5.4-mini` | input + output | ✓ / ✓ |
-| `gpt-5.4-nano` | input + output | ✓ / ✓ |
+| `gpt-5.4-mini` | + cache read | ✓ / ✓ |
+| `gpt-5.4-nano` | + cache read | ✓ / ✓ |
 | `gpt-5.3-codex` | input + output | — / — |
-| `gpt-5.2` | input + output | ✓ / ✓ |
+| `gpt-5.2` | + cache read | ✓ / ✓ |
 | `gpt-5.2-pro` | input + output | — / — |
-| `gpt-5.1` | input + output | ✓ / ✓ |
-| `gpt-5` | input + output | — / ✓ |
-| `gpt-5-mini` | input + output | ✓ / ✓ |
-| `gpt-5-nano` | input + output | ✓ / ✓ |
+| `gpt-5.1` | + cache read | ✓ / ✓ |
+| `gpt-5` | + cache read | — / ✓ |
+| `gpt-5-mini` | + cache read | ✓ / ✓ |
+| `gpt-5-nano` | + cache read | ✓ / ✓ |
 | `gpt-5-pro` | input + output | — / — |
-| `gpt-4.1` | input + output | ✓ / ✓ |
-| `gpt-4.1-mini` | input + output | ✓ / ✓ |
-| `gpt-4.1-nano` | input + output | ✓ / ✓ |
+| `gpt-4.1` | + cache read | ✓ / ✓ |
+| `gpt-4.1-mini` | + cache read | ✓ / ✓ |
+| `gpt-4.1-nano` | + cache read | ✓ / ✓ |
 | `o3` | input + output | ✓ / ✓ |
 | `o3-pro` | input + output | — / — |
-| `o4-mini` | input + output | ✓ / ✓ |
-| `o3-mini` | input + output | ✓ / ✓ |
-| `o1` | input + output | ✓ / ✓ |
+| `o4-mini` | + cache read | ✓ / ✓ |
+| `o3-mini` | + cache read | ✓ / ✓ |
+| `o1` | + cache read | ✓ / ✓ |
 
 **Model notes**
 
-- `gpt-6-astra` — 272K long-context tier; has a separate cache-write rate; max input 922K, max output 12.8K; tool calling is not supported; use `reasoning_effort: "low"`; `"none"` is unsupported, and `temperature`, `top_p` and `logprobs` are not supported
+- `gpt-6-sol` — 272K long-context tier; has a separate cache-write rate; max input 922K, max output 128K; function calling requires `reasoning_effort: "none"`; when `reasoning_effort` is not `none`, `temperature`, `top_p` and `logprobs` are not supported
+- `gpt-6-luna` — 272K long-context tier; has a separate cache-write rate; max input 922K, max output 128K; function calling requires `reasoning_effort: "none"`; when `reasoning_effort` is not `none`, `temperature`, `top_p` and `logprobs` are not supported
+- `gpt-6-astra` — 272K long-context tier; has a separate cache-write rate; max input 922K, max output 12.8K; function calling works only through `/v1/responses`; use `reasoning_effort: "low"`; `"none"` is unsupported, and `temperature`, `top_p` and `logprobs` are not supported
 - `gpt-5.6-luna` — 272K long-context tier; has a separate cache-write rate; max input 922K, max output 128K; supports automatic cache hits
 - `gpt-5.6-terra` — 272K long-context tier; has a separate cache-write rate; max input 922K, max output 12.8K
 - `gpt-5.6-sol` — 272K long-context tier; has a separate cache-write rate; max input 922K, max output 12.8K
 - `gpt-5.5` — 272K long-context tier; max input 1M, max output 12.8K; no separate cache-write rate
 - `gpt-5.4` — 272K long-context tier; max input 1M, max output 12.8K; no separate cache-write rate
 - `gpt-5.4-pro` — 272K long-context tier; `/v1/responses` only
+- `gpt-5.4-mini` — supports automatic cache hits
+- `gpt-5.4-nano` — supports automatic cache hits
 - `gpt-5.3-codex` — `/v1/responses` only
+- `gpt-5.2` — supports automatic cache hits
 - `gpt-5.2-pro` — `/v1/responses` only
+- `gpt-5.1` — supports automatic cache hits
+- `gpt-5` — supports automatic cache hits
+- `gpt-5-mini` — supports automatic cache hits
+- `gpt-5-nano` — supports automatic cache hits
 - `gpt-5-pro` — `/v1/responses` only
+- `gpt-4.1` — supports automatic cache hits
+- `gpt-4.1-mini` — supports automatic cache hits
+- `gpt-4.1-nano` — supports automatic cache hits
 - `o3-pro` — `/v1/responses` only
+- `o4-mini` — supports automatic cache hits
+- `o3-mini` — supports automatic cache hits
+- `o1` — supports automatic cache hits
 
 GPT-5 and later use `max_completion_tokens` to cap output and `reasoning_effort` to pick a reasoning tier (GPT-6 Astra supports `"low"` only). `max_tokens` is rejected. `gpt-5-pro`, `gpt-5.2-pro`, `gpt-5.4-pro`, `gpt-5.3-codex` and `o3-pro` are served only on the [Responses API](/en/api-reference/text/openai-multimodal) and return 400 on Chat. The 272K tier is judged on **total input**: exactly 272,000 stays on the base rate, anything above moves the whole request (cache and output included) to the long-context rate. GPT-5.6 cache writes cost 1.25× the tier's input rate and replace the ordinary input charge rather than adding to it; GPT-5.4 / 5.5 have no separate cache-write rate.
 
@@ -205,6 +223,7 @@ GPT-5 and later use `max_completion_tokens` to cap output and `reasoning_effort`
 |---|---|:---:|
 | `claude-fable-5-1` | + 3 cache rates | — / ✓ |
 | `claude-fable-5` | + 3 cache rates | — / ✓ |
+| `claude-opus-5-5` | + 3 cache rates | — / ✓ |
 | `claude-opus-5` | + 3 cache rates | — / ✓ |
 | `claude-sonnet-5` | + 3 cache rates | — / ✓ |
 | `claude-opus-4-8` | input + output | — / ✓ |
@@ -219,10 +238,11 @@ GPT-5 and later use `max_completion_tokens` to cap output and `reasoning_effort`
 
 - `claude-fable-5-1` — cache writes are priced at two TTLs, 5-minute and 1-hour; max input 1M, max output 128K; JSON Schema structured output is not supported; `tool_choice` accepts only `"auto"`; `"required"` and named functions return 400
 - `claude-fable-5` — cache writes are priced at two TTLs, 5-minute and 1-hour; max input 1M, max output 128K; JSON Schema structured output is not supported; `tool_choice` accepts only `"auto"`
+- `claude-opus-5-5` — cache writes are priced at two TTLs, 5-minute and 1-hour; JSON Schema and `json_object` are not supported; the native `/v1/messages` endpoint is available; use `tool_choice: "auto"`; `any` and `tool` are not supported; thinking is always on and cannot be disabled
 - `claude-opus-5` — cache writes are priced at two TTLs, 5-minute and 1-hour; max input 128K, max output 16K; JSON Schema and `json_object` are not supported; the native `/v1/messages` endpoint is available
 - `claude-sonnet-5` — cache writes are priced at two TTLs, 5-minute and 1-hour; max input 1M, max output 128K; JSON Schema and `json_object` are not supported; the native `/v1/messages` endpoint is available
 
-Use `max_tokens` on the Chat endpoint to cap output; the GPT-only `reasoning_effort` and `max_completion_tokens` do not apply to Claude models. The four Claude 5 / Fable models carry three cache rates (read / 5-minute write / 1-hour write) and are the only models that currently **allow explicit `cache_control`** — see [Caching](#caching) for the request shape. These four do **not support structured output**: `response_format` with `json_schema` or `json_object` returns 400. On the Fable models `tool_choice` accepts only `"auto"`; `"required"` or a named function returns 400. The 4.x line bills input and output only and does not support `cache_control`. Apps built on the Anthropic SDK can use the native [Messages endpoint](/en/api-reference/text/claude-messages), but **only `claude-sonnet-5` and `claude-opus-5` support it**; any other Claude model returns 400 there — use the Chat endpoint instead.
+Use `max_tokens` on the Chat endpoint to cap output; the GPT-only `reasoning_effort` and `max_completion_tokens` do not apply to Claude models. The five Claude 5 / Claude 5.5 / Fable models carry three cache rates (read / 5-minute write / 1-hour write) and allow explicit `cache_control` — see [Caching](#caching) for the request shape. These five do **not support structured output**: `response_format` with `json_schema` or `json_object` returns 400. On the Fable models and `claude-opus-5-5` `tool_choice` accepts only `"auto"`; `"required"` or a named function returns 400. The 4.x line bills input and output only and does not support `cache_control`. Apps built on the Anthropic SDK can use the native [Messages endpoint](/en/api-reference/text/claude-messages), but **only `claude-sonnet-5`, `claude-opus-5` and `claude-opus-5-5` support it**; any other Claude model returns 400 there — use the Chat endpoint instead.
 
 ### Google Gemini
 
@@ -249,7 +269,7 @@ Use `max_tokens` on the Chat endpoint to cap output; the GPT-only `reasoning_eff
 - `gemini-2.5-pro` — 200K long-context tier; the Gemini native endpoint is available
 - `gemini-2.5-flash-lite` — the Gemini native endpoint is available
 
-Besides the OpenAI-compatible endpoint, these models can also be called on the Gemini native endpoint: `gemini-2.5-flash-lite`, `gemini-2.5-pro`, `gemini-3-flash-preview`, `gemini-3.1-pro-preview`, `gemini-3.5-flash`, `gemini-3.6-flash`, `gemini-3.7-flash`, `gemini-3.8-flash` (`gemini-3.5-flash-lite` is Chat-only). The native entry is `POST /v1beta/models/{model}:generateContent` (streaming: `:streamGenerateContent?alt=sse`), see [Gemini native API](/en/api-reference/text/gemini-native). Native responses report usage in `usageMetadata` without `usage.cost`; `candidatesTokenCount` and `thoughtsTokenCount` are reported separately and billed output is their sum. The Pro models (`gemini-2.5-pro` / `gemini-3.1-pro-preview`) have a 200K long-context tier that switches the whole request above 200,000 total input. 3.6 / 3.7 / 3.8 Flash have an implicit cache-read rate whose hits are decided upstream; the other models bill two rates. The whole Gemini line supports automatic caching only; explicit caching (`cache_control` / `cachedContent`) returns 400, as do built-in tools, `web_search_options` and any `service_tier` other than `standard` / `default`.
+Besides the OpenAI-compatible endpoint, these models can also be called on the Gemini native endpoint: `gemini-2.5-flash-lite`, `gemini-2.5-pro`, `gemini-3-flash-preview`, `gemini-3.1-pro-preview`, `gemini-3.5-flash`, `gemini-3.6-flash`, `gemini-3.7-flash`, `gemini-3.8-flash` (`gemini-3.5-flash-lite` is Chat-only). The native entry is `POST /v1beta/models/{model}:generateContent` (streaming: `:streamGenerateContent?alt=sse`), see [Gemini native API](/en/api-reference/text/gemini-native). Native responses report usage in `usageMetadata` without `usage.cost`; `candidatesTokenCount` and `thoughtsTokenCount` are reported separately and billed output is their sum. The Pro models (`gemini-2.5-pro` / `gemini-3.1-pro-preview`) have a 200K long-context tier that switches the whole request above 200,000 total input. 3.6 / 3.7 / 3.8 Flash have an implicit cache-read rate whose hits are decided upstream; the other models bill two rates. The whole Gemini line supports automatic caching only: `cache_control` has no effect, and `cachedContent` on the native endpoint returns 400, as do built-in tools, `web_search_options` and any `service_tier` other than `standard` / `default`.
 
 ### DeepSeek
 
@@ -285,20 +305,30 @@ Beijing time is UTC+8. The per-slot input / output / cache-read rates for each m
 
 | Model ID | Billing | JSON / Tools |
 |---|---|:---:|
-| `qwen3.8-max` | + cache read | ✓ / ✓ |
+| `qwen3.8-max` | + cache read/write | ✓ / ✓ |
+| `qwen3.8-max-0902` | + cache read/write | ✓ / ✓ |
+| `qwen3.8-2.4t-a95b` | + cache read/write | ✓ / ✓ |
+| `qwen3.8-27b` | + cache read/write | — / ✓ |
+| `qwen3.8-flash` | + cache read/write | ✓ / ✓ |
 | `qwen3.7-max` | input + output | ✓ / ✓ |
 | `qwen3.7-plus` | input + output | ✓ / ✓ |
+| `qwen3.7-flash` | + cache read/write | ✓ / ✓ |
 | `qwen3.6-plus` | input + output | — / ✓ |
 | `qwen3.6-flash` | input + output | — / ✓ |
 
 **Model notes**
 
-- `qwen3.8-max` — max input 983K, max output 131K; supports automatic cache hits; explicit `cache_control` is not supported; use `tool_choice: "auto"`
+- `qwen3.8-max` — has a separate cache-write rate; max input 983K, max output 131K; supports automatic cache hits; use `tool_choice: "auto"`
+- `qwen3.8-max-0902` — has a separate cache-write rate; max input 983K, max output 131K; supports automatic cache hits; use `tool_choice: "auto"`
+- `qwen3.8-2.4t-a95b` — has a separate cache-write rate; supports automatic cache hits; use `tool_choice: "auto"`
+- `qwen3.8-27b` — has a separate cache-write rate; supports automatic cache hits; use `tool_choice: "auto"`
+- `qwen3.8-flash` — has a separate cache-write rate; supports automatic cache hits; use `tool_choice: "auto"`
 - `qwen3.7-plus` — 256K long-context tier
+- `qwen3.7-flash` — 32K long-context tier; has a separate cache-write rate; supports automatic cache hits
 - `qwen3.6-plus` — 256K long-context tier
 - `qwen3.6-flash` — 256K long-context tier
 
-Qwen3.8 Max supports automatic caching only, and whether a request hits is decided upstream; explicit `cache_control` returns 400. Plus / Flash have a 256K tier switched on total input for the whole request. Reasoning tokens come out of the output budget and cannot be turned off.
+Whether an automatic cache hit occurs is decided upstream; when a prefix is marked with `cache_control`, writes are billed at the cache-write rate and hits at the cache-read rate. Plus / Flash have a 256K tier (32K for `qwen3.7-flash`) switched on total input for the whole request. Reasoning tokens come out of the output budget and cannot be turned off.
 
 ### Kimi (Moonshot)
 
@@ -319,7 +349,8 @@ Kimi K3 supports automatic caching. Use `tool_choice: "auto"`, and give function
 
 | Model ID | Billing | JSON / Tools |
 |---|---|:---:|
-| `grok-4.6` | + cache read | ✓ / — |
+| `grok-4.7` | + cache read | ✓ / ✓ |
+| `grok-4.6` | + cache read | ✓ / ✓ |
 | `grok-4.5` | input + output | ✓ / — |
 | `grok-4.3` | input + output | ✓ / ✓ |
 | `grok-4.20-0309-reasoning` | input + output | ✓ / ✓ |
@@ -328,7 +359,8 @@ Kimi K3 supports automatic caching. Use `tool_choice: "auto"`, and give function
 
 **Model notes**
 
-- `grok-4.6` — 200K long-context tier; max input 500K, max output 12.8K; supports automatic cache hits; tool calling is not supported; `max_tokens` is not a hard cap; reasoning can push completion_tokens past it
+- `grok-4.7` — 200K long-context tier; supports automatic cache hits
+- `grok-4.6` — 200K long-context tier; max input 500K, max output 12.8K; supports automatic cache hits; function calling works only through `/v1/responses`; `max_tokens` is not a hard cap; reasoning can push completion_tokens past it
 - `grok-4.5` — 200K long-context tier; tool calling is not supported
 - `grok-4.3` — 200K long-context tier
 - `grok-4.20-0309-reasoning` — 200K long-context tier
@@ -341,11 +373,16 @@ The whole Grok line has a 200K tier: once total input (cache included) reaches 2
 
 | Model ID | Billing | JSON / Tools |
 |---|---|:---:|
+| `glm-5.3` | + cache read | — / ✓ |
 | `glm-5.2` | input + output | — / ✓ |
 | `glm-5.1` | input + output | — / ✓ |
 | `glm-5` | input + output | ✓ / ✓ |
 | `glm-4.7` | input + output | ✓ / ✓ |
 | `glm-4.6` | input + output | — / ✓ |
+
+**Model notes**
+
+- `glm-5.3` — supports automatic cache hits
 
 Input and output are the only two rates; `cache_control` is not supported.
 
