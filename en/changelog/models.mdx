@@ -3,6 +3,17 @@ title: "Model Updates"
 ---
 
 <Update label="2026-09-23" description="Capability update">
+**Image models: GPT Image 2.5 moves to the official model ID and gains a reverse line; several models now return multiple images**
+
+- **`gpt-image-2.5` is renamed `gpt-image-2.5-flare`** to match OpenAI's official model ID; parameters and prices are unchanged. The old ID is disabled and now returns model-not-found — change `model` to `gpt-image-2.5-flare`.
+- **Inpainting on GPT Image 2.5**: `gpt-image-2.5-flare` and `gpt-image-2.5-sunburst` accept `mask_url` (a PNG with an alpha channel; `image_urls` required).
+- **New GPT Image 2.5 reverse line**: `gpt-image-2.5-flare-rev` · `gpt-image-2.5-sunburst-rev` — text-to-image and reference editing, `1k` / `2k` / `4k`, one image per request, fixed per-image price by resolution tier.
+- **Multiple images per request**: `grok-imagine-image-2.0` returns 1–10 images, `grok-imagine-image-2.0-rev` 1–12, `qwen-image-3.0` / `qwen-image-3.0-pro` 1–6, `seedream-5.0-lite` up to 15, and `seedream-4.0` / `seedream-4.5` up to 15 reference plus output images when editing. Multi-image requests are billed by the number of images actually returned.
+- **`z-image-turbo` no longer accepts `prompt_extend`**; sending it returns `400` and is not billed.
+- **Docs**: [GPT Image series](/en/api-reference/image/gpt-image/overview) · [GPT Image 2.5 Reverse](/en/api-reference/image/gpt-image/gpt-image-2.5-rev) · [Grok Imagine](/en/api-reference/image/grok-imagine) · [Qwen Image](/en/api-reference/image/qwen-image) · [Seedream](/en/api-reference/image/seedream)
+</Update>
+
+<Update label="2026-09-23" description="Capability update">
 **45 text models support the Responses API**
 
 - Text models from OpenAI (the `gpt-4.1` / `gpt-5` / `gpt-5.x` / `gpt-6` lines, `o1` / `o3` / `o3-mini` / `o4-mini`), Qwen, DeepSeek and xAI can now also be called through `POST /v1/responses`, with streaming and function calling, so clients such as Codex can use them directly. `deepseek-v3.1-terminus` is not supported yet.

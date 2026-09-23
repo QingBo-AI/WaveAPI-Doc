@@ -24,20 +24,6 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
   }'
 ```
 
-```bash 提示词改写
-curl -X POST https://api.qingbo.ai/v1/tasks \
-  -H "Authorization: Bearer $WAVE_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "model": "z-image-turbo",
-    "action": "generate",
-    "prompt": "国风茶馆海报",
-    "aspect_ratio": "3:4",
-    "resolution": "1k",
-    "prompt_extend": true
-  }'
-```
-
 </CodeGroup>
 
 提交成功后返回 `task_id`。用 [`GET /v1/tasks/{task_id}`](/cn/api-reference/task/status) 查询结果，也可以用 [`Prefer: wait`](/cn/api-reference/task/submit#请求内等待prefer-wait) 在一次调用里等待，或配置 Webhook。
@@ -64,13 +50,9 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
   输出分辨率，`1k` 或 `2k`。
 </ParamField>
 
-<ParamField body="prompt_extend" type="boolean" default="false">
-  智能提示词改写：由模型先把提示词扩写得更具体，再生成图片。
-</ParamField>
-
 通用的 `callback_url`、`callback_events`、`Prefer: wait`、`Idempotency-Key` 和费用上限请求头见[提交任务](/cn/api-reference/task/submit)。
 
-本模型不接受 `image_urls`、`n`、`seed`、`quality`、`negative_prompt` 和 `mask_url`。以上之外的参数会返回 `400`，不计费。
+本模型不接受 `image_urls`、`n`、`seed`、`quality`、`negative_prompt`、`mask_url` 和 `prompt_extend`。以上之外的参数会返回 `400`，不计费。
 
 ## 限制
 

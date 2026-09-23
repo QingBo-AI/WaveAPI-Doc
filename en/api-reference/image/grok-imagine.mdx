@@ -108,7 +108,7 @@ A successful submission returns a `task_id`. Retrieve the result with [`GET /v1/
 </ParamField>
 
 <ParamField body="n" type="integer" default="1">
-  Number of images to return. `grok-imagine-image`, `grok-imagine-image-quality`, `grok-imagine-1.5-rev` and `grok-imagine-1.5-edit-rev` accept `1`–`10`; `grok-imagine-image` returns one image under `edit`. `grok-imagine-image-2.0` and `grok-imagine-image-2.0-rev` accept the value `1`.
+  Number of images to return. `grok-imagine-image`, `grok-imagine-image-quality`, `grok-imagine-image-2.0`, `grok-imagine-1.5-rev` and `grok-imagine-1.5-edit-rev` accept `1`–`10`; `grok-imagine-image` returns one image under `edit`. `grok-imagine-image-2.0-rev` accepts `1`–`12`.
 </ParamField>
 
 <ParamField body="aspect_ratio" type="string" default="auto">
@@ -143,11 +143,11 @@ See [Submit Task](/en/api-reference/task/submit) for `callback_url`, `callback_e
 | `grok-imagine-image-quality` | Per request | 1 to 10 output images per request |
 | `grok-imagine-image-quality` | `action: "generate"` | Text-to-image does not take reference images; use edit |
 | `grok-imagine-image-quality` | `action: "edit"` | Edit takes 1-3 reference images (one edits that image, several act as multi-image references) |
-| `grok-imagine-image-2.0` | Per request | One image per request during the initial release |
+| `grok-imagine-image-2.0` | Per request | 1 to 10 output images per request |
 | `grok-imagine-image-2.0` | `action: "generate"` | Text-to-image does not take reference images; use the edit action |
 | `grok-imagine-image-2.0` | `action: "edit"` | Editing needs 1 to 3 reference images |
 | `grok-imagine-image-2.0` | `action: "edit"` | Quality cannot be chosen when editing with reference images |
-| `grok-imagine-image-2.0-rev` | Per request | One image per request during the initial release |
+| `grok-imagine-image-2.0-rev` | Per request | 1 to 12 images per request |
 | `grok-imagine-image-2.0-rev` | `action: "generate"` | This route is text-to-image only |
 | `grok-imagine-1.5-rev` | Per request | Up to 10 images per request |
 | `grok-imagine-1.5-edit-rev` | Per request | Up to 10 images per request |
@@ -160,12 +160,12 @@ All six models settle at a **fixed price per successfully generated image**. `ge
 |---|---|
 | `grok-imagine-image` | One price per image, the same at `1k` and `2k`; each reference image is charged separately |
 | `grok-imagine-image-quality` | Priced by resolution, `2k` above `1k`; each reference image is charged separately |
-| `grok-imagine-image-2.0` | Priced by resolution × quality (`1k` / `2k` × `low` / `medium`); without `quality`, the resolution tier applies; each reference image is charged separately |
+| `grok-imagine-image-2.0` | Priced by resolution × quality (`1k` / `2k` × `low` / `medium`); without `quality`, the resolution tier applies; each reference image is charged separately, once per request |
 | `grok-imagine-image-2.0-rev` | One price per image |
 | `grok-imagine-1.5-rev` | One price per image; reference images add no fee |
 | `grok-imagine-1.5-edit-rev` | One price per image; reference images add no fee |
 
-With reference images, the cost of a call is (resolution tier price + per-reference-image price × number of reference images) × number of output images. A `resolution` outside the tiers a model supports settles at its fallback price, equal to the `1k` tier.
+With reference images, a call to `grok-imagine-image` or `grok-imagine-image-quality` costs (resolution tier price + per-reference-image price × number of reference images) × number of output images; on `grok-imagine-image-2.0` the reference-image fee is not repeated per output, so a call costs resolution tier price × number of output images + per-reference-image price × number of reference images. A `resolution` outside the tiers a model supports settles at its fallback price, equal to the `1k` tier.
 
 Rates are in `price_config` on `GET /v1/models` and in the console's Model Market. What a single call actually cost is the `cost` field on the task response — an integer quota at **500,000 quota = 1 USD**, not dollars.
 

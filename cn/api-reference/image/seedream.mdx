@@ -97,7 +97,9 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
 </ParamField>
 
 <ParamField body="n" type="integer" default="1">
-  生成数量，取值 `1`。每次请求返回一张图。
+  生成数量。`seedream-4.0` 与 `seedream-4.5` 的文生图每次只出 1 张，编辑时参考图张数 + `n` 不超过 15（带 1 张参考图时 `n` 最多 14）；`seedream-5.0-lite` 文生图取 `1`–`15`，编辑时同样是参考图张数 + `n` 不超过 15；`seedream-5.0-pro` 取值 `1`。
+
+  `n` 大于 1 时进入组图模式：`n` 是本次最多生成的张数，实际返回可能少于 `n`，按实际返回的张数计费。
 </ParamField>
 
 <ParamField body="watermark" type="boolean" default="false">
@@ -129,7 +131,9 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
 
 | 条件 | 限制 |
 |---|---|
-| 每次请求 | 返回 1 张图，`prompt` 必填 |
+| `seedream-4.0` / `seedream-4.5` / `seedream-5.0-lite` | 必须提供提示词；每次请求最多 15 张，参考图计入这 15 张。 |
+| `seedream-4.0` / `seedream-4.5`，`action: "generate"` | 文生图每次只生成 1 张；多张输出需要带参考图（编辑）。 |
+| `seedream-5.0-pro` | 必须提供提示词，且每次请求生成 1 张图片 |
 | `action: "generate"` | 不接受参考图 |
 | `action: "edit"` | 必须提供 1 张参考图 |
 | 参考图张数 | 最多 1 张 |
@@ -143,7 +147,7 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
 
 单价见 `GET /v1/models` 返回的 `price_config`，或控制台「模型市场」。单次调用的实际花费见任务响应里的 `cost`——整数 quota，**500,000 quota = 1 USD**，不是美元。
 
-`generate` 与 `edit` 同价，参考图不加价，画幅、输出格式与提示词长度都不影响价格——分辨率是唯一的计费维度，提交前即可确定单次费用。`resolution` 不在该模型支持的档位内时，按其兜底价结算（等于该模型的基础档价）。
+`generate` 与 `edit` 同价，参考图不加价，画幅、输出格式与提示词长度都不影响价格——单张价格只由分辨率决定，总价 = 张价 × 实际返回的张数。提交时按 `n` 张冻结额度；组图模式下实际返回少于 `n` 张时，多冻结的部分在任务完成时退回。`resolution` 不在该模型支持的档位内时，按其兜底价结算（等于该模型的基础档价）。
 
 只有成功出图才计费。任务失败、取消，或没有返回可用图片时，全额退款。
 
@@ -186,7 +190,7 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
 | `seedream-5.0-lite` | `2k` `3k` `4k`（同价） | 10 种 + `auto` | `output_format` |
 | `seedream-5.0-pro` | `1k` `1.5k` `2k`（`2k` 更贵） | 10 种 + `auto` | `output_format`、`background` |
 
-四个模型都支持文生图与单张参考图编辑，每次请求出 1 张图，都接受 `watermark`。
+四个模型都支持文生图与单张参考图编辑，都接受 `watermark`；除 `seedream-5.0-pro` 外都可以一次出多张（见 `n`）。
 
 - **10 种共通画幅**：`1:1` `4:3` `3:4` `16:9` `9:16` `3:2` `2:3` `2:1` `1:2` `21:9`
 - **`seedream-4.0` 与 `seedream-4.5` 额外支持 `9:21`**
