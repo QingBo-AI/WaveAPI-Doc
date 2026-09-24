@@ -1,10 +1,10 @@
 ---
 title: "Seedream Series"
-description: "ByteDance Seedream image models: text-to-image and single-reference editing at a fixed price per image"
+description: "ByteDance Seedream image models: text-to-image and reference editing at a fixed price per image"
 api: "POST https://api.qingbo.ai/v1/tasks"
 ---
 
-Seedream is ByteDance's line of image generation and editing models. This page covers the four models available today. They share one set of request parameters, one task endpoint and one billing model (a fixed price per successfully generated image), and differ in resolution tiers, aspect ratios and line-specific parameters — switching models means changing `model` and nothing else.
+Seedream is ByteDance's line of image generation and editing models. This page covers the five models available today. They share one set of request parameters, one task endpoint and one billing model (a fixed price per successfully generated image), and differ in resolution tiers, aspect ratios and line-specific parameters — switching models means changing `model` and nothing else.
 
 ## Quick start
 
@@ -56,6 +56,23 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
   }'
 ```
 
+```bash Multi-image reference (Flash)
+curl -X POST https://api.qingbo.ai/v1/tasks \
+  -H "Authorization: Bearer $WAVE_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "seedream-5.0-flash",
+    "action": "edit",
+    "prompt": "Dress the person in image 1 in the coat from image 2, set against the street in image 3",
+    "image_urls": [
+      "https://cdn.example.com/person.jpg",
+      "https://cdn.example.com/coat.jpg",
+      "https://cdn.example.com/street.jpg"
+    ],
+    "resolution": "1.5k"
+  }'
+```
+
 </CodeGroup>
 
 A successful submission returns a `task_id`. Retrieve the result with [`GET /v1/tasks/{task_id}`](/en/api-reference/task/status), wait inline with [`Prefer: wait`](/en/api-reference/task/submit#in-request-waiting-prefer-wait), or configure a webhook.
@@ -63,7 +80,7 @@ A successful submission returns a `task_id`. Retrieve the result with [`GET /v1/
 ## Request parameters
 
 <ParamField body="model" type="string" required>
-  One of `seedream-4.0`, `seedream-4.5`, `seedream-5.0-lite` or `seedream-5.0-pro`.
+  One of `seedream-4.0`, `seedream-4.5`, `seedream-5.0-lite`, `seedream-5.0-pro` or `seedream-5.0-flash`.
 </ParamField>
 
 <ParamField body="action" type="string" default="generate">
@@ -76,15 +93,15 @@ A successful submission returns a `task_id`. Retrieve the result with [`GET /v1/
 </ParamField>
 
 <ParamField body="image_urls" type="string[]">
-  Reference image URLs. Required for `edit`, one image maximum; `generate` does not accept references.
+  Reference image URLs. Required for `edit`: up to 10 on `seedream-5.0-flash`, one on the other models; `generate` does not accept references.
 </ParamField>
 
 <ParamField body="aspect_ratio" type="string" default="1:1">
-  Framing. The 10 ratios shared by all four models: `1:1`, `4:3`, `3:4`, `16:9`, `9:16`, `3:2`, `2:3`, `2:1`, `1:2`, `21:9`.
+  Framing. The 10 ratios shared by all five models: `1:1`, `4:3`, `3:4`, `16:9`, `9:16`, `3:2`, `2:3`, `2:1`, `1:2`, `21:9`.
 
   `seedream-4.0` and `seedream-4.5` also support `9:21`.
 
-  `auto` lets the model choose the ratio. `seedream-5.0-pro` defaults to `auto`; the other three default to `1:1` and accept `auto` only on `edit`.
+  `auto` lets the model choose the ratio. `seedream-5.0-pro` and `seedream-5.0-flash` default to `auto` and accept it on both actions; the other three default to `1:1` and accept `auto` only on `edit`.
 </ParamField>
 
 <ParamField body="resolution" type="string" default="2k">
@@ -94,10 +111,11 @@ A successful submission returns a `task_id`. Retrieve the result with [`GET /v1/
   - `seedream-4.5`: `2k`, `4k`
   - `seedream-5.0-lite`: `2k`, `3k`, `4k`
   - `seedream-5.0-pro`: `1k`, `1.5k`, `2k`, defaulting to `1.5k`
+  - `seedream-5.0-flash`: `1k`, `1.5k`, `2k`, defaulting to `1k`
 </ParamField>
 
 <ParamField body="n" type="integer" default="1">
-  Number of images to generate. `seedream-4.0` and `seedream-4.5` return one image for text-to-image; when editing, reference images + `n` may not exceed 15 (with one reference image, `n` is at most 14). `seedream-5.0-lite` accepts `1`–`15` for text-to-image, and the same reference images + `n` ≤ 15 rule applies when editing. `seedream-5.0-pro` accepts `1`.
+  Number of images to generate. `seedream-4.0` and `seedream-4.5` return one image for text-to-image; when editing, reference images + `n` may not exceed 15 (with one reference image, `n` is at most 14). `seedream-5.0-lite` accepts `1`–`15` for text-to-image, and the same reference images + `n` ≤ 15 rule applies when editing. `seedream-5.0-pro` and `seedream-5.0-flash` accept `1`.
 
   With `n` above 1 the model works in multi-image mode: `n` is the maximum number of images for the request, the model may return fewer, and you are charged for the images actually returned.
 </ParamField>
@@ -116,11 +134,11 @@ A successful submission returns a `task_id`. Retrieve the result with [`GET /v1/
 </ParamField>
 
 <ParamField body="output_format" type="string" default="jpeg">
-  Output image format, `jpeg` or `png`. Supported by `seedream-5.0-lite` and `seedream-5.0-pro` only.
+  Output image format, `jpeg` or `png`. Supported by `seedream-5.0-lite`, `seedream-5.0-pro` and `seedream-5.0-flash` only.
 </ParamField>
 
 <ParamField body="background" type="string" default="opaque">
-  Background: `opaque` or `transparent`. Supported by `seedream-5.0-pro` only, and transparency requires image-to-image with a single alpha-channel input and `output_format` set to `png`.
+  Background: `opaque` or `transparent`. Supported by `seedream-5.0-pro` and `seedream-5.0-flash` only, and transparency requires image-to-image with a single alpha-channel input and `output_format` set to `png`.
 </ParamField>
 
 See [Submit a task](/en/api-reference/task/submit) for `callback_url`, `callback_events`, `Prefer: wait`, `Idempotency-Key` and the maximum-cost header.
@@ -133,17 +151,17 @@ This series does not accept `seed`, `quality`, `negative_prompt` or `mask_url`. 
 |---|---|
 | `seedream-4.0` / `seedream-4.5` / `seedream-5.0-lite` | A prompt is required; up to 15 images per request, and reference images count toward the 15. |
 | `seedream-4.0` / `seedream-4.5`, `action: "generate"` | Text-to-image returns one image; multiple outputs need a reference image (edit). |
-| `seedream-5.0-pro` | A prompt is required and each request returns one image |
+| `seedream-5.0-pro` / `seedream-5.0-flash` | A prompt is required and each request returns one image |
 | `action: "generate"` | Takes no reference images |
-| `action: "edit"` | Exactly one reference image is required |
-| Reference images | One maximum |
+| `action: "edit"` | Reference images are required: 1 to 10 on `seedream-5.0-flash`, exactly one on the other models |
+| Reference images | Up to 10 on `seedream-5.0-flash`, one on the other models |
 | `aspect_ratio: "auto"` | Available on `edit` only for `seedream-4.0`, `seedream-4.5` and `seedream-5.0-lite` |
 | `optimize_prompt_options` | `seedream-4.0` (string) and `seedream-4.5` (object) only |
-| `output_format` / `background` | `output_format` on the two 5.0 models; `background` on `seedream-5.0-pro` only |
+| `output_format` / `background` | `output_format` on the three 5.0 models; `background` on `seedream-5.0-pro` and `seedream-5.0-flash` only |
 
 ## Pricing
 
-Billed at a **fixed price per successfully generated image**. `seedream-4.0`, `seedream-4.5` and `seedream-5.0-lite` charge the same at every resolution they support; `seedream-5.0-pro` charges more at `2k` than at `1k` / `1.5k`.
+Billed at a **fixed price per successfully generated image**. `seedream-4.0`, `seedream-4.5`, `seedream-5.0-lite` and `seedream-5.0-flash` charge the same at every resolution they support; `seedream-5.0-pro` charges more at `2k` than at `1k` / `1.5k`.
 
 Rates are in `price_config` on `GET /v1/models` and in the console's Model Market. What a single call actually cost is the `cost` field on the task response — an integer quota at **500,000 quota = 1 USD**, not dollars.
 
@@ -189,12 +207,13 @@ Generated images come back in `result.images`, and `expires_at` is when that lin
 | `seedream-4.5` | `2k` `4k` (same price) | 11 + `auto` | `optimize_prompt_options` (object) |
 | `seedream-5.0-lite` | `2k` `3k` `4k` (same price) | 10 + `auto` | `output_format` |
 | `seedream-5.0-pro` | `1k` `1.5k` `2k` (`2k` costs more) | 10 + `auto` | `output_format`, `background` |
+| `seedream-5.0-flash` | `1k` `1.5k` `2k` (same price) | 10 + `auto` | `output_format`, `background` |
 
-All four do text-to-image and editing with one reference image and accept `watermark`; all except `seedream-5.0-pro` can return several images per request (see `n`).
+All five do text-to-image and reference editing and accept `watermark`. `seedream-5.0-flash` takes up to 10 reference images when editing, the other models one; `seedream-4.0`, `seedream-4.5` and `seedream-5.0-lite` can return several images per request (see `n`).
 
 - **The 10 shared aspect ratios**: `1:1` `4:3` `3:4` `16:9` `9:16` `3:2` `2:3` `2:1` `1:2` `21:9`
 - **`seedream-4.0` and `seedream-4.5` also support `9:21`**
-- **`auto` lets the model pick the framing**: `seedream-4.0`, `seedream-4.5` and `seedream-5.0-lite` accept it only on `edit`; `seedream-5.0-pro` accepts it on both actions and defaults to it
+- **`auto` lets the model pick the framing**: `seedream-4.0`, `seedream-4.5` and `seedream-5.0-lite` accept it only on `edit`; `seedream-5.0-pro` and `seedream-5.0-flash` accept it on both actions and default to it
 
 ## Related
 
