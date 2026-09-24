@@ -198,7 +198,6 @@
                   "cn/api-reference/video/flux/flux-3-video",
                   "cn/api-reference/video/skyreels",
                   "cn/api-reference/video/grok-imagine-video",
-                  "cn/api-reference/video/sora",
                   "cn/api-reference/video/pixverse",
                   {
                     "group": "Omni 视频系列",
@@ -356,7 +355,6 @@
                   "en/api-reference/video/flux/flux-3-video",
                   "en/api-reference/video/skyreels",
                   "en/api-reference/video/grok-imagine-video",
-                  "en/api-reference/video/sora",
                   "en/api-reference/video/pixverse",
                   {
                     "group": "Omni Video Series",
