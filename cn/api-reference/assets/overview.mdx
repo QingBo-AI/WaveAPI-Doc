@@ -1,0 +1,123 @@
+---
+title: "素材库"
+description: "上传图片、视频、音频，在 Seedance 生成请求中以 asset:// 引用"
+---
+
+把可公开下载的图片、视频或音频链接上传为素材，审核通过后得到 `asset://<素材 ID>`，在 Seedance 生成请求的媒体字段中引用。真人人像作为参考时，须先上传为素材。
+
+<Warning>
+**素材存放在模型供应商的共享素材库中，该供应商的其他客户可能看到并下载**。请勿上传私密或敏感内容。
+</Warning>
+
+## 接口列表
+
+| 方法 | 路径 | 说明 |
+|---|---|---|
+| `POST` | `/v1/assets` | [上传素材](/cn/api-reference/assets/create) |
+| `GET` | `/v1/assets` | [列出素材](/cn/api-reference/assets/list) |
+| `GET` | `/v1/assets/{asset_id}` | [查询素材](/cn/api-reference/assets/get) |
+| `DELETE` | `/v1/assets/{asset_id}` | [删除素材](/cn/api-reference/assets/delete) |
+
+## 快速开始
+
+1. `POST /v1/assets` 上传，返回 `id`（`ast_…`），`status` 为 `processing`。
+2. `GET /v1/assets/{id}` 查询，直到 `status` 为 `active`，取响应中的 `asset_url`。
+3. 把 `asset_url` 原样填入 `POST /v1/tasks` 的对应字段。
+
+```bash
+curl -X POST https://api.qingbo.ai/v1/tasks \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "seedance-2.0",
+    "prompt": "The character walks along a city street at dusk",
+    "image_urls": ["asset://asset-20260924112839-scjs4"],
+    "duration": 5,
+    "resolution": "720p"
+  }'
+```
+
+管理素材用 `id`，生成请求中引用用 `asset_url`。
+
+## 支持的模型与字段
+
+| 模型 | 素材类型 |
+|---|---|
+| `seedance-2.0` | `image`、`video`、`audio` |
+| `seedance-2.0-fast` | `image`、`video`、`audio` |
+| `seedance-2.0-mini` | `image`、`video`、`audio` |
+| `seedance-2.5` | `image`、`video`、`audio` |
+
+| 素材类型 | 可引用字段 |
+|---|---|
+| `image` | `image_urls`、`first_frame_image`、`last_frame_image`、`image_with_roles[].url` |
+| `video` | `video_urls` |
+| `audio` | `audio_urls` |
+
+素材与普通链接可以混用。数量上限与字段组合规则见 [Seedance 系列](/cn/api-reference/video/seedance)。
+
+## 状态
+
+| `status` | 说明 | 可引用 |
+|---|---|---|
+| `processing` | 审核中 | 否 |
+| `active` | 审核通过，响应带 `asset_url` | 是 |
+| `failed` | 审核失败，原因见 `error.message` | 否 |
+
+- 状态流转：`processing` → `active` 或 `failed`。`failed` 为终态，需重新上传。
+- 审核超过 24 小时未完成，判为 `failed`。
+- 同一素材的审核状态最多每 5 秒更新一次，查询间隔不必短于 5 秒。
+
+**失败原因**（`error.message`）
+
+| `error.message` | 处理 |
+|---|---|
+| 素材分辨率不符合要求：总像素需在 407,696 到 8,295,044 之间 | 调整分辨率后重新上传 |
+| 素材宽高比不在模型支持范围内 | 调整宽高比后重新上传 |
+| 素材时长不在模型支持范围内 | 调整时长后重新上传 |
+| 素材格式不受支持 | 更换格式后重新上传 |
+| 上游处理超时，请稍后重新上传 | 稍后重新上传 |
+| 素材未通过模型供应商审核 | 更换素材 |
+| 素材审核超时 | 重新上传 |
+| 素材登记失败（错误码） / 素材登记失败 | 检查素材后重新上传 |
+
+## 限制
+
+| 项目 | 规则 |
+|---|---|
+| 来源 | 可公开下载的 `http(s)` 链接，不超过 4096 字符 |
+| 视频 / 音频 | 上传时读取时长，读不到时返回 `400`（`asset_duration_unknown`）；视频用 MP4 / MOV / WebM，音频用 WAV / MP3 |
+| 数量 | 每个账号最多 500 个 `processing` 与 `active` 素材；`failed` 不计入 |
+| 上传频率 | 超出返回 `429` |
+| 归属 | 素材属于账号；同一账号的任意 API Key 可查看、引用、删除该账号的全部素材 |
+| 跨账号 | 不能引用其他账号的素材；不存在与不属于本账号返回同一错误码 `asset_not_found` |
+| 删除 | 删除后立即不能再被引用，模型供应商素材库中的副本随后删除 |
+
+## 计费
+
+| 项目 | 规则 |
+|---|---|
+| 素材接口 | 不计费 |
+| 引用素材的生成任务 | 按模型正常计费 |
+| 视频 / 音频素材的输入时长 | 按上传时读取的时长计算 |
+
+## 错误码
+
+在 `POST /v1/tasks` 中引用素材时的错误。均返回 `400`，不计费；`param` 为出错的字段名。
+
+| `code` | 说明 |
+|---|---|
+| `asset_reference_invalid` | 引用格式不是 `asset://<素材 ID>` |
+| `asset_reference_unsupported` | 该模型或该字段不支持素材引用 |
+| `asset_not_found` | 素材不存在、不属于本账号、未激活或已删除 |
+| `asset_type_mismatch` | 素材类型与字段不符，例如 `image` 素材填在 `video_urls` |
+| `asset_route_mismatch` | 素材不能用于该模型的当前线路 |
+
+## 相关文档
+
+- [上传素材](/cn/api-reference/assets/create)
+- [列出素材](/cn/api-reference/assets/list)
+- [查询素材](/cn/api-reference/assets/get)
+- [删除素材](/cn/api-reference/assets/delete)
+- [Seedance 系列](/cn/api-reference/video/seedance)
+- [提交任务](/cn/api-reference/task/submit)

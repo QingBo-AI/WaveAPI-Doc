@@ -1,0 +1,170 @@
+---
+title: "Upload asset"
+description: "POST /v1/assets — upload an image, video or audio link as an asset"
+api: "POST https://api.qingbo.ai/v1/assets"
+---
+
+Upload a publicly downloadable image, video or audio link as an asset. After submission `status` is `processing`; use [Get asset](/en/api-reference/assets/get) for the review result.
+
+<Warning>
+Assets are stored in the model provider's shared asset library, where other customers of that provider may be able to see and download them. Do not upload private or sensitive content.
+</Warning>
+
+<RequestExample>
+```bash cURL
+curl -X POST https://api.qingbo.ai/v1/assets \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "seedance-2.5",
+    "type": "video",
+    "url": "https://cdn.example.com/refs/hero-walk.mp4",
+    "name": "hero-walk-ref"
+  }'
+```
+
+```python Python
+import requests
+
+response = requests.post(
+    "https://api.qingbo.ai/v1/assets",
+    headers={"Authorization": "Bearer YOUR_API_KEY"},
+    json={
+        "model": "seedance-2.5",
+        "type": "video",
+        "url": "https://cdn.example.com/refs/hero-walk.mp4",
+        "name": "hero-walk-ref"
+    }
+)
+
+asset_id = response.json()["id"]
+```
+</RequestExample>
+
+<ResponseExample>
+```json 200
+{
+  "id": "ast_3f9c2a7d1e8b4c6a5f0e9d21",
+  "object": "asset",
+  "model": "seedance-2.5",
+  "type": "video",
+  "name": "hero-walk-ref",
+  "status": "processing",
+  "duration_seconds": 5.062,
+  "created_at": 1790220525,
+  "updated_at": 1790220525
+}
+```
+
+```json 400
+{
+  "error": {
+    "message": "无法读取该文件的时长，请使用可直接下载的 MP4 / MOV / WebM 视频或 WAV / MP3 音频",
+    "type": "invalid_request_error",
+    "param": "url",
+    "code": "asset_duration_unknown"
+  }
+}
+```
+
+```json 404
+{
+  "error": {
+    "message": "Model 'seedance-9' not found or not enabled",
+    "type": "invalid_request_error",
+    "param": "model",
+    "code": "model_not_found"
+  }
+}
+```
+</ResponseExample>
+
+## Authorizations
+
+<ParamField header="Authorization" type="string" required>
+  `Bearer YOUR_API_KEY`
+</ParamField>
+
+## Request parameters
+
+<ParamField body="model" type="string" required>
+  The model that will reference the asset: `seedance-2.0`, `seedance-2.0-fast`, `seedance-2.0-mini`, `seedance-2.5`.
+</ParamField>
+
+<ParamField body="type" type="string" required>
+  Asset type: `image`, `video`, `audio`.
+</ParamField>
+
+<ParamField body="url" type="string" required>
+  Publicly downloadable `http(s)` link, up to 4096 characters. The duration of video and audio is read at upload; if it cannot be read the request returns `400`. Use MP4 / MOV / WebM for video and WAV / MP3 for audio.
+</ParamField>
+
+<ParamField body="name" type="string">
+  A label, up to 128 characters.
+</ParamField>
+
+Any other field returns `400` (`invalid_request`).
+
+## Response
+
+<ResponseField name="id" type="string">
+  Asset ID, starting with `ast_`. Used to get and delete the asset.
+</ResponseField>
+
+<ResponseField name="object" type="string">
+  Always `asset`.
+</ResponseField>
+
+<ResponseField name="model" type="string">
+  The `model` sent at upload.
+</ResponseField>
+
+<ResponseField name="type" type="string">
+  `image`, `video` or `audio`.
+</ResponseField>
+
+<ResponseField name="name" type="string">
+  The label; an empty string if not sent.
+</ResponseField>
+
+<ResponseField name="status" type="string">
+  Always `processing` on a successful upload.
+</ResponseField>
+
+<ResponseField name="duration_seconds" type="number">
+  Duration of a video or audio asset in seconds, read at upload. Absent for images.
+</ResponseField>
+
+<ResponseField name="created_at" type="integer">
+  Creation time (Unix seconds).
+</ResponseField>
+
+<ResponseField name="updated_at" type="integer">
+  Last update time (Unix seconds).
+</ResponseField>
+
+## Error codes
+
+| HTTP | `code` | Meaning |
+|---|---|---|
+| 400 | `invalid_request` | The body is not valid JSON, or contains an unsupported field |
+| 400 | `missing_model` | `model` is missing |
+| 400 | `invalid_asset_type` | `type` is not `image` / `video` / `audio` |
+| 400 | `invalid_name` | `name` is longer than 128 characters |
+| 400 | `invalid_url` | `url` is not a publicly downloadable `http(s)` link |
+| 400 | `asset_type_unsupported` | The model does not accept this asset type |
+| 400 | `asset_limit_exceeded` | The account has reached 500 assets |
+| 400 | `asset_duration_unknown` | The duration of the video or audio cannot be read |
+| 400 | `asset_rejected` | The file does not meet the model's requirements (format, size, duration or content) |
+| 401 | — | API key missing or invalid |
+| 404 | `model_not_found` | The model does not exist or is not enabled |
+| 429 | — | Too many uploads |
+| 500 | `asset_store_error` | The asset record could not be saved; retry |
+| 502 | `asset_upstream_error` | The asset service is temporarily unavailable; retry |
+
+## Related
+
+- [Asset library](/en/api-reference/assets/overview)
+- [Get asset](/en/api-reference/assets/get)
+- [List assets](/en/api-reference/assets/list)
+- [Delete asset](/en/api-reference/assets/delete)

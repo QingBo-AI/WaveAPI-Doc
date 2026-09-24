@@ -108,10 +108,6 @@ A successful submission returns a `task_id`. Retrieve the result with [`GET /v1/
   URL of the last frame; combine with `first_frame_image` for an A-to-B transition. Supported by `minimax-hailuo-02` only.
 </ParamField>
 
-<ParamField body="seed" type="integer">
-  Random seed. The same parameters with the same seed produce similar results. Supported by `minimax-hailuo-2.3` and `minimax-hailuo-2.3-fast` only.
-</ParamField>
-
 <ParamField body="prompt_optimizer" type="boolean" default="true">
   Auto-optimize the prompt.
 </ParamField>
@@ -126,7 +122,7 @@ A successful submission returns a `task_id`. Retrieve the result with [`GET /v1/
 
 The shared `callback_url`, `callback_events`, `Prefer: wait`, `Idempotency-Key` and cost-cap headers are documented in [Submit Task](/en/api-reference/task/submit).
 
-None of the three models accepts `image_urls`, `video_urls`, `audio_urls`, `aspect_ratio`, `n` or `negative_prompt`. `minimax-hailuo-02` additionally does not accept `seed`, and `minimax-hailuo-2.3` / `minimax-hailuo-2.3-fast` do not accept `last_frame_image`. Anything beyond the parameters above returns `400` and is not billed.
+None of the three models accepts `image_urls`, `video_urls`, `audio_urls`, `aspect_ratio`, `n`, `seed` or `negative_prompt`; `minimax-hailuo-2.3` / `minimax-hailuo-2.3-fast` do not accept `last_frame_image`. Anything beyond the parameters above returns `400` and is not billed.
 
 ## Limits
 
@@ -144,17 +140,23 @@ None of the three models accepts `image_urls`, `video_urls`, `audio_urls`, `aspe
 
 ## Pricing
 
-Billed by **resolution tier times seconds**: the resolution sets the per-second rate, `duration` sets the number of seconds, and their product is the cost of the call — known before you submit. The three models have different per-second rates; within a model, `1080p` costs more than `768p`, which costs more than `512p`.
+Billed at a **fixed price per clip for each resolution × duration tier**, not per second: every allowed resolution and duration combination has its own price, so the cost of a call is known before you submit.
 
-`prompt_optimizer`, `fast_pretreatment`, `watermark`, `seed` and the first / last frame images do not affect the price.
+| Model ID | Billing tiers |
+|---|---|
+| `minimax-hailuo-02` | `512p` 5 s / 10 s, `768p` 5 s / 10 s, `1080p` 5 s |
+| `minimax-hailuo-2.3` | `768p` 6 s / 10 s, `1080p` 6 s |
+| `minimax-hailuo-2.3-fast` | `768p` 6 s / 10 s, `1080p` 6 s |
+
+Without `resolution` or `duration`, the tier of the defaults (`768p`, 5 or 6 seconds) applies. `prompt_optimizer`, `fast_pretreatment`, `watermark` and the first / last frame images do not affect the price.
 
 <Note>
-**This page does not list unit prices** — rates change upstream, so this section covers billing dimensions and how they are applied.
+Per-model rates are in `price_config` on `GET /v1/models`, and in the console's Model Market.
 
-Current rates are in `price_config` on `GET /v1/models` and in the console's Model Market. What a single call actually cost is the `cost` field on the task response: an integer quota, **500,000 quota = 1 USD**.
+What a single call actually cost is the `cost` field on the task response — an integer quota at 500,000 quota = 1 USD.
 </Note>
 
-You are only billed for a video that is produced. Failed and cancelled tasks, and tasks that return no usable video, are refunded in full.
+You are only billed for a video that is produced. Failed and cancelled tasks, and tasks that return no usable video, are refunded in full. The final charge is the `cost` field on the task response — an integer quota, not dollars.
 
 ## Response
 
@@ -191,7 +193,7 @@ You are only billed for a video that is produced. Failed and cancelled tasks, an
 | Model ID | Resolutions | Duration (s) | Modes | Notes |
 |---|---|---|---|---|
 | `minimax-hailuo-02` | `512p` `768p` (default) `1080p` | 5 (default) / 10 | Text, first frame, first and last frame | `512p` needs a first frame; `1080p` is 5 s only |
-| `minimax-hailuo-2.3` | `768p` (default) `1080p` | 6 (default) / 10 | Text, first frame | Camera-movement tags and `seed` |
+| `minimax-hailuo-2.3` | `768p` (default) `1080p` | 6 (default) / 10 | Text, first frame | Camera-movement tags |
 | `minimax-hailuo-2.3-fast` | `768p` (default) `1080p` | 6 (default) / 10 | First frame (required) | Faster tier of 2.3, lower rate |
 
 ## Examples

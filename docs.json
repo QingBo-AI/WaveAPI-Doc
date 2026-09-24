@@ -235,6 +235,16 @@
                 ]
               },
               {
+                "group": "素材管理",
+                "pages": [
+                  "cn/api-reference/assets/overview",
+                  "cn/api-reference/assets/create",
+                  "cn/api-reference/assets/list",
+                  "cn/api-reference/assets/get",
+                  "cn/api-reference/assets/delete"
+                ]
+              },
+              {
                 "group": "账户与用量",
                 "pages": [
                   "cn/api-reference/account/balance",
@@ -389,6 +399,16 @@
                   "en/api-reference/task/submit",
                   "en/api-reference/task/status",
                   "en/api-reference/task/cancel"
+                ]
+              },
+              {
+                "group": "Asset Management",
+                "pages": [
+                  "en/api-reference/assets/overview",
+                  "en/api-reference/assets/create",
+                  "en/api-reference/assets/list",
+                  "en/api-reference/assets/get",
+                  "en/api-reference/assets/delete"
                 ]
               },
               {

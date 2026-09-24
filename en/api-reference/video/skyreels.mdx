@@ -1,10 +1,10 @@
 ---
 title: "SkyReels V4 Series"
-description: "SkyReels V4 Fast and Std: text, image, keyframe, reference-image and reference-video generation with joint video and audio, billed by resolution tier × seconds"
+description: "SkyReels V4 Fast and Std: text, image, keyframe, reference-image and reference-video generation plus video extension, with joint video and audio, billed by resolution tier × seconds"
 api: "POST https://api.qingbo.ai/v1/tasks"
 ---
 
-SkyReels V4 is a unified multimodal video-and-audio generation model that jointly produces synchronized picture and sound from text, image and video inputs, at 480p to 1080p and 3 to 15 seconds. This page covers `skyreels-v4-fast` and `skyreels-v4-std`: both tiers expose the same action, parameters and value ranges — Fast is the speed-optimized configuration, Std is the default quality configuration — so switching tiers means changing `model`. Every request is submitted asynchronously through `POST /v1/tasks`.
+SkyReels V4 is a unified multimodal video-and-audio generation model that jointly produces synchronized picture and sound from text, image and video inputs, at 480p to 1080p and 3 to 15 seconds, and can extend an existing video. This page covers `skyreels-v4-fast` and `skyreels-v4-std`: both tiers expose the same actions, parameters and value ranges — Fast favors speed, Std favors fidelity — so switching tiers means changing `model`.
 
 ## Quick start
 
@@ -49,6 +49,20 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
     "action": "generate",
     "prompt": "Follow the camera motion in @video_1, but set it on a snowy mountain",
     "video_urls": ["https://cdn.example.com/source.mp4"],
+    "resolution": "1080p"
+  }'
+```
+
+```bash Video extension
+curl -X POST https://api.qingbo.ai/v1/tasks \
+  -H "Authorization: Bearer $WAVE_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "skyreels-v4-fast",
+    "action": "extend",
+    "prompt": "Extend @video_1: someone walks over and sits on the sofa",
+    "video_urls": ["https://cdn.example.com/source.mp4"],
+    "duration": 8,
     "resolution": "720p"
   }'
 ```
@@ -84,39 +98,46 @@ A successful submission returns a `task_id`. Retrieve the result with [`GET /v1/
 </ParamField>
 
 <ParamField body="action" type="string" default="generate">
-  `generate` is the only action in this series. The mode follows the media fields you send: `prompt` alone is text-to-video; `first_frame_image`, `end_frame_image` or `mid_frame_images` is image-to-video; `ref_images` or `video_urls` is reference-driven generation. Image-to-video fields and reference fields cannot be combined.
+  - `generate` — generate a video. The mode follows the media fields you send: `prompt` alone is text-to-video; `first_frame_image`, `end_frame_image` or `mid_frame_images` is image-to-video; `ref_images` or `video_urls` is reference-driven generation. Image-to-video fields and reference fields cannot be combined.
+  - `extend` — video extension. Continues the one source video in `video_urls` for `duration` seconds.
 </ParamField>
 
 <ParamField body="prompt" type="string" required>
-  The video description. When you send `video_urls`, `ref_images` or `mid_frame_images`, the prompt must contain the matching `@` tag.
+  The video description. When you send `video_urls`, `ref_images` or `mid_frame_images`, the prompt must contain the matching `@` tag; under `action: "extend"` reference `@video_1`.
 </ParamField>
 
 <ParamField body="duration" type="integer">
-  Video length in seconds, an integer from `3` to `15`. Ignored when `video_urls` is present — the output follows the reference video.
+  Video length in seconds, an integer from `3` to `15`.
+
+  - `action: "generate"` with `video_urls`: the output follows the reference video (3 seconds when shorter) and this parameter has no effect
+  - `action: "extend"`: the length of the extension
 </ParamField>
 
 <ParamField body="resolution" type="string" default="1080p">
-  Output resolution: `480p`, `720p` or `1080p`; defaults to `1080p`. Only `480p` and `720p` are available when `video_urls` is present, and you must send one of them explicitly: without it the request falls back to the `1080p` default and returns `400`, not billed.
+  Output resolution: `480p`, `720p` or `1080p`; defaults to `1080p`.
 </ParamField>
 
 <ParamField body="aspect_ratio" type="string">
-  Frame ratio: `16:9`, `9:16`, `1:1`, `4:3` or `3:4`. Ignored when a first/end frame image or a reference video is present — the ratio follows the input material.
+  Frame ratio: `16:9`, `9:16`, `1:1`, `4:3` or `3:4`. Ignored when a first/end frame image or a reference video is present, and under `action: "extend"` — the ratio follows the input material.
 </ParamField>
 
 <ParamField body="video_urls" type="string[]">
-  Reference video URLs, used as motion and subject reference. The Nth entry gets the tag `@video_N`, which the prompt must reference (for example `Follow the camera motion in @video_1`); without it the upstream rejects the request and nothing is billed. With a reference video, also send `resolution` (`480p` or `720p`).
+  Video URLs, at most 1, MP4 / MOV. The Nth entry gets the tag `@video_N`, which the prompt must reference (for example `Follow the camera motion in @video_1`); without it the upstream rejects the request and nothing is billed.
+
+  - `action: "generate"`: motion and subject reference, 1 to 10 seconds
+  - `action: "extend"`: required, the source video to extend, 1 to 15 seconds
 </ParamField>
 
 <ParamField body="first_frame_image" type="string">
-  Starting frame image URL (jpg / jpeg / png / gif / bmp).
+  Starting frame image URL (jpg / jpeg / png / gif / bmp). `action: "generate"` only.
 </ParamField>
 
 <ParamField body="end_frame_image" type="string">
-  Closing frame image URL; combine with the first frame for start/end control.
+  Closing frame image URL; combine with the first frame for start/end control. `action: "generate"` only.
 </ParamField>
 
 <ParamField body="mid_frame_images" type="object[]">
-  Mid keyframe list, up to 6 entries, available in image-to-video mode only. Each entry holds:
+  Mid keyframe list, up to 6 entries, available in the image-to-video mode of `action: "generate"` only. Each entry holds:
 
   - `tag`: a tag starting with `@` that must appear in the prompt
   - `image_url`: the image URL
@@ -124,7 +145,7 @@ A successful submission returns a `task_id`. Retrieve the result with [`GET /v1/
 </ParamField>
 
 <ParamField body="ref_images" type="object[]">
-  Reference image list, available in reference mode only and mutually exclusive with the image-to-video fields. All entries must share the same `type`. Each entry holds:
+  Reference image list, available in the reference mode of `action: "generate"` only and mutually exclusive with the image-to-video fields. All entries must share the same `type`. Each entry holds:
 
   - `tag`: a tag starting with `@` that must appear in the prompt
   - `type`: `image` for an ordinary reference image, `grid` for a single image composed of several tiles
@@ -133,7 +154,7 @@ A successful submission returns a `task_id`. Retrieve the result with [`GET /v1/
 </ParamField>
 
 <ParamField body="prompt_optimizer" type="boolean" default="true">
-  Whether to auto-optimize the prompt before generation.
+  Whether to auto-optimize the prompt.
 </ParamField>
 
 See [Submit Task](/en/api-reference/task/submit) for `callback_url`, `callback_events`, `Prefer: wait`, `Idempotency-Key` and the maximum-cost header.
@@ -142,14 +163,17 @@ Any other parameter returns `400` and is not billed.
 
 ## Limits
 
-- With reference video: duration follows the reference (max 10s), resolution limited to 480p/720p
-- This model produces one result per task; n is not supported
+| Condition | Limit |
+|---|---|
+| `action: "generate"` with `video_urls` | With reference video: duration follows the reference (max 10s) |
+| `action: "extend"` | Extension continues exactly one source video (MP4/MOV, at most 15 s) for the requested duration (3-15 s); images, first/end frames and reference images cannot be sent, and the aspect ratio follows the source video. |
+| Every request | This model produces one result per task; n is not supported |
 
 | Item | Limit |
 |---|---|
-| Duration `duration` | 3 to 15 seconds; follows the reference video, capped at 10 seconds, when `video_urls` is present |
-| Resolution `resolution` | `480p` / `720p` / `1080p`, default `1080p`; only `480p` / `720p` when `video_urls` is present, sent explicitly |
-| Reference video `video_urls` | 1 clip, 1 to 10 seconds, MP4 / MOV |
+| Duration `duration` | 3 to 15 seconds; under `generate` with `video_urls`, follows the reference video, capped at 10 seconds |
+| Resolution `resolution` | `480p` / `720p` / `1080p`, default `1080p` |
+| Video `video_urls` | 1 clip, MP4 / MOV; 1 to 10 seconds under `generate`, 1 to 15 seconds under `extend` |
 | Mid keyframes `mid_frame_images` | Up to 6 entries |
 | Reference images `ref_images` | `type: image`: 1 to 3 entries with 1 to 5 images each; `type: grid`: 1 entry with 1 image |
 | Mutually exclusive | `first_frame_image` / `end_frame_image` / `mid_frame_images` cannot be combined with `ref_images` / `video_urls` |
@@ -158,17 +182,20 @@ All input material must be publicly downloadable over HTTP(S).
 
 ## Pricing
 
-Billing is **resolution tier × output seconds**, where the seconds come from the `duration` you send; without `resolution` the default `1080p` tier applies. The three resolutions are priced separately, and every `skyreels-v4-std` tier sits above the matching `skyreels-v4-fast` tier.
+Billing is **output resolution tier × seconds**; without `resolution` the `1080p` tier applies. Every `skyreels-v4-std` tier sits above the matching `skyreels-v4-fast` tier.
 
-Sending `video_urls` switches tiers: the output seconds settle at the **reference-video tier**, which is above the ordinary tier at the same resolution, and the reference video's own length is not billed on top. In this mode the output length follows the reference video (capped at 10 seconds), only `480p` and `720p` are available, and `resolution` must be sent explicitly.
+| Request | Rate tier | Billed seconds |
+|---|---|---|
+| `generate` without `video_urls` | Ordinary tier | The requested `duration` |
+| `generate` with `video_urls` | Reference-video tier | The reference video's length (3 seconds when shorter); the requested `duration` has no effect |
+| `extend` | Reference-video tier | The requested `duration` |
 
-Reference images (`ref_images`), keyframe images and prompt length carry no separate charge.
+The reference-video tier is above the ordinary tier at the same resolution. The input video's own seconds are not billed; reference images (`ref_images`), keyframe images and prompt length carry no separate charge.
 
 <Note>
-Rates move with the upstream, so this section describes billing dimensions only and lists no amounts.
+Per-model rates are in `price_config` on `GET /v1/models`, and in the console's Model Market.
 
-Current rates: `price_config` on `GET /v1/models`, or the Model Market in the console.
-Actual cost of one call: the `cost` field on the task response (an integer quota; 500,000 quota = 1 USD).
+What a single call actually cost is the `cost` field on the task response — an integer quota at 500,000 quota = 1 USD.
 </Note>
 
 You are billed only for a delivered video. Failed and cancelled tasks, and upstream successes that carry no deliverable video, are refunded in full. The final charge is the `cost` field on the task response — an integer quota, not dollars (500,000 quota = 1 USD).
@@ -207,8 +234,8 @@ Generated videos are returned in `result.videos`, with picture and audio in the 
 
 | Model ID | Resolution | Duration (s) | Action | Notes |
 |---|---|---|---|---|
-| `skyreels-v4-fast` | `480p` / `720p` / `1080p` | Any integer 3 to 15 | `generate` | Speed-optimized configuration, trading some fidelity for quicker generation |
-| `skyreels-v4-std` | `480p` / `720p` / `1080p` | Any integer 3 to 15 | `generate` | Default quality configuration, prioritizing full fidelity |
+| `skyreels-v4-fast` | `480p` / `720p` / `1080p` | Any integer 3 to 15 | `generate` `extend` | Speed first |
+| `skyreels-v4-std` | `480p` / `720p` / `1080p` | Any integer 3 to 15 | `generate` `extend` | Fidelity first |
 
 ## Related
 

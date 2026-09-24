@@ -1,0 +1,147 @@
+---
+title: "查询素材"
+description: "GET /v1/assets/{asset_id} — 查询素材的审核状态"
+api: "GET https://api.qingbo.ai/v1/assets/{asset_id}"
+---
+
+查询本账号的一个素材。`status` 为 `active` 时响应带 `asset_url`，用于生成请求。
+
+<RequestExample>
+```bash cURL
+curl https://api.qingbo.ai/v1/assets/ast_3f9c2a7d1e8b4c6a5f0e9d21 \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+```python Python
+import requests
+
+response = requests.get(
+    "https://api.qingbo.ai/v1/assets/ast_3f9c2a7d1e8b4c6a5f0e9d21",
+    headers={"Authorization": "Bearer YOUR_API_KEY"}
+)
+
+asset = response.json()
+if asset["status"] == "active":
+    print(asset["asset_url"])
+```
+</RequestExample>
+
+<ResponseExample>
+```json 200 active
+{
+  "id": "ast_3f9c2a7d1e8b4c6a5f0e9d21",
+  "object": "asset",
+  "model": "seedance-2.5",
+  "type": "video",
+  "name": "hero-walk-ref",
+  "status": "active",
+  "duration_seconds": 5.062,
+  "created_at": 1790220525,
+  "updated_at": 1790220534,
+  "asset_url": "asset://asset-20260924112839-scjs4"
+}
+```
+
+```json 200 failed
+{
+  "id": "ast_3f9c2a7d1e8b4c6a5f0e9d21",
+  "object": "asset",
+  "model": "seedance-2.5",
+  "type": "video",
+  "name": "hero-walk-ref",
+  "status": "failed",
+  "duration_seconds": 5.062,
+  "created_at": 1790220525,
+  "updated_at": 1790220540,
+  "error": {
+    "message": "素材分辨率不符合要求：总像素需在 407,696 到 8,295,044 之间"
+  }
+}
+```
+
+```json 404
+{
+  "error": {
+    "message": "素材不存在",
+    "type": "invalid_request_error",
+    "param": "asset_id",
+    "code": "asset_not_found"
+  }
+}
+```
+</ResponseExample>
+
+## 鉴权
+
+<ParamField header="Authorization" type="string" required>
+  `Bearer YOUR_API_KEY`。API Key 的 quota 已用尽时也可调用。
+</ParamField>
+
+## 请求参数
+
+<ParamField path="asset_id" type="string" required>
+  素材 ID，`ast_` 开头（上传响应中的 `id`）。
+</ParamField>
+
+## 响应
+
+<ResponseField name="id" type="string">
+  素材 ID，`ast_` 开头。
+</ResponseField>
+
+<ResponseField name="object" type="string">
+  固定为 `asset`。
+</ResponseField>
+
+<ResponseField name="model" type="string">
+  上传时的 `model`。
+</ResponseField>
+
+<ResponseField name="type" type="string">
+  `image`、`video` 或 `audio`。
+</ResponseField>
+
+<ResponseField name="name" type="string">
+  备注名，未传时为空字符串。
+</ResponseField>
+
+<ResponseField name="status" type="string">
+  - `processing`：审核中
+  - `active`：审核通过，可引用
+  - `failed`：审核失败，需重新上传
+</ResponseField>
+
+<ResponseField name="duration_seconds" type="number">
+  视频、音频的时长（秒），上传时读取。图片无此字段。
+</ResponseField>
+
+<ResponseField name="created_at" type="integer">
+  创建时间（Unix 秒）。
+</ResponseField>
+
+<ResponseField name="updated_at" type="integer">
+  更新时间（Unix 秒）。
+</ResponseField>
+
+<ResponseField name="asset_url" type="string">
+  `asset://<素材 ID>`，仅 `active` 时返回。原样填入生成请求的媒体字段。
+</ResponseField>
+
+<ResponseField name="error" type="object">
+  仅 `failed` 时返回。`message` 为失败原因，取值见[素材库](/cn/api-reference/assets/overview)。
+</ResponseField>
+
+## 错误码
+
+| HTTP | `code` | 说明 |
+|---|---|---|
+| 401 | — | API Key 缺失或无效 |
+| 404 | `asset_not_found` | 素材不存在、不属于本账号或已删除 |
+| 500 | `asset_store_error` | 素材记录读取失败，可重试 |
+
+## 相关文档
+
+- [素材库](/cn/api-reference/assets/overview)
+- [上传素材](/cn/api-reference/assets/create)
+- [列出素材](/cn/api-reference/assets/list)
+- [删除素材](/cn/api-reference/assets/delete)

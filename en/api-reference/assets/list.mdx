@@ -1,0 +1,102 @@
+---
+title: "List assets"
+description: "GET /v1/assets — list the account's assets"
+api: "GET https://api.qingbo.ai/v1/assets"
+---
+
+List the account's assets that have not been deleted, newest first.
+
+<RequestExample>
+```bash cURL
+curl "https://api.qingbo.ai/v1/assets?limit=20&offset=0" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+```python Python
+import requests
+
+response = requests.get(
+    "https://api.qingbo.ai/v1/assets",
+    headers={"Authorization": "Bearer YOUR_API_KEY"},
+    params={"limit": 20, "offset": 0}
+)
+
+for asset in response.json()["data"]:
+    print(asset["id"], asset["status"])
+```
+</RequestExample>
+
+<ResponseExample>
+```json 200
+{
+  "object": "list",
+  "data": [
+    {
+      "id": "ast_3f9c2a7d1e8b4c6a5f0e9d21",
+      "object": "asset",
+      "model": "seedance-2.5",
+      "type": "video",
+      "name": "hero-walk-ref",
+      "status": "active",
+      "duration_seconds": 5.062,
+      "created_at": 1790220525,
+      "updated_at": 1790220534,
+      "asset_url": "asset://asset-20260924112839-scjs4"
+    },
+    {
+      "id": "ast_9b1e4c7a2d5f8e0b3c6a9d14",
+      "object": "asset",
+      "model": "seedance-2.0",
+      "type": "image",
+      "name": "",
+      "status": "failed",
+      "created_at": 1790220301,
+      "updated_at": 1790220318,
+      "error": {
+        "message": "素材格式不受支持"
+      }
+    }
+  ]
+}
+```
+</ResponseExample>
+
+## Authorizations
+
+<ParamField header="Authorization" type="string" required>
+  `Bearer YOUR_API_KEY`. Also works when the API key's quota is exhausted.
+</ParamField>
+
+## Request parameters
+
+<ParamField query="limit" type="integer" default="20">
+  Items per page, `1`–`100`. Values outside the range are treated as `20`.
+</ParamField>
+
+<ParamField query="offset" type="integer" default="0">
+  Number of items to skip.
+</ParamField>
+
+## Response
+
+<ResponseField name="object" type="string">
+  Always `list`.
+</ResponseField>
+
+<ResponseField name="data" type="array">
+  Array of asset objects; see [Get asset](/en/api-reference/assets/get) for the fields. Fewer items than `limit` means this is the last page.
+</ResponseField>
+
+## Error codes
+
+| HTTP | `code` | Meaning |
+|---|---|---|
+| 401 | — | API key missing or invalid |
+| 500 | `asset_store_error` | The asset records could not be read; retry |
+
+## Related
+
+- [Asset library](/en/api-reference/assets/overview)
+- [Upload asset](/en/api-reference/assets/create)
+- [Get asset](/en/api-reference/assets/get)
+- [Delete asset](/en/api-reference/assets/delete)

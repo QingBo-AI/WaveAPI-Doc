@@ -1,10 +1,10 @@
 ---
 title: "MiniMax H3"
-description: "MiniMax H3 全模态视频生成：文本、参考图、首尾帧、参考视频与参考音频，以及 2K 再生成"
+description: "MiniMax H3 全模态视频生成：文本、参考图、首尾帧、参考视频与参考音频，H3 Max 高质量版，以及 2K 再生成"
 api: "POST https://api.qingbo.ai/v1/tasks"
 ---
 
-MiniMax H3 是 MiniMax 的全模态视频模型：一个接口同时接受文本、图片、视频和音频输入，单次生成直接出带音轨的成片。本页覆盖两个模型：`minimax-h3` 负责生成，`minimax-h3-regeneration` 把已完成的 `minimax-h3` 768P 有声任务再生成原生 2K。只要文生视频或首帧生视频、不需要多模态参考时，[Hailuo 系列](/cn/api-reference/video/hailuo)更省。
+MiniMax H3 是 MiniMax 的全模态视频模型：一个接口同时接受文本、图片、视频和音频输入。本页覆盖三个模型：`minimax-h3` 输出 768P / 2K 带音轨成片；`minimax-h3-max` 是高质量版，输出 480P / 768P / 1080P；`minimax-h3-regeneration` 把已完成的 `minimax-h3` 768P 任务再生成原生 2K。只要文生视频或首帧生视频、不需要多模态参考时，[Hailuo 系列](/cn/api-reference/video/hailuo)更省。
 
 ## 快速开始
 
@@ -56,6 +56,25 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
   }'
 ```
 
+```bash H3 Max
+curl -X POST https://api.qingbo.ai/v1/tasks \
+  -H "Authorization: Bearer $WAVE_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "minimax-h3-max",
+    "action": "generate",
+    "prompt": "参考图里的角色走进参考视频的街景，镜头跟随",
+    "image_urls": [
+      "https://cdn.example.com/character.jpg",
+      "https://cdn.example.com/outfit.jpg"
+    ],
+    "video_urls": ["https://cdn.example.com/street.mp4"],
+    "duration": 8,
+    "resolution": "1080p",
+    "aspect_ratio": "16:9"
+  }'
+```
+
 ```bash 2K 再生成
 curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
@@ -71,29 +90,32 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
 
 提交成功后返回 `task_id`。用 [`GET /v1/tasks/{task_id}`](/cn/api-reference/task/status) 查询结果，也可以用 [`Prefer: wait`](/cn/api-reference/task/submit#请求内等待prefer-wait) 在一次调用里等待，或配置 Webhook。
 
-**接着往下做**：先用 `minimax-h3` 以 `resolution: "768p"` 生成一段视频，等任务 `completed` 后，把它返回的 `task_id` 填进 `minimax-h3-regeneration` 的 `ref_task_id`，就能拿到同一段内容的原生 2K 版本。`ref_task_id` 传的是本平台的任务 ID，不是上游的 ID；提示词、参考素材都由源任务带过来，不用重复提交。
+**接着往下做**：先用 `minimax-h3` 以 `resolution: "768p"` 生成一段视频，任务 `completed` 后，把返回的 `task_id` 填进 `minimax-h3-regeneration` 的 `ref_task_id`，得到同一段内容的原生 2K 版本。`ref_task_id` 是本平台的任务 ID，不是上游 ID；提示词与参考素材取自源任务，不用重复提交。
 
 ## 请求参数
 
 <ParamField body="model" type="string" required>
-  `minimax-h3` 或 `minimax-h3-regeneration`。
+  `minimax-h3`、`minimax-h3-max` 或 `minimax-h3-regeneration`。
 </ParamField>
 
 <ParamField body="action" type="string" default="generate">
-  - `generate`：`minimax-h3` 的唯一动作
+  - `generate`：`minimax-h3` 与 `minimax-h3-max` 的唯一动作
   - `regenerate`：`minimax-h3-regeneration` 的唯一动作，需要 `ref_task_id`
 </ParamField>
 
 <ParamField body="prompt" type="string" required>
-  画面描述。`generate` 必填，即使带了参考素材也要写清要生成什么：参考素材决定「像什么」，提示词决定「做什么」。
+  画面描述，`generate` 必填，带参考素材时也必填。
 </ParamField>
 
 <ParamField body="duration" type="integer" required>
-  视频时长（秒），`4` 到 `15` 之间的整数。`generate` 必填。
+  视频时长（秒），整数，`generate` 必填。`minimax-h3` 取 `4`–`15`，`minimax-h3-max` 取 `5`–`15`。
 </ParamField>
 
-<ParamField body="resolution" type="string" default="2k">
-  输出分辨率：`768p` 或 `2k`。用 `minimax-h3-regeneration` 再生成的前提是源任务为 `768p`。
+<ParamField body="resolution" type="string">
+  输出分辨率：
+
+  - `minimax-h3`：`768p` 或 `2k`，默认 `2k`；用 `minimax-h3-regeneration` 再生成的前提是源任务为 `768p`
+  - `minimax-h3-max`：`480p`、`768p` 或 `1080p`，默认 `768p`
 </ParamField>
 
 <ParamField body="aspect_ratio" type="string">
@@ -101,70 +123,82 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
 </ParamField>
 
 <ParamField body="image_urls" type="string[]">
-  参考图片 URL 数组，最多 9 张。每一张都按参考图处理，不会因为张数被当成首帧或尾帧。
+  参考图片 URL 数组，最多 9 张。每一张都按参考图处理，不会按张数被当成首帧或尾帧。
 </ParamField>
 
 <ParamField body="first_frame_image" type="string">
-  首帧图片 URL，作为视频的起始画面。
+  首帧图片 URL，作为视频的起始画面。不能与 `image_urls`、`video_urls`、`audio_urls` 混用。
 </ParamField>
 
 <ParamField body="last_frame_image" type="string">
-  尾帧图片 URL，与 `first_frame_image` 配合做「从 A 变到 B」。
+  尾帧图片 URL，与 `first_frame_image` 配合做「从 A 变到 B」。不能与 `image_urls`、`video_urls`、`audio_urls` 混用。
 </ParamField>
 
 <ParamField body="video_urls" type="string[]">
-  参考视频 URL 数组，提供运镜、节奏与风格参考。最多 3 段，总时长不超过 15 秒。
+  参考视频 URL 数组，提供运镜、节奏与风格参考。最多 3 段，总时长不超过 15 秒，帧率 23.976–60 fps；`minimax-h3-max` 单段 2–15 秒。
 </ParamField>
 
 <ParamField body="audio_urls" type="string[]">
-  参考音频 URL 数组，影响成片的节奏与配乐。最多 3 段，总时长不超过 15 秒；必须与参考图片一起提供。
+  参考音频 URL 数组，最多 3 段，总时长不超过 15 秒。
+
+  - `minimax-h3`：必须与参考图片一起提供
+  - `minimax-h3-max`：必须与参考图片或参考视频一起提供；单段 2–15 秒
+</ParamField>
+
+<ParamField body="image_with_roles" type="array">
+  带角色的图片数组，每项 `{url, role}`，`role` 取 `first_frame`、`last_frame` 或 `reference_image`。最多 2 项，不能与 `image_urls` 同时使用，更多参考图用 `image_urls`。仅 `minimax-h3-max`。
 </ParamField>
 
 <ParamField body="watermark" type="boolean" default="false">
-  输出添加水印。
+  输出添加水印。`minimax-h3-max` 的 `1080p` 不接受这个参数。
 </ParamField>
 
 <ParamField body="ref_task_id" type="string">
-  已完成的 `minimax-h3` 任务 ID，只在 `minimax-h3-regeneration` 的 `regenerate` 动作下使用，且必填。源任务必须是同账号下已成功的 `minimax-h3` `generate` 任务，分辨率为 `768p`、带音轨。
+  已完成的 `minimax-h3` 任务 ID，只在 `minimax-h3-regeneration` 的 `regenerate` 动作下使用，且必填。源任务必须是同账号下已成功的 `minimax-h3` `generate` 任务，分辨率为 `768p`。
 </ParamField>
 
 通用的 `callback_url`、`callback_events`、`Prefer: wait`、`Idempotency-Key` 和费用上限请求头见[提交任务](/cn/api-reference/task/submit)。
 
-`minimax-h3` 不接受 `seed`、`n`、`negative_prompt`、`quality` 和 `generate_audio`（音轨随成片一起产出）。`minimax-h3-regeneration` 只接受 `model` 与 `ref_task_id`，其余参数从源任务继承。以上之外的参数会返回 `400`，不计费。
+`minimax-h3` 与 `minimax-h3-max` 不接受 `seed`、`n`、`negative_prompt`、`quality` 和 `generate_audio`。`minimax-h3-regeneration` 只接受 `model` 与 `ref_task_id`，其余参数从源任务继承。以上之外的参数会返回 `400`，不计费。
 
 ## 限制
 
 | 模型 | 条件 | 限制 |
 |---|---|---|
-| `minimax-h3` | `action: "generate"` | 必须提供提示词。 |
+| `minimax-h3` `minimax-h3-max` | `action: "generate"` | 必须提供提示词。 |
 | `minimax-h3` | `action: "generate"` | 视频生成必须明确提供时长。 |
 | `minimax-h3` | 传 `first_frame_image` | 首尾帧模式不能与多模态参考混用。 |
 | `minimax-h3` | 传 `audio_urls` | 参考音频必须与参考图片一起提供。 |
+| `minimax-h3-max` | 传 `first_frame_image` 或 `last_frame_image` | 首尾帧模式不能与多模态参考混用。 |
+| `minimax-h3-max` | 传 `audio_urls`，未传参考图片 | 参考音频必须与参考图片或参考视频一起提供。 |
+| `minimax-h3-max` | 每次请求 | 参考视频、参考音频各最多 3 段；image_with_roles 最多 2 项。 |
+| `minimax-h3-max` | 传 `image_with_roles` | image_with_roles 不能与 image_urls 同时使用，参考图请用 image_urls 传。 |
+| `minimax-h3-max` | `resolution: "1080p"` | 1080p 不支持水印参数，请不要传 watermark。 |
 | `minimax-h3-regeneration` | `action: "regenerate"` | 再生成必须提供已完成的本地 H3 任务 ID，且源任务须为 768p 输出（generate 时显式传 resolution=768p）。 |
 
-| 项目 | 上限 |
-|---|---|
-| 时长 | 4–15 秒，整数 |
-| 参考图片 | 最多 9 张 |
-| 参考视频 | 最多 3 段，总时长 ≤ 15 秒，帧率 23.976–60 fps |
-| 参考音频 | 最多 3 段，总时长 ≤ 15 秒 |
+| 项目 | `minimax-h3` | `minimax-h3-max` |
+|---|---|---|
+| 时长 | 4–15 秒 | 5–15 秒 |
+| 参考图片 | 最多 9 张 | 最多 9 张 |
+| 参考视频 | 最多 3 段，总时长 ≤ 15 秒 | 最多 3 段，单段 2–15 秒，总时长 ≤ 15 秒 |
+| 参考音频 | 最多 3 段，总时长 ≤ 15 秒 | 最多 3 段，单段 2–15 秒，总时长 ≤ 15 秒 |
 
 ## 计费
 
-`minimax-h3` 按**分辨率档 × 秒数**计费：`768p` 与 `2k` 各有一个每秒单价，乘以 `duration` 就是输出部分的费用。另外两个维度只在用到时才计：
+`minimax-h3` 与 `minimax-h3-max` 按**分辨率档 × 秒数**计费：每个分辨率档一个每秒单价，乘以 `duration`。另外两个维度只在用到时才计：
 
-- **参考视频**：带 `video_urls` 时，输出秒按同分辨率的参考档单价计算，并按参考视频的实际总秒数再计一段输入费用；取不到参考视频时长时，按 15 秒的上限计。
-- **参考图片**：`image_urls` 的前 5 张不加价，从第 6 张起每张按固定价加收。首帧、尾帧和参考音频不单独计费。
+- **参考视频**：带 `video_urls` 时，输出秒按同分辨率的参考档单价计，参考视频的实际总秒数再按输入秒单价计一笔；读不到参考视频时长时按 15 秒计。
+- **参考图片**：`image_urls` 前若干张不加价（`minimax-h3` 前 5 张，`minimax-h3-max` 前 2 张），之后每张按固定价加收。首帧、尾帧和参考音频不单独计费。
 
-`minimax-h3-regeneration` 用同一套口径，单价按 `2k` 档，计费用的时长与参考素材取自 `ref_task_id` 指向的源任务——源任务里的参考视频与参考图片会在再生成时再计一次。
+`minimax-h3-regeneration` 用同一套口径，单价按 `2k` 档，计费时长与参考素材取自 `ref_task_id` 指向的源任务，源任务里的参考视频与参考图片在再生成时再计一次。
 
 <Note>
-**本页不列具体单价**——单价会随上游调整，这里只讲计费维度与口径。
+各模型的单价见 `GET /v1/models` 返回的 `price_config`，或控制台「模型市场」。
 
-实时单价见 `GET /v1/models` 返回的 `price_config`，或控制台「模型市场」。单次调用的实际费用见任务响应里的 `cost`：整数 quota，**500,000 quota = 1 USD**。
+看这一单实际花了多少：任务响应里的 `cost`（整数 quota，500,000 quota = 1 USD）。
 </Note>
 
-提交时按上述维度冻结一笔额度，任务完成后按实际结果结算，差额退回。只有成功出片才计费；任务失败、取消，或没有返回可用视频时，全额退款。
+只有成功出片才计费。任务失败、取消，或没有返回可用视频时，全额退款。最终费用以任务响应里的 `cost` 为准，它是整数 quota 不是美元。
 
 ## 响应
 
@@ -194,13 +228,14 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
 }
 ```
 
-`result.videos` 返回带音轨的成片，`expires_at` 是链接过期时间（Unix 秒），过期前把文件转存到自己的存储。再生成任务的响应形状相同，`model` 为 `minimax-h3-regeneration`。完整字段说明见[查询任务状态](/cn/api-reference/task/status)。
+`result.videos` 返回成片，`expires_at` 是链接过期时间（Unix 秒），过期前把文件转存到自己的存储。`minimax-h3-max` 与再生成任务的响应形状相同。完整字段说明见[查询任务状态](/cn/api-reference/task/status)。
 
 ## 可用模型
 
 | 模型 ID | 动作 | 分辨率 | 时长（秒） | 输入 |
 |---|---|---|---|---|
 | `minimax-h3` | `generate` | `768p` `2k` | 4–15 | 文本、参考图、首尾帧、参考视频、参考音频 |
+| `minimax-h3-max` | `generate` | `480p` `768p` `1080p` | 5–15 | 文本、参考图、首尾帧、参考视频、参考音频 |
 | `minimax-h3-regeneration` | `regenerate` | `2k` | 取自源任务 | 已完成的 `minimax-h3` 768P 任务 ID |
 
 ## 相关文档

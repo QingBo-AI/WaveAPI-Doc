@@ -77,6 +77,21 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
   }'
 ```
 
+```bash Asset reference
+curl -X POST https://api.qingbo.ai/v1/tasks \
+  -H "Authorization: Bearer $WAVE_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "seedance-2.0",
+    "action": "generate",
+    "prompt": "The character strolls along a street at dusk, tracking shot",
+    "image_urls": ["asset://asset-20260924112839-scjs4"],
+    "duration": 5,
+    "resolution": "720p",
+    "aspect_ratio": "adaptive"
+  }'
+```
+
 ```bash Video edit
 curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
@@ -134,7 +149,10 @@ A successful submission returns a `task_id`. Retrieve the result with [`GET /v1/
 <ParamField body="duration" type="integer">
   Output length in seconds, an integer. The range depends on the model: `2`–`12` on `seedance-1.0-pro` and `seedance-1.0-pro-fast`, `4`–`12` on `seedance-1.5-pro`, `4`–`15` on the three 2.0 tiers, `4`–`30` on `seedance-2.5`.
 
-  Send `0` for `edit` on `seedance-2.5`, meaning the output keeps the source video's length.
+  Special values on `seedance-2.5`:
+
+  - `0` under `generate` or `extend`: the model picks the length (4–30 seconds), billed on the length actually generated
+  - `0` under `edit`: the output keeps the source video's length
 </ParamField>
 
 <ParamField body="resolution" type="string">
@@ -164,7 +182,7 @@ A successful submission returns a `task_id`. Retrieve the result with [`GET /v1/
 </ParamField>
 
 <ParamField body="image_urls" type="string[]">
-  Reference image URLs. Up to 2 on `seedance-1.5-pro`, 9 on the three 2.0 tiers and 30 on `seedance-2.5`; `seedance-1.0-pro` and `seedance-1.0-pro-fast` do not take this field. Reference images cannot be combined with a first or last frame.
+  Reference image URLs. Up to 2 on `seedance-1.5-pro`, 9 on the three 2.0 tiers and 30 on `seedance-2.5`; `seedance-1.0-pro` and `seedance-1.0-pro-fast` do not take this field. Reference images cannot be combined with a first or last frame; on `seedance-1.5-pro` and the three 2.0 tiers they cannot be combined with `image_with_roles`.
 </ParamField>
 
 <ParamField body="video_urls" type="string[]">
@@ -184,7 +202,13 @@ A successful submission returns a `task_id`. Retrieve the result with [`GET /v1/
 </ParamField>
 
 <ParamField body="image_with_roles" type="object[]">
-  Role-tagged images, merged with `first_frame_image` and `last_frame_image`. Each entry holds a `url` and a `role` of `first_frame` or `last_frame`. Supported on every model.
+  Role-tagged images, merged with `first_frame_image` and `last_frame_image`. Each entry holds a `url` and a `role`; supported on every model. `role` values:
+
+  - `seedance-1.0-pro`, `seedance-1.5-pro`: `first_frame` or `last_frame`, at most one each
+  - `seedance-1.0-pro-fast`: `first_frame` only
+  - The three 2.0 tiers and `seedance-2.5`: `first_frame`, `last_frame` or `reference_image`
+
+  Cannot be combined with `image_urls` on `seedance-1.5-pro` and the three 2.0 tiers.
 </ParamField>
 
 <ParamField body="camerafixed" type="boolean" default="false">
@@ -207,6 +231,18 @@ A successful submission returns a `task_id`. Retrieve the result with [`GET /v1/
   Reference-mode hint for `generate`, `auto` or `reference`. Sending `reference` validates the reference-to-video constraints at submit time: an invalid request returns `400` with no task created and nothing billed. `edit` and `extend` are derived from the action and need no hint. `seedance-2.5` only.
 </ParamField>
 
+### Asset references (`asset://`)
+
+On `seedance-2.0`, `seedance-2.0-fast`, `seedance-2.0-mini` and `seedance-2.5`, media fields accept `asset://<asset ID>` to reference an asset uploaded to the [Asset library](/en/api-reference/assets/overview); assets and ordinary links can be mixed:
+
+| Asset type | Fields |
+|---|---|
+| Image | `image_urls`, `first_frame_image`, `last_frame_image`, `image_with_roles[].url` |
+| Video | `video_urls` |
+| Audio | `audio_urls` |
+
+Only active assets owned by your account can be referenced; an asset that does not exist, belongs to another account or is not active returns `400` and is not billed. Other models do not accept `asset://`.
+
 See [Submit Task](/en/api-reference/task/submit) for `callback_url`, `callback_events`, `Prefer: wait`, `Idempotency-Key` and the maximum-cost header.
 
 Any other parameter returns `400` and is not billed.
@@ -219,15 +255,16 @@ Any other parameter returns `400` and is not billed.
 - generate/extend requires an explicit duration from 2 to 12 seconds. (`seedance-1.0-pro`, `seedance-1.0-pro-fast`)
 - generate/extend requires an explicit duration from 4 to 12 seconds. (`seedance-1.5-pro`)
 - generate/extend requires an explicit duration from 4 to 15 seconds. (`seedance-2.0`, `seedance-2.0-fast`, `seedance-2.0-mini`)
-- generate/extend requires an explicit duration from 4 to 30 seconds. (`seedance-2.5`)
+- generate/extend requires duration: 4 to 30 seconds, or 0 to let the model pick the length. (`seedance-2.5`)
 - A last frame requires a first frame. (every model except `seedance-1.0-pro-fast`)
 - First/last frames cannot be mixed with general image references.
 - 2.x first-frame tasks require adaptive aspect ratio.
 - 2.x first/last-frame tasks require adaptive aspect ratio.
 - At most two reference images are accepted. (`seedance-1.5-pro`)
-- Reference videos must be duration-readable HTTP(S) MP4/MOV/WebM; asset:// is not supported in the first release; total duration must be 2 to 15 seconds. (`seedance-2.0`, `seedance-2.0-fast`, `seedance-2.0-mini`)
-- Reference videos must be duration-readable HTTP(S) MP4/MOV/WebM; asset:// is not supported in the first release; total duration must be 2 to 30 seconds. (`seedance-2.5`)
+- Reference videos must be duration-readable HTTP(S) MP4/MOV/WebM or your own active asset:// video assets; total duration must be 2 to 15 seconds. (`seedance-2.0`, `seedance-2.0-fast`, `seedance-2.0-mini`)
+- Reference videos must be duration-readable HTTP(S) MP4/MOV/WebM or your own active asset:// video assets; total duration must be 2 to 30 seconds. (`seedance-2.5`)
 - Seedance 2.0 does not accept audio-only reference requests.
+- image_with_roles cannot be combined with image_urls. (`seedance-1.5-pro`, `seedance-2.0`, `seedance-2.0-fast`, `seedance-2.0-mini`)
 - Video edit requires a source video, adaptive aspect ratio, and source-length duration. (`seedance-2.5` · `edit`)
 - The edit source video must be 4 to 30 seconds. (`seedance-2.5` · `edit`)
 - Video extension requires a source video and adaptive aspect ratio. (`seedance-2.5` · `extend`)
@@ -237,34 +274,39 @@ Any other parameter returns `400` and is not billed.
 | Reference images `image_urls` | Not supported | 2 | 9 | 30 |
 | Reference videos `video_urls` | Not supported | Not supported | 3 clips, 2–15s total | 10 clips, 2–30s total |
 | Reference audio `audio_urls` | Not supported | Not supported | 3 clips, 15s total | 10 clips, 30s total |
-| Duration `duration` | 2–12s | 4–12s | 4–15s | 4–30s |
+| Duration `duration` | 2–12s | 4–12s | 4–15s | 4–30s, or `0` for model-chosen |
 | Excluded by a first/last frame | No reference material on this tier | `image_urls` | `image_urls` / `video_urls` / `audio_urls` | `image_urls` |
 
 The upstream also classifies 2.5 sub-tasks from the prompt: write `edit` prompts as editing instructions (remove, replace, modify) and `extend` prompts as continuation instructions, matching the `action` you send.
 
 ## Pricing
 
-Billing is **resolution tier × output seconds**, where the seconds come from the `duration` you send. Within one model, higher resolutions cost more; at the same resolution, `seedance-2.0-mini` is the cheapest, `seedance-2.0-fast` sits in the middle and `seedance-2.0` is the most expensive.
+Billing is **resolution tier × output seconds**. Within one model, higher resolutions cost more; at the same resolution, `seedance-2.0-mini` is the cheapest, `seedance-2.0-fast` sits in the middle and `seedance-2.0` is the most expensive.
 
-Sending `video_urls` switches tiers, and the charge is the sum of two parts:
+With a reference video (`video_urls`, on the three 2.0 tiers and `seedance-2.5`), the charge is the sum of two parts:
 
-- the **output seconds**, settled at the **reference-video tier** for that resolution
-- the **reference video's own length**, settled at the **input-second** rate
+- the **output seconds**, at the **reference-video tier** for that resolution
+- the reference video's **input seconds**, at the **input-second** rate
 
-The reference video's length is probed at submit time; when it cannot be read, the model's declared reference-video ceiling is used instead. Reference images and reference audio carry no separate charge.
+| Model | Output seconds | Input seconds |
+|---|---|---|
+| The three 2.0 tiers | The requested `duration` | The reference video's actual length |
+| `seedance-2.5` · `generate` / `extend` | The requested `duration`; with `0`, the length actually generated | The reference video's actual length, and no less than 0.75 × the output seconds (rounded up) |
+| `seedance-2.5` · `edit` | The source video's length | The source video's length |
 
-`seedance-1.5-pro` has its own audio tier, so `generate_audio` settles at the audio tier for that resolution. The other models have no separate audio tier, and audio does not change the tier.
+The reference video's length is read at submit time; when it cannot be read, the model's reference-video ceiling is used instead, and `asset://` assets use the length measured at upload. Reference images and reference audio carry no separate charge.
 
-For `edit` on `seedance-2.5`, `duration: 0` lets the source video decide the output length: a hold is placed at the model's duration ceiling on submit, the task settles on the source video's actual length, and the difference is released.
+`seedance-1.5-pro` has its own audio tier, so `generate_audio` is billed at the audio tier for that resolution; on the other models audio does not change the tier.
+
+`seedance-2.5` freezes quota at submission (at 30 seconds when `duration` is `0`) and settles on the actual result when the task completes, refunding the difference.
 
 <Note>
-Rates move with the upstream, so this section describes billing dimensions only and lists no amounts.
+Per-model rates are in `price_config` on `GET /v1/models`, and in the console's Model Market.
 
-Current rates: `price_config` on `GET /v1/models`, or the Model Market in the console.
-Actual cost of one call: the `cost` field on the task response (an integer quota; 500,000 quota = 1 USD).
+What a single call actually cost is the `cost` field on the task response — an integer quota at 500,000 quota = 1 USD.
 </Note>
 
-You are billed only for a delivered video. Failed and cancelled tasks, and upstream successes that carry no deliverable video, are refunded in full. The final charge is the `cost` field on the task response — an integer quota, not dollars (500,000 quota = 1 USD).
+You are billed only for a delivered video. Failed and cancelled tasks, and upstream successes that carry no deliverable video, are refunded in full. The final charge is the `cost` field on the task response — an integer quota, not dollars.
 
 ## Response
 
@@ -306,12 +348,13 @@ Generated videos are returned in `result.videos`; `url` is an array and `expires
 | `seedance-2.0` | `480p` / `720p` / `1080p` / `4k` | 4–15 | First/last frame, 9 images, 3 videos, 3 audio | `generate` |
 | `seedance-2.0-fast` | `480p` / `720p` | 4–15 | First/last frame, 9 images, 3 videos, 3 audio | `generate` |
 | `seedance-2.0-mini` | `480p` / `720p` | 4–15 | First/last frame, 9 images, 3 videos, 3 audio | `generate` |
-| `seedance-2.5` | `480p` / `720p` / `1080p` | 4–30 | First/last frame, 30 images, 10 videos, 10 audio | `generate` / `edit` / `extend` |
+| `seedance-2.5` | `480p` / `720p` / `1080p` | 4–30, or model-chosen | First/last frame, 30 images, 10 videos, 10 audio | `generate` / `edit` / `extend` |
 
 ## Related
 
 - [Video Generation Overview](/en/api-reference/video/overview)
 - [Seedream Series](/en/api-reference/image/seedream)
+- [Asset library](/en/api-reference/assets/overview)
 - [Submit Task](/en/api-reference/task/submit)
 - [Query Task Status](/en/api-reference/task/status)
 - [Task System](/en/docs/task-system)

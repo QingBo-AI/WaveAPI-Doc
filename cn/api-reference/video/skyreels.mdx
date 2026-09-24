@@ -1,10 +1,10 @@
 ---
 title: "SkyReels V4 系列"
-description: "SkyReels V4 Fast 与 Std：文生 / 图生 / 关键帧 / 参考图 / 参考视频，画面与音频联合生成，按分辨率档 × 秒数计费"
+description: "SkyReels V4 Fast 与 Std：文生 / 图生 / 关键帧 / 参考图 / 参考视频 / 视频续写，画面与音频联合生成，按分辨率档 × 秒数计费"
 api: "POST https://api.qingbo.ai/v1/tasks"
 ---
 
-SkyReels V4 是统一的多模态视频与音频生成模型，从文本、图像和视频输入联合生成同步的画面与声音，输出 480p 到 1080p、3–15 秒的片段。本页覆盖 `skyreels-v4-fast` 与 `skyreels-v4-std`：两档的动作、参数集合和取值范围完全一致，Fast 是速度优先的配置，Std 是保真度优先的默认配置，换档只改 `model`。请求统一走 `POST /v1/tasks` 异步提交。
+SkyReels V4 是统一的多模态视频与音频生成模型，从文本、图像和视频输入联合生成同步的画面与声音，输出 480p 到 1080p、3–15 秒的片段，并可对已有视频往后续写。本页覆盖 `skyreels-v4-fast` 与 `skyreels-v4-std`：两档的动作、参数集合和取值范围一致，Fast 速度优先，Std 保真度优先，换档只改 `model`。
 
 ## 快速开始
 
@@ -49,6 +49,20 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
     "action": "generate",
     "prompt": "复刻 @video_1 的镜头运动，把场景换成雪山",
     "video_urls": ["https://cdn.example.com/source.mp4"],
+    "resolution": "1080p"
+  }'
+```
+
+```bash 视频续写
+curl -X POST https://api.qingbo.ai/v1/tasks \
+  -H "Authorization: Bearer $WAVE_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "skyreels-v4-fast",
+    "action": "extend",
+    "prompt": "续写 @video_1，有人走过来坐到沙发上",
+    "video_urls": ["https://cdn.example.com/source.mp4"],
+    "duration": 8,
     "resolution": "720p"
   }'
 ```
@@ -84,39 +98,46 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
 </ParamField>
 
 <ParamField body="action" type="string" default="generate">
-  `generate` 是本系列唯一的动作。生成模式由传入的媒体字段决定：只给 `prompt` 是文生视频；带 `first_frame_image`、`end_frame_image` 或 `mid_frame_images` 是图生视频；带 `ref_images` 或 `video_urls` 是参考素材生成。图生视频字段与参考素材字段不能混用。
+  - `generate`：生成视频。生成模式由传入的媒体字段决定：只给 `prompt` 是文生视频；带 `first_frame_image`、`end_frame_image` 或 `mid_frame_images` 是图生视频；带 `ref_images` 或 `video_urls` 是参考素材生成。图生视频字段与参考素材字段不能混用。
+  - `extend`：视频续写。以 `video_urls` 里的 1 条源视频为起点，往后生成 `duration` 秒。
 </ParamField>
 
 <ParamField body="prompt" type="string" required>
-  视频描述。使用 `video_urls`、`ref_images` 或 `mid_frame_images` 时，提示词里必须出现对应的 `@` 标签。
+  视频描述。使用 `video_urls`、`ref_images` 或 `mid_frame_images` 时，提示词里必须出现对应的 `@` 标签；`action: "extend"` 时引用 `@video_1`。
 </ParamField>
 
 <ParamField body="duration" type="integer">
-  视频时长（秒），`3`–`15` 的整数。带 `video_urls` 时输出时长跟随参考视频，该参数不生效。
+  视频时长（秒），`3`–`15` 的整数。
+
+  - `action: "generate"` 带 `video_urls` 时，输出时长跟随参考视频（不足 3 秒按 3 秒），该参数不生效
+  - `action: "extend"` 时，表示续写部分的时长
 </ParamField>
 
 <ParamField body="resolution" type="string" default="1080p">
-  输出分辨率：`480p`、`720p` 或 `1080p`，默认 `1080p`。带 `video_urls` 时只支持 `480p` 与 `720p`，必须显式传入其中一档：不传会按默认的 `1080p` 处理，请求返回 `400`，不计费。
+  输出分辨率：`480p`、`720p` 或 `1080p`，默认 `1080p`。
 </ParamField>
 
 <ParamField body="aspect_ratio" type="string">
-  画面比例：`16:9`、`9:16`、`1:1`、`4:3`、`3:4`。带首帧 / 尾帧图或参考视频时该参数被忽略，比例跟随输入素材。
+  画面比例：`16:9`、`9:16`、`1:1`、`4:3`、`3:4`。带首帧 / 尾帧图、参考视频，或 `action: "extend"` 时该参数被忽略，比例跟随输入素材。
 </ParamField>
 
 <ParamField body="video_urls" type="string[]">
-  参考视频 URL 数组，作为运动与主体参考。传入的第 N 段对应标签 `@video_N`，提示词里必须引用（例如 `复刻 @video_1 的镜头运动`），未引用时上游拒绝请求，不计费。带参考视频时须同时传 `resolution`（`480p` 或 `720p`）。
+  视频 URL 数组，最多 1 段，MP4 / MOV。传入的第 N 段对应标签 `@video_N`，提示词里必须引用（例如 `复刻 @video_1 的镜头运动`），未引用时上游拒绝请求，不计费。
+
+  - `action: "generate"`：运动与主体参考，1–10 秒
+  - `action: "extend"`：必填，待续写的源视频，1–15 秒
 </ParamField>
 
 <ParamField body="first_frame_image" type="string">
-  起始帧图片 URL，支持 jpg / jpeg / png / gif / bmp。
+  起始帧图片 URL，支持 jpg / jpeg / png / gif / bmp。仅 `action: "generate"`。
 </ParamField>
 
 <ParamField body="end_frame_image" type="string">
-  结束帧图片 URL，与首帧组合可控首尾帧。
+  结束帧图片 URL，与首帧组合可控首尾帧。仅 `action: "generate"`。
 </ParamField>
 
 <ParamField body="mid_frame_images" type="object[]">
-  中间关键帧列表，最多 6 项，只在图生视频模式下有效。每项包含：
+  中间关键帧列表，最多 6 项，只在 `action: "generate"` 的图生视频模式下有效。每项包含：
 
   - `tag`：以 `@` 开头的标签，必须出现在提示词里
   - `image_url`：图片 URL
@@ -124,7 +145,7 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
 </ParamField>
 
 <ParamField body="ref_images" type="object[]">
-  参考图列表，只在参考素材模式下有效，与图生视频字段互斥。所有元素的 `type` 必须相同。每项包含：
+  参考图列表，只在 `action: "generate"` 的参考素材模式下有效，与图生视频字段互斥。所有元素的 `type` 必须相同。每项包含：
 
   - `tag`：以 `@` 开头的标签，必须出现在提示词里
   - `type`：`image` 表示普通参考图，`grid` 表示由多格拼成的一张宫格图
@@ -133,7 +154,7 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
 </ParamField>
 
 <ParamField body="prompt_optimizer" type="boolean" default="true">
-  是否自动优化提示词。开启后系统会先改写提示词再生成。
+  是否自动优化提示词。
 </ParamField>
 
 通用的 `callback_url`、`callback_events`、`Prefer: wait`、`Idempotency-Key` 和费用上限请求头见[提交任务](/cn/api-reference/task/submit)。
@@ -142,14 +163,17 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
 
 ## 限制
 
-- 带参考视频时：输出时长跟随参考视频（上限 10 秒），分辨率只支持 480p / 720p
-- 本模型一次任务只产出一个结果，不支持用 n 批量生成
+| 条件 | 限制 |
+|---|---|
+| `action: "generate"` 且提供了 `video_urls` | 带参考视频时：输出时长跟随参考视频（上限 10 秒） |
+| `action: "extend"` | 续写需要且只接受 1 条源视频（MP4 / MOV，不超过 15 秒），按请求的 duration（3–15 秒）往后生成；不能同时传图片、首尾帧或参考图，画幅跟随源视频。 |
+| 每次请求 | 本模型一次任务只产出一个结果，不支持用 n 批量生成 |
 
 | 项目 | 上限 |
 |---|---|
-| 时长 `duration` | 3–15 秒整数；带 `video_urls` 时跟随参考视频，上限 10 秒 |
-| 分辨率 `resolution` | `480p` / `720p` / `1080p`，默认 `1080p`；带 `video_urls` 时只有 `480p` / `720p`，须显式传入 |
-| 参考视频 `video_urls` | 1 段，单段 1–10 秒，MP4 / MOV |
+| 时长 `duration` | 3–15 秒整数；`generate` 带 `video_urls` 时跟随参考视频，上限 10 秒 |
+| 分辨率 `resolution` | `480p` / `720p` / `1080p`，默认 `1080p` |
+| 视频 `video_urls` | 1 段，MP4 / MOV；`generate` 1–10 秒，`extend` 1–15 秒 |
 | 中间关键帧 `mid_frame_images` | 最多 6 项 |
 | 参考图 `ref_images` | `type` 为 `image` 时 1–3 项、每项 1–5 张；`type` 为 `grid` 时 1 项 1 张 |
 | 字段互斥 | `first_frame_image` / `end_frame_image` / `mid_frame_images` 与 `ref_images` / `video_urls` 不能同时使用 |
@@ -158,17 +182,20 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
 
 ## 计费
 
-按**输出分辨率档 × 输出秒数**计费，秒数取请求里的 `duration`，不传 `resolution` 时按默认的 `1080p` 档计。三档分辨率单价各不相同；`skyreels-v4-std` 的每一档都高于 `skyreels-v4-fast` 的同名档。
+按**输出分辨率档 × 秒数**计费，不传 `resolution` 时按 `1080p` 档计。`skyreels-v4-std` 每一档都高于 `skyreels-v4-fast` 的同名档。
 
-带 `video_urls` 时换一套档位：输出秒数改按**参考视频档**单价结算，参考视频档高于同分辨率的普通档；参考视频本身的时长不另外计秒。此时输出时长跟随参考视频（上限 10 秒），可用分辨率只有 `480p` 与 `720p`，需要显式传 `resolution`。
+| 请求 | 单价档 | 计费秒数 |
+|---|---|---|
+| `generate`，无 `video_urls` | 普通档 | 请求的 `duration` |
+| `generate`，带 `video_urls` | 参考视频档 | 参考视频时长（不足 3 秒按 3 秒），请求的 `duration` 不生效 |
+| `extend` | 参考视频档 | 请求的 `duration` |
 
-参考图（`ref_images`）、关键帧图与提示词长度都不单独计费。
+参考视频档高于同分辨率的普通档。输入视频本身的秒数不另计；参考图（`ref_images`）、关键帧图与提示词长度都不单独计费。
 
 <Note>
-单价会随上游调整，本节只讲计费维度与口径，不列具体金额。
+各模型的单价见 `GET /v1/models` 返回的 `price_config`，或控制台「模型市场」。
 
-看实时单价：`GET /v1/models` 的 `price_config`，或控制台「模型市场」。
-看单次实际费用：任务响应里的 `cost`（整数 quota，500,000 quota = 1 USD）。
+看这一单实际花了多少：任务响应里的 `cost`（整数 quota，500,000 quota = 1 USD）。
 </Note>
 
 只有成功出片才计费。任务失败、取消，或上游返回成功但没有可交付视频时，全额退款。最终费用以任务响应里的 `cost` 为准，`cost` 是整数 quota 不是美元（500,000 quota = 1 USD）。
@@ -207,8 +234,8 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
 
 | 模型 ID | 分辨率 | 时长（秒） | 动作 | 说明 |
 |---|---|---|---|---|
-| `skyreels-v4-fast` | `480p` / `720p` / `1080p` | 3–15 任意整数 | `generate` | 速度优先配置，牺牲部分保真度换更快出片 |
-| `skyreels-v4-std` | `480p` / `720p` / `1080p` | 3–15 任意整数 | `generate` | 默认质量配置，优先保证完整保真度 |
+| `skyreels-v4-fast` | `480p` / `720p` / `1080p` | 3–15 任意整数 | `generate` `extend` | 速度优先 |
+| `skyreels-v4-std` | `480p` / `720p` / `1080p` | 3–15 任意整数 | `generate` `extend` | 保真度优先 |
 
 ## 相关文档
 

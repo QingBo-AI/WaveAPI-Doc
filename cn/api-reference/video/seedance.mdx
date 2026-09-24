@@ -77,6 +77,21 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
   }'
 ```
 
+```bash 素材引用
+curl -X POST https://api.qingbo.ai/v1/tasks \
+  -H "Authorization: Bearer $WAVE_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "seedance-2.0",
+    "action": "generate",
+    "prompt": "人物在黄昏的街道上散步，镜头跟随",
+    "image_urls": ["asset://asset-20260924112839-scjs4"],
+    "duration": 5,
+    "resolution": "720p",
+    "aspect_ratio": "adaptive"
+  }'
+```
+
 ```bash 视频编辑
 curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
@@ -134,7 +149,10 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
 <ParamField body="duration" type="integer">
   输出时长（秒），整数。取值范围按模型不同：`seedance-1.0-pro` 与 `seedance-1.0-pro-fast` 为 `2`–`12`，`seedance-1.5-pro` 为 `4`–`12`，2.0 三档为 `4`–`15`，`seedance-2.5` 为 `4`–`30`。
 
-  `seedance-2.5` 的 `edit` 传 `0`，表示输出沿用源视频时长。
+  `seedance-2.5` 的语义值：
+
+  - `generate`、`extend` 传 `0`：由模型自定时长（4–30 秒），按实际生成的时长结算
+  - `edit` 传 `0`：输出沿用源视频时长
 </ParamField>
 
 <ParamField body="resolution" type="string">
@@ -164,7 +182,7 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
 </ParamField>
 
 <ParamField body="image_urls" type="string[]">
-  参考图 URL 数组。`seedance-1.5-pro` 最多 2 张，2.0 三档最多 9 张，`seedance-2.5` 最多 30 张；`seedance-1.0-pro` 与 `seedance-1.0-pro-fast` 不接受该字段。传首帧或尾帧时不能同时传参考图。
+  参考图 URL 数组。`seedance-1.5-pro` 最多 2 张，2.0 三档最多 9 张，`seedance-2.5` 最多 30 张；`seedance-1.0-pro` 与 `seedance-1.0-pro-fast` 不接受该字段。传首帧或尾帧时不能同时传参考图；`seedance-1.5-pro` 与 2.0 三档不能与 `image_with_roles` 同时传。
 </ParamField>
 
 <ParamField body="video_urls" type="string[]">
@@ -184,7 +202,13 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
 </ParamField>
 
 <ParamField body="image_with_roles" type="object[]">
-  带角色的图片数组，与 `first_frame_image`、`last_frame_image` 合并发送。每项包含 `url` 和 `role`，`role` 取 `first_frame` 或 `last_frame`。所有模型都支持。
+  带角色的图片数组，与 `first_frame_image`、`last_frame_image` 合并发送。每项包含 `url` 和 `role`，所有模型都支持。`role` 取值：
+
+  - `seedance-1.0-pro`、`seedance-1.5-pro`：`first_frame` 或 `last_frame`，各最多一张
+  - `seedance-1.0-pro-fast`：只能取 `first_frame`
+  - 2.0 三档与 `seedance-2.5`：`first_frame`、`last_frame` 或 `reference_image`
+
+  `seedance-1.5-pro` 与 2.0 三档不能与 `image_urls` 同时传。
 </ParamField>
 
 <ParamField body="camerafixed" type="boolean" default="false">
@@ -207,6 +231,18 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
   `generate` 时的参考模式提示，`auto` 或 `reference`。传 `reference` 会在提交时按参考生视频的约束校验，不合法直接返回 `400`，不建任务也不计费。`edit` 与 `extend` 由 `action` 决定，不需要这个字段。仅 `seedance-2.5` 支持。
 </ParamField>
 
+### 素材引用（`asset://`）
+
+`seedance-2.0`、`seedance-2.0-fast`、`seedance-2.0-mini`、`seedance-2.5` 的媒体字段可以直接填 `asset://<素材 ID>`，引用在[素材库](/cn/api-reference/assets/overview)上传的素材，可与普通链接混用：
+
+| 素材类型 | 可引用字段 |
+|---|---|
+| 图片 | `image_urls`、`first_frame_image`、`last_frame_image`、`image_with_roles[].url` |
+| 视频 | `video_urls` |
+| 音频 | `audio_urls` |
+
+只能引用本账号已激活的素材；素材不存在、不属于本账号或未激活时返回 `400`，不计费。其余模型不接受 `asset://`。
+
 通用的 `callback_url`、`callback_events`、`Prefer: wait`、`Idempotency-Key` 和费用上限请求头见[提交任务](/cn/api-reference/task/submit)。
 
 以上之外的参数会返回 `400`，不计费。
@@ -219,15 +255,16 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
 - generate/extend 必须明确传入 2–12 秒时长。（`seedance-1.0-pro`、`seedance-1.0-pro-fast`）
 - generate/extend 必须明确传入 4–12 秒时长。（`seedance-1.5-pro`）
 - generate/extend 必须明确传入 4–15 秒时长。（`seedance-2.0`、`seedance-2.0-fast`、`seedance-2.0-mini`）
-- generate/extend 必须明确传入 4–30 秒时长。（`seedance-2.5`）
+- generate/extend 必须传入 duration：4–30 秒，或传 0 由模型自定时长。（`seedance-2.5`）
 - 尾帧必须与首帧一起提供。（`seedance-1.0-pro-fast` 之外的模型）
 - 首尾帧不能与一般图片引用混用。
 - 2.x 首帧任务必须使用 adaptive 画幅。
 - 2.x 首尾帧任务必须使用 adaptive 画幅。
 - 最多提供两张参考图。（`seedance-1.5-pro`）
-- 参考视频必须是可读取时长的 HTTP(S) MP4/MOV/WebM，首发不支持 asset://；总时长须为 2–15 秒。（`seedance-2.0`、`seedance-2.0-fast`、`seedance-2.0-mini`）
-- 参考视频必须是可读取时长的 HTTP(S) MP4/MOV/WebM，首发不支持 asset://；总时长须为 2–30 秒。（`seedance-2.5`）
+- 参考视频必须是可读取时长的 HTTP(S) MP4/MOV/WebM，或本人已激活的 asset:// 视频素材；总时长须为 2–15 秒。（`seedance-2.0`、`seedance-2.0-fast`、`seedance-2.0-mini`）
+- 参考视频必须是可读取时长的 HTTP(S) MP4/MOV/WebM，或本人已激活的 asset:// 视频素材；总时长须为 2–30 秒。（`seedance-2.5`）
 - Seedance 2.0 系列不接受纯音频参考。
+- image_with_roles 不能与 image_urls 同时使用。（`seedance-1.5-pro`、`seedance-2.0`、`seedance-2.0-fast`、`seedance-2.0-mini`）
 - 视频编辑需要源视频、adaptive 画幅，输出时长沿用源视频。（`seedance-2.5` · `edit`）
 - 待编辑源视频必须为 4–30 秒。（`seedance-2.5` · `edit`）
 - 视频延长需要源视频并使用 adaptive 画幅。（`seedance-2.5` · `extend`）
@@ -237,34 +274,39 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
 | 参考图 `image_urls` | 不支持 | 2 张 | 9 张 | 30 张 |
 | 参考视频 `video_urls` | 不支持 | 不支持 | 3 段，总时长 2–15 秒 | 10 段，总时长 2–30 秒 |
 | 参考音频 `audio_urls` | 不支持 | 不支持 | 3 段，总时长 ≤ 15 秒 | 10 段，总时长 ≤ 30 秒 |
-| 时长 `duration` | 2–12 秒 | 4–12 秒 | 4–15 秒 | 4–30 秒 |
+| 时长 `duration` | 2–12 秒 | 4–12 秒 | 4–15 秒 | 4–30 秒，或 `0` 由模型自定 |
 | 传首帧 / 尾帧时不能同时传 | 该档不接受参考素材 | `image_urls` | `image_urls` / `video_urls` / `audio_urls` | `image_urls` |
 
 2.5 的子任务类型上游还会从提示词判断一次：`edit` 的提示词写成删除、替换、修改一类的编辑指令，`extend` 的提示词写成继续、往后接一类的续拍指令，与 `action` 保持一致。
 
 ## 计费
 
-按**输出分辨率档 × 输出秒数**计费，秒数取请求里的 `duration`。同一模型下分辨率越高越贵；同一分辨率下，`seedance-2.0-mini` 最便宜、`seedance-2.0-fast` 居中、`seedance-2.0` 最贵。
+按**输出分辨率档 × 输出秒数**计费。同一模型下分辨率越高越贵；同一分辨率下，`seedance-2.0-mini` 最便宜、`seedance-2.0-fast` 居中、`seedance-2.0` 最贵。
 
-带参考视频（`video_urls`）时换一套档位，费用由两项相加：
+带参考视频（`video_urls`，2.0 三档与 `seedance-2.5`）时，费用由两项相加：
 
-- **输出秒数**改按该分辨率的**参考视频档**单价结算
-- **参考视频自身的时长**按**输入秒**单价再计一笔
+- **输出秒数**按该分辨率的**参考视频档**单价计
+- **参考视频的输入秒数**按**输入秒**单价再计一笔
 
-参考视频时长在提交时探测，探测不到时按该模型声明的参考视频时长上限计入。参考图与参考音频不单独计费。
+| 模型 | 输出秒数 | 输入秒数 |
+|---|---|---|
+| 2.0 三档 | 请求的 `duration` | 参考视频实际时长 |
+| `seedance-2.5` · `generate` / `extend` | 请求的 `duration`；传 `0` 时为实际生成时长 | 参考视频实际时长，且不低于输出秒数的 0.75 倍（向上取整） |
+| `seedance-2.5` · `edit` | 源视频时长 | 源视频时长 |
 
-`seedance-1.5-pro` 有独立的带声档，开启 `generate_audio` 时按对应分辨率的带声档结算；其余模型没有独立带声档，音频不改变计费档位。
+参考视频时长在提交时读取，读不到时按该模型的参考视频时长上限计入；`asset://` 素材取上传时测得的时长。参考图与参考音频不单独计费。
 
-`seedance-2.5` 的 `edit` 传 `duration: 0`，输出时长由源视频决定：提交时按该模型的时长上限冻结额度，任务完成后按源视频的实际时长结算，差额退回。
+`seedance-1.5-pro` 有独立的带声档，开启 `generate_audio` 时按对应分辨率的带声档计；其余模型音频不改变计费档位。
+
+`seedance-2.5` 提交时冻结额度（`duration: 0` 按 30 秒冻结），完成后按实际生成结果结算退差。
 
 <Note>
-单价会随上游调整，本节只讲计费维度与口径，不列具体金额。
+各模型的单价见 `GET /v1/models` 返回的 `price_config`，或控制台「模型市场」。
 
-看实时单价：`GET /v1/models` 的 `price_config`，或控制台「模型市场」。
-看单次实际费用：任务响应里的 `cost`（整数 quota，500,000 quota = 1 USD）。
+看这一单实际花了多少：任务响应里的 `cost`（整数 quota，500,000 quota = 1 USD）。
 </Note>
 
-只有成功出片才计费。任务失败、取消，或上游返回成功但没有可交付视频时，全额退款。最终费用以任务响应里的 `cost` 为准，`cost` 是整数 quota 不是美元（500,000 quota = 1 USD）。
+只有成功出片才计费。任务失败、取消，或上游返回成功但没有可交付视频时，全额退款。最终费用以任务响应里的 `cost` 为准，它是整数 quota 不是美元。
 
 ## 响应
 
@@ -306,12 +348,13 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
 | `seedance-2.0` | `480p` / `720p` / `1080p` / `4k` | 4–15 | 首尾帧、图 ×9、视频 ×3、音频 ×3 | `generate` |
 | `seedance-2.0-fast` | `480p` / `720p` | 4–15 | 首尾帧、图 ×9、视频 ×3、音频 ×3 | `generate` |
 | `seedance-2.0-mini` | `480p` / `720p` | 4–15 | 首尾帧、图 ×9、视频 ×3、音频 ×3 | `generate` |
-| `seedance-2.5` | `480p` / `720p` / `1080p` | 4–30 | 首尾帧、图 ×30、视频 ×10、音频 ×10 | `generate` / `edit` / `extend` |
+| `seedance-2.5` | `480p` / `720p` / `1080p` | 4–30，或模型自定 | 首尾帧、图 ×30、视频 ×10、音频 ×10 | `generate` / `edit` / `extend` |
 
 ## 相关文档
 
 - [视频生成概述](/cn/api-reference/video/overview)
 - [Seedream 系列](/cn/api-reference/image/seedream)
+- [素材库](/cn/api-reference/assets/overview)
 - [提交任务](/cn/api-reference/task/submit)
 - [查询任务状态](/cn/api-reference/task/status)
 - [任务系统](/cn/docs/task-system)

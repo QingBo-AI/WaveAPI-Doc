@@ -1,0 +1,102 @@
+---
+title: "列出素材"
+description: "GET /v1/assets — 列出本账号的素材"
+api: "GET https://api.qingbo.ai/v1/assets"
+---
+
+列出本账号未删除的素材，按创建时间倒序。
+
+<RequestExample>
+```bash cURL
+curl "https://api.qingbo.ai/v1/assets?limit=20&offset=0" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+```python Python
+import requests
+
+response = requests.get(
+    "https://api.qingbo.ai/v1/assets",
+    headers={"Authorization": "Bearer YOUR_API_KEY"},
+    params={"limit": 20, "offset": 0}
+)
+
+for asset in response.json()["data"]:
+    print(asset["id"], asset["status"])
+```
+</RequestExample>
+
+<ResponseExample>
+```json 200
+{
+  "object": "list",
+  "data": [
+    {
+      "id": "ast_3f9c2a7d1e8b4c6a5f0e9d21",
+      "object": "asset",
+      "model": "seedance-2.5",
+      "type": "video",
+      "name": "hero-walk-ref",
+      "status": "active",
+      "duration_seconds": 5.062,
+      "created_at": 1790220525,
+      "updated_at": 1790220534,
+      "asset_url": "asset://asset-20260924112839-scjs4"
+    },
+    {
+      "id": "ast_9b1e4c7a2d5f8e0b3c6a9d14",
+      "object": "asset",
+      "model": "seedance-2.0",
+      "type": "image",
+      "name": "",
+      "status": "failed",
+      "created_at": 1790220301,
+      "updated_at": 1790220318,
+      "error": {
+        "message": "素材格式不受支持"
+      }
+    }
+  ]
+}
+```
+</ResponseExample>
+
+## 鉴权
+
+<ParamField header="Authorization" type="string" required>
+  `Bearer YOUR_API_KEY`。API Key 的 quota 已用尽时也可调用。
+</ParamField>
+
+## 请求参数
+
+<ParamField query="limit" type="integer" default="20">
+  每页条数，取值 `1`–`100`。超出范围按 `20` 处理。
+</ParamField>
+
+<ParamField query="offset" type="integer" default="0">
+  跳过条数。
+</ParamField>
+
+## 响应
+
+<ResponseField name="object" type="string">
+  固定为 `list`。
+</ResponseField>
+
+<ResponseField name="data" type="array">
+  素材对象数组，字段见[查询素材](/cn/api-reference/assets/get)。条数小于 `limit` 即为最后一页。
+</ResponseField>
+
+## 错误码
+
+| HTTP | `code` | 说明 |
+|---|---|---|
+| 401 | — | API Key 缺失或无效 |
+| 500 | `asset_store_error` | 素材记录读取失败，可重试 |
+
+## 相关文档
+
+- [素材库](/cn/api-reference/assets/overview)
+- [上传素材](/cn/api-reference/assets/create)
+- [查询素材](/cn/api-reference/assets/get)
+- [删除素材](/cn/api-reference/assets/delete)

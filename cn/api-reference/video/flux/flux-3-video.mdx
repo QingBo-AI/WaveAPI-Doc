@@ -1,10 +1,10 @@
 ---
 title: "FLUX 3 Video"
-description: "Black Forest Labs FLUX 3 Video：文生、关键帧、视频续写，带同步音频，按分辨率档 × 秒数计费"
+description: "Black Forest Labs FLUX 3 Video：文生、关键帧、视频续写、草稿转终稿，带同步音频，按分辨率档 × 秒数计费"
 api: "POST https://api.qingbo.ai/v1/tasks"
 ---
 
-FLUX 3 Video 是 Black Forest Labs 的视频模型，从文本、1–10 张有序关键帧或一段续写视频生成 5–20 秒带同步音频的片段。本页覆盖标准档 `flux-3-video` 与草稿档 `flux-3-video-draft`：两档参数集合完全相同，草稿档只出 `hd`、画质更低、单价更低，适合先快速看效果再用标准档出片。换档只改 `model`，两档之间不会自动切换。
+FLUX 3 Video 是 Black Forest Labs 的视频模型，从文本、1–10 张有序关键帧或一段续写视频生成 5–20 秒带同步音频的片段。本页覆盖标准档 `flux-3-video` 与草稿档 `flux-3-video-draft`：两档生成参数相同，草稿档只出 `hd`、画质更低、单价更低。草稿满意后，可用 `flux-3-video` 的 `finalize` 把它转成终稿。
 
 ## 快速开始
 
@@ -70,9 +70,23 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
   }'
 ```
 
+```bash 草稿转终稿
+curl -X POST https://api.qingbo.ai/v1/tasks \
+  -H "Authorization: Bearer $WAVE_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "flux-3-video",
+    "action": "finalize",
+    "ref_task_id": "task-wave1788780141b950265604",
+    "resolution": "fhd"
+  }'
+```
+
 </CodeGroup>
 
 提交成功后返回 `task_id`。用 [`GET /v1/tasks/{task_id}`](/cn/api-reference/task/status) 查询结果，也可以用 [`Prefer: wait`](/cn/api-reference/task/submit#请求内等待prefer-wait) 在一次调用里等待，或配置 Webhook。
+
+**接着往下做**：先用 `flux-3-video-draft` 提交 `action: "generate"` 拿到 `task_id`；任务 `completed` 后，把这个 `task_id` 作为 `ref_task_id`，用 `flux-3-video` 提交 `action: "finalize"`。提示词、时长、画幅和素材沿用草稿，只能改 `resolution`。
 
 ## 请求参数
 
@@ -81,27 +95,28 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
 </ParamField>
 
 <ParamField body="action" type="string" default="generate">
-  `generate` —— 两档都只支持这一个动作。文生、关键帧和视频续写靠传什么素材区分，不靠动作区分。
+  - `generate`：生成视频，两档都支持。文生、关键帧和视频续写由传入的素材决定。
+  - `finalize`：草稿转终稿，只有 `flux-3-video` 支持；必须提供 `ref_task_id`。
 </ParamField>
 
-<ParamField body="prompt" type="string" required>
-  视频内容描述。
+<ParamField body="prompt" type="string">
+  视频内容描述，`action: "generate"` 时必填；`action: "finalize"` 不接受。
 </ParamField>
 
 <ParamField body="image_urls" type="string[]">
-  关键帧图片，1–10 张，顺序有意义：1 张为首帧，2 张为首帧 + 末帧，3–10 张时首尾为首末帧、中间帧按时间等距分布。与 `video_urls` 不能同时传。
+  关键帧图片，1–10 张，顺序有意义：1 张为首帧，2 张为首帧 + 末帧，3–10 张时首尾为首末帧、中间帧按时间等距分布。与 `video_urls` 不能同时传。`action: "finalize"` 不接受。
 </ParamField>
 
 <ParamField body="video_urls" type="string[]">
-  续写视频，最多 1 条，最长 20 秒。传了之后模型接着这段视频往下生成。
+  续写视频，最多 1 条，最长 20 秒。传了之后模型接着这段视频往下生成。`action: "finalize"` 不接受。
 </ParamField>
 
 <ParamField body="resolution" type="string" default="hd">
-  输出分辨率。`flux-3-video` 支持 `hd` 与 `fhd`；`flux-3-video-draft` 只支持 `hd`。
+  输出分辨率。`flux-3-video` 支持 `hd` 与 `fhd`（`finalize` 同样可选）；`flux-3-video-draft` 只支持 `hd`。
 </ParamField>
 
 <ParamField body="duration" type="integer" default="5">
-  输出时长（秒），`5`–`20` 任意整数。
+  输出时长（秒），`5`–`20` 任意整数。`action: "finalize"` 不接受，沿用草稿时长。
 </ParamField>
 
 <ParamField body="aspect_ratio" type="string" default="auto">
@@ -113,12 +128,16 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
 </ParamField>
 
 <ParamField body="safety_tolerance" type="integer" default="2">
-  安全容忍度，`0`–`4`，越大越宽松。
+  安全容忍度，`0`–`4`，越大越宽松。仅 `action: "generate"`。
+</ParamField>
+
+<ParamField body="ref_task_id" type="string">
+  要转成终稿的草稿任务 ID，`action: "finalize"` 时必填。取本账户下已完成的 `flux-3-video-draft` 任务返回的 `task_id`。
 </ParamField>
 
 通用的 `callback_url`、`callback_events`、`Prefer: wait`、`Idempotency-Key` 和费用上限请求头见[提交任务](/cn/api-reference/task/submit)。
 
-两档都不接受 `n`、`seed`、`quality`、`negative_prompt`、`first_frame_image` 与 `audio_urls`。以上之外的参数会返回 `400`，不计费。
+两档都不接受 `n`、`seed`、`quality`、`negative_prompt`、`first_frame_image` 与 `audio_urls`。以上之外的参数会返回 `400`，不计费。`action: "finalize"` 时 `aspect_ratio` 与 `generate_audio` 不生效。
 
 ## 限制
 
@@ -128,28 +147,27 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
 | 传了 `video_urls` | 视频续写模式下图片会被忽略，不要同时传 |
 | 续写视频时长 | 最长 20 秒 |
 | `flux-3-video-draft` 的分辨率 | 只有 `hd` |
+| `action: "finalize"` | 草稿转终稿只接受草稿任务（ref_task_id）与分辨率；提示词、时长、图片和视频沿用草稿，不能再传。 |
 
 ## 计费
 
-两档都按**分辨率档 × 输出秒数**计费。`price_config.video_prices` 按分辨率分键，未单独列出的分辨率按同级的 `default` 兜底档结算。
+两档都按**分辨率档 × 输出秒数**计费。传了 `video_urls`（续写）时改按同分辨率的续写档计，续写档高于普通档；续写视频本身的秒数不计费。
 
-| 模型 ID | 分辨率档 | 续写档 |
+| 请求 | 单价档 | 计费秒数 |
 |---|---|---|
-| `flux-3-video` | `hd`、`fhd` | `hd_video_ref`、`fhd_video_ref` |
-| `flux-3-video-draft` | `hd` | `hd_video_ref` |
+| `flux-3-video` · `generate` | `hd` / `fhd`，续写时为对应续写档 | 请求的 `duration` |
+| `flux-3-video-draft` · `generate` | `hd`，续写时为 `hd` 续写档 | 请求的 `duration` |
+| `flux-3-video` · `finalize` | 终稿的 `hd` / `fhd`，草稿是续写时为对应续写档 | 草稿的时长 |
 
-**续写档**——传了 `video_urls` 时，输出秒数按 `<分辨率>_video_ref` 档单价结算，这一档比同分辨率的普通档贵。续写视频本身的秒数不单独计费。
-
-`generate_audio` 不影响价格：有声与无声同价。`aspect_ratio`、关键帧张数、提示词长度同样不影响价格——**分辨率档、是否续写、输出秒数是仅有的三个计费维度**。
-
-只有成功出片才计费。任务失败、取消，或没有返回可用视频时，全额退款。最终费用以任务响应里的 `cost` 为准——整数 quota，**500,000 quota = 1 USD**，不是美元。
+`finalize` 单独计一次终稿费用，草稿费不抵扣。`generate_audio`、`aspect_ratio`、关键帧张数与提示词长度都不影响价格。
 
 <Note>
-**本页不列具体单价**。单价随上游调整，本节只讲计费维度与口径。
+各模型的单价见 `GET /v1/models` 返回的 `price_config`，或控制台「模型市场」。
 
-实时单价见 `GET /v1/models` 返回的 `price_config`，或控制台「模型市场」。
-单次调用的实际费用见任务响应里的 `cost`（整数 quota，500,000 quota = 1 USD）。
+看这一单实际花了多少：任务响应里的 `cost`（整数 quota，500,000 quota = 1 USD）。
 </Note>
+
+只有成功出片才计费。任务失败、取消，或没有返回可用视频时，全额退款。最终费用以任务响应里的 `cost` 为准，它是整数 quota 不是美元。
 
 ## 响应
 
@@ -183,12 +201,10 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
 
 ## 可用模型
 
-| 模型 ID | 档位 | 分辨率 | 时长（秒） | 可传的媒体输入 |
+| 模型 ID | 动作 | 分辨率 | 时长（秒） | 可传的媒体输入 |
 |---|---|---|---|---|
-| `flux-3-video` | 标准 | `hd` `fhd` | `5`–`20` | `image_urls` 1–10 · `video_urls` ≤1 |
-| `flux-3-video-draft` | 草稿 | 仅 `hd` | `5`–`20` | `image_urls` 1–10 · `video_urls` ≤1 |
-
-两档共用同一套参数、同样的关键帧语义和同样的画幅集合，差别只在可用分辨率与单价。
+| `flux-3-video` | `generate` `finalize` | `hd` `fhd` | `5`–`20` | `image_urls` 1–10 · `video_urls` ≤1 |
+| `flux-3-video-draft` | `generate` | 仅 `hd` | `5`–`20` | `image_urls` 1–10 · `video_urls` ≤1 |
 
 ## 相关文档
 
