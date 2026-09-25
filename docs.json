@@ -188,7 +188,22 @@
                 "pages": [
                   "cn/api-reference/video/overview",
                   "cn/api-reference/video/veo",
-                  "cn/api-reference/video/seedance",
+                  {
+                    "group": "Seedance 系列",
+                    "root": "cn/api-reference/video/seedance",
+                    "pages": [
+                      {
+                        "group": "素材库",
+                        "root": "cn/api-reference/assets/overview",
+                        "pages": [
+                          "cn/api-reference/assets/create",
+                          "cn/api-reference/assets/list",
+                          "cn/api-reference/assets/get",
+                          "cn/api-reference/assets/delete"
+                        ]
+                      }
+                    ]
+                  },
                   "cn/api-reference/video/kling",
                   "cn/api-reference/video/hailuo",
                   "cn/api-reference/video/minimax-h3",
@@ -232,16 +247,6 @@
                   "cn/api-reference/task/submit",
                   "cn/api-reference/task/status",
                   "cn/api-reference/task/cancel"
-                ]
-              },
-              {
-                "group": "素材管理",
-                "pages": [
-                  "cn/api-reference/assets/overview",
-                  "cn/api-reference/assets/create",
-                  "cn/api-reference/assets/list",
-                  "cn/api-reference/assets/get",
-                  "cn/api-reference/assets/delete"
                 ]
               },
               {
@@ -355,7 +360,22 @@
                 "pages": [
                   "en/api-reference/video/overview",
                   "en/api-reference/video/veo",
-                  "en/api-reference/video/seedance",
+                  {
+                    "group": "Seedance Series",
+                    "root": "en/api-reference/video/seedance",
+                    "pages": [
+                      {
+                        "group": "Asset library",
+                        "root": "en/api-reference/assets/overview",
+                        "pages": [
+                          "en/api-reference/assets/create",
+                          "en/api-reference/assets/list",
+                          "en/api-reference/assets/get",
+                          "en/api-reference/assets/delete"
+                        ]
+                      }
+                    ]
+                  },
                   "en/api-reference/video/kling",
                   "en/api-reference/video/hailuo",
                   "en/api-reference/video/minimax-h3",
@@ -399,16 +419,6 @@
                   "en/api-reference/task/submit",
                   "en/api-reference/task/status",
                   "en/api-reference/task/cancel"
-                ]
-              },
-              {
-                "group": "Asset Management",
-                "pages": [
-                  "en/api-reference/assets/overview",
-                  "en/api-reference/assets/create",
-                  "en/api-reference/assets/list",
-                  "en/api-reference/assets/get",
-                  "en/api-reference/assets/delete"
                 ]
               },
               {
