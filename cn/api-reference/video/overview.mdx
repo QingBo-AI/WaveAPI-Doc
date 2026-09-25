@@ -29,7 +29,7 @@ POST https://api.qingbo.ai/v1/tasks
     MiniMax 海螺 02 / 2.3 / 2.3 Fast，文生、首帧与首尾帧
   </Card>
   <Card title="MiniMax H3" href="/cn/api-reference/video/minimax-h3">
-    MiniMax H3 文生 / 参考生视频，H3 Regeneration 把成片重渲染为原生 2K
+    MiniMax H3 / H3 Max 文生 / 参考生视频，H3 Regeneration 把成片重渲染为原生 2K
   </Card>
   <Card title="Vidu Q3 系列" href="/cn/api-reference/video/vidu">
     生数科技 Vidu Q3 / Q3 Mix / Q3 Pro / Q3 Turbo，起始帧、首尾帧与参考图
@@ -53,7 +53,7 @@ POST https://api.qingbo.ai/v1/tasks
     PixVerse V6，可选生成带声音视频
   </Card>
   <Card title="Omni 视频系列" href="/cn/api-reference/video/omni/overview">
-    Omni-Flash-Ext 视频续写扩展，Gemini Omni 1.1 Flash / Flash Preview 由模型决定时长
+    Omni-Flash-Ext 固定时长档（首帧、参考图、参考视频作动作参考），Gemini Omni 1.1 Flash / Flash Preview 由模型决定时长
   </Card>
 </CardGroup>
 
@@ -162,8 +162,8 @@ POST https://api.qingbo.ai/v1/tasks
 | **首尾帧** | `first_frame_image + last_frame_image`(Kling 用 `image_urls` 传两张) | Seedance / Kling / Veo / Vidu / SkyReels / Hailuo 02 / Wan 3.0 / Gemini Omni 1.1 Flash |
 | **参考生视频(R2V)** | `image_urls`(多图) | Seedance / Kling Omni / Vidu / SkyReels / HappyHorse / Wan 2.7 R2V / Omni |
 | **视频参考(R2V 视频)** | `+ video_urls`(参考视频) | Seedance 2.x / Kling / SkyReels / Wan / MiniMax H3 / Omni |
-| **视频续写** | `video_urls`(单段)或 `ref_task_id` | Omni / FLUX 3 Video / Veo 逆向版(`extend`)/ Seedance 2.5(`extend`) |
-| **视频编辑(EDIT)** | `video_urls + prompt`(可加 `image_urls` 作风格参考) | Wan VideoEdit / HappyHorse 1.0 / Seedance 2.5 / Kling v3 Omni · Video O1 |
+| **视频续写** | `video_urls`(单段)或 `ref_task_id` | Omni / FLUX 3 Video / Veo 逆向版(`extend`)/ Seedance 2.5(`extend`)/ SkyReels V4(`extend`)/ PixVerse V6(`extend`) |
+| **视频编辑(EDIT)** | `video_urls + prompt`(可加 `image_urls` 作风格参考) | Wan VideoEdit / HappyHorse 1.0 / Seedance 2.5 / Kling v3 Omni · Video O1 / Grok Imagine Video |
 | **音频参考** | `+ audio_urls` | HappyHorse / Wan / SkyReels / Seedance 2.x / MiniMax H3 |
 
 <Note>

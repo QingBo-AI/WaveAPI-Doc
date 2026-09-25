@@ -1,10 +1,10 @@
 ---
 title: "Grok Imagine Video 系列"
-description: "xAI Grok Imagine 视频生成：官方版与经济版共三个模型，按分辨率档 × 秒数计费"
+description: "xAI Grok Imagine 视频生成：官方版与经济版共三个模型，文生、图生与视频编辑，按分辨率档 × 秒数计费"
 api: "POST https://api.qingbo.ai/v1/tasks"
 ---
 
-xAI 的 Grok Imagine 视频线，当前有三个模型 ID，全部通过统一任务接口 `POST /v1/tasks` 提交，只有 `generate` 一个动作，也全部按输出分辨率档乘生成秒数计费。官方线路的 `grok-imagine-video-1.5` 最高到 1080p、时长从 1 秒起，`grok-imagine-video` 还接受参考视频，两者的参考图都按张另计；经济版的 `grok-imagine-video-1.5-rev` 只有 480p / 720p、时长从 6 秒起，参考图不加价。图像生成见 [Grok Imagine 系列](/cn/api-reference/image/grok-imagine)。
+xAI 的 Grok Imagine 视频线，共三个模型 ID。官方版 `grok-imagine-video-1.5` 最高 1080p、时长从 1 秒起，可传多张参考图；官方版 `grok-imagine-video` 支持 480p / 720p 生成，另有视频编辑动作 `edit`；经济版 `grok-imagine-video-1.5-rev` 只有 480p / 720p、时长从 6 秒起，最多 7 张参考图且不加价。图像生成见 [Grok Imagine 系列](/cn/api-reference/image/grok-imagine)。
 
 ## 快速开始
 
@@ -25,7 +25,7 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
   }'
 ```
 
-```bash 图生视频
+```bash 多图参考
 curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
@@ -33,11 +33,26 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
   -d '{
     "model": "grok-imagine-video-1.5",
     "action": "generate",
-    "prompt": "人物缓缓转头看向镜头，光线保持不变",
-    "image_urls": ["https://cdn.example.com/portrait.jpg"],
+    "prompt": "第一张图的人物穿着第二张图的外套，缓缓转头看向镜头",
+    "image_urls": [
+      "https://cdn.example.com/portrait.jpg",
+      "https://cdn.example.com/coat.jpg"
+    ],
     "duration": 6,
     "resolution": "720p",
     "aspect_ratio": "9:16"
+  }'
+```
+
+```bash 视频编辑
+curl -X POST https://api.qingbo.ai/v1/tasks \
+  -H "Authorization: Bearer $WAVE_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "grok-imagine-video",
+    "action": "edit",
+    "prompt": "把画面改成水彩风格，人物动作保持不变",
+    "video_urls": ["https://cdn.example.com/source.mp4"]
   }'
 ```
 
@@ -62,7 +77,7 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
 
 </CodeGroup>
 
-提交成功后返回 `task_id`。用 [`GET /v1/tasks/{task_id}`](/cn/api-reference/task/status) 查询结果，也可以用 [`Prefer: wait`](/cn/api-reference/task/submit#请求内等待prefer-wait) 在一次调用里等待，或配置 Webhook。视频任务耗时较长，生产环境建议配 `callback_url`。
+提交成功后返回 `task_id`。用 [`GET /v1/tasks/{task_id}`](/cn/api-reference/task/status) 查询结果，也可以用 [`Prefer: wait`](/cn/api-reference/task/submit#请求内等待prefer-wait) 在一次调用里等待，或配置 Webhook。
 
 ## 请求参数
 
@@ -71,31 +86,32 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
 </ParamField>
 
 <ParamField body="action" type="string" default="generate">
-  `generate` 是三个模型唯一支持的动作。文生视频、图生视频都走它，区别只在传不传 `image_urls`。
+  - `generate`：文生视频或图生视频，三个模型都支持；传 `image_urls` 即为图生视频
+  - `edit`：视频编辑，只有 `grok-imagine-video` 支持；必须提供 `video_urls`
 </ParamField>
 
 <ParamField body="prompt" type="string" required>
-  视频内容描述，中英文均可。带参考图时作为运动与风格引导。
+  视频内容描述或编辑指令，中英文均可。
 </ParamField>
 
-<ParamField body="duration" type="integer" required>
-  输出时长（秒），整数。`grok-imagine-video` 和 `grok-imagine-video-1.5` 取 `1`–`15`；`grok-imagine-video-1.5-rev` 取 `6`–`15`。时长是计费维度之一，不传无法定价。
+<ParamField body="duration" type="integer">
+  输出时长（秒），整数，`action: "generate"` 时必填。`grok-imagine-video` 和 `grok-imagine-video-1.5` 取 `1`–`15`；`grok-imagine-video-1.5-rev` 取 `6`–`15`。`action: "edit"` 不传或传 `0`，输出时长跟随源视频。
 </ParamField>
 
 <ParamField body="resolution" type="string" default="480p">
-  输出分辨率。`grok-imagine-video-1.5` 支持 `480p`、`720p`、`1080p`；其余两个模型支持 `480p` 和 `720p`。
+  输出分辨率。`grok-imagine-video-1.5` 支持 `480p`、`720p`、`1080p`；其余两个模型支持 `480p` 和 `720p`。`action: "edit"` 不生效，输出沿用源视频分辨率（最高 `720p`）。
 </ParamField>
 
 <ParamField body="aspect_ratio" type="string">
-  画面比例，取值集合按模型不同，见[可用模型](#可用模型)。`grok-imagine-video-1.5` 默认 `auto`，由模型决定构图；`grok-imagine-video` 和 `grok-imagine-video-1.5-rev` 默认 `16:9`。
+  画面比例，取值集合按模型不同，见[可用模型](#可用模型)。`grok-imagine-video-1.5` 默认 `auto`，带参考图时必须指定具体比例；`grok-imagine-video` 和 `grok-imagine-video-1.5-rev` 默认 `16:9`。`action: "edit"` 不生效，沿用源视频画幅。
 </ParamField>
 
 <ParamField body="image_urls" type="string[]">
-  参考图 URL 数组，需公网可访问。传入即为图生视频。`grok-imagine-video-1.5` 最多 1 张，`grok-imagine-video-1.5-rev` 最多 7 张。
+  参考图 URL 数组，需公网可访问，只用于 `action: "generate"`。`grok-imagine-video` 与 `grok-imagine-video-1.5` 可传多张；`grok-imagine-video-1.5-rev` 最多 7 张。
 </ParamField>
 
 <ParamField body="video_urls" type="string[]">
-  参考视频 URL 数组，只有 `grok-imagine-video` 接受。
+  源视频 URL 数组，只有 `grok-imagine-video` 的 `action: "edit"` 接受；1 条，最长 8.7 秒。
 </ParamField>
 
 通用的 `callback_url`、`callback_events`、`Prefer: wait`、`Idempotency-Key` 和费用上限请求头见[提交任务](/cn/api-reference/task/submit)。
@@ -107,28 +123,36 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
 | 模型 | 条件 | 限制 |
 |---|---|---|
 | `grok-imagine-video` | 每次请求 | 本模型一次任务只产出一个结果，不支持用 n 批量生成 |
+| `grok-imagine-video` | `action: "generate"` | generate 不接受源视频；编辑视频请用 edit。 |
+| `grok-imagine-video` | `action: "edit"` | 视频编辑需要且只接受一条源视频（最长 8.7 秒），不接受参考图。输出沿用源视频的时长、画幅和分辨率（最高 720p），因此不能指定 duration（不传或传 0），resolution / aspect_ratio 不生效。 |
 | `grok-imagine-video-1.5` | 每次请求 | 视频接口不支持 n。 |
 | `grok-imagine-video-1.5` | 素材输入 | 该组不接收视频或音频输入。 |
 | `grok-imagine-video-1.5` | 音频生成 | 供应商未公开音频控制参数。 |
+| `grok-imagine-video-1.5` | 提供了 `image_urls` | 带参考图时需要指定具体画幅比例（1:1 / 16:9 / 9:16 / 4:3 / 3:4 / 3:2 / 2:3），不支持 auto。 |
 | `grok-imagine-video-1.5-rev` | 每次请求 | 视频接口不支持 n。 |
 | `grok-imagine-video-1.5-rev` | 素材输入 | 该组不接收视频或音频输入。 |
 | `grok-imagine-video-1.5-rev` | 音频生成 | 供应商未公开音频控制参数。 |
 
 ## 计费
 
-三个模型都按**分辨率档 × 秒数**计费：每个分辨率档有各自的每秒价，乘以请求里的 `duration`。分辨率与时长是仅有的两个基础维度，提交前即可确定单次费用。
+按**分辨率档 × 秒数**计费，每个分辨率档有各自的每秒价。
 
-| 模型 | 计费维度 |
+| 模型 · 动作 | 计费维度 |
 |---|---|
-| `grok-imagine-video` | `480p` / `720p` 两档每秒价 × `duration`；参考图另计一笔按张的费用，与时长无关；带 `video_urls` 时计费口径不变 |
-| `grok-imagine-video-1.5` | `480p` / `720p` / `1080p` 三档每秒价 × `duration`；参考图另计一笔按张的费用，与时长无关 |
-| `grok-imagine-video-1.5-rev` | `480p` / `720p` 两档每秒价 × `duration`；参考图不加价 |
+| `grok-imagine-video` · `generate` | `480p` / `720p` 每秒价 × 输出秒数；参考图按张另计 |
+| `grok-imagine-video` · `edit` | 编辑档每秒价 × 实际输出秒数 + 源视频每秒价 × 源视频秒数 |
+| `grok-imagine-video-1.5` · `generate` | `480p` / `720p` / `1080p` 每秒价 × `duration`；参考图按张另计 |
+| `grok-imagine-video-1.5-rev` · `generate` | `480p` / `720p` 每秒价 × `duration`；参考图不加价 |
 
-`resolution` 不在该模型支持的档位内时，按基础每秒价结算（等于 `480p` 档）。
+`grok-imagine-video` 提交时冻结额度（`edit` 按时长上限冻结），完成后按实际生成结果结算退差。
 
-单价见 `GET /v1/models` 返回的 `price_config`，或控制台「模型市场」。单次调用的实际花费见任务响应里的 `cost`——整数 quota，**500,000 quota = 1 USD**，不是美元。
+<Note>
+各模型的单价见 `GET /v1/models` 返回的 `price_config`，或控制台「模型市场」。
 
-只有成功出片才计费。任务失败、取消，或没有返回可用视频时，全额退款。
+看这一单实际花了多少：任务响应里的 `cost`（整数 quota，500,000 quota = 1 USD）。
+</Note>
+
+只有成功出片才计费。任务失败、取消，或没有返回可用视频时，全额退款。最终费用以任务响应里的 `cost` 为准，它是整数 quota 不是美元。
 
 ## 响应
 
@@ -162,19 +186,17 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
 
 ## 可用模型
 
-| 模型 ID | 分辨率 | 时长（秒） | 画幅 | 参考图 |
+| 模型 ID | 动作 | 分辨率 | 时长（秒） | 参考图 |
 |---|---|---|---|---|
-| `grok-imagine-video` | `480p` `720p` | 1–15 | 7 种 | 可传，按张另计 |
-| `grok-imagine-video-1.5` | `480p` `720p` `1080p` | 1–15 | 8 种 | 最多 1 张，按张另计 |
-| `grok-imagine-video-1.5-rev` | `480p` `720p` | 6–15 | 5 种 | 最多 7 张，不加价 |
-
-只有 `grok-imagine-video` 接受参考视频（`video_urls`）。
+| `grok-imagine-video` | `generate` `edit` | `480p` `720p` | 1–15；`edit` 跟随源视频 | 可传多张，按张另计 |
+| `grok-imagine-video-1.5` | `generate` | `480p` `720p` `1080p` | 1–15 | 可传多张，按张另计 |
+| `grok-imagine-video-1.5-rev` | `generate` | `480p` `720p` | 6–15 | 最多 7 张，不加价 |
 
 画幅取值集合：
 
-- **8 种**（`grok-imagine-video-1.5`）：`auto`、`1:1`、`16:9`、`9:16`、`4:3`、`3:4`、`3:2`、`2:3`
-- **7 种**（`grok-imagine-video`）：`1:1`、`16:9`、`9:16`、`4:3`、`3:4`、`3:2`、`2:3`
-- **5 种**（`grok-imagine-video-1.5-rev`）：`16:9`、`9:16`、`1:1`、`3:2`、`2:3`
+- `grok-imagine-video-1.5`：`auto`、`1:1`、`16:9`、`9:16`、`4:3`、`3:4`、`3:2`、`2:3`（带参考图时不能用 `auto`）
+- `grok-imagine-video`：`1:1`、`16:9`、`9:16`、`4:3`、`3:4`、`3:2`、`2:3`
+- `grok-imagine-video-1.5-rev`：`16:9`、`9:16`、`1:1`、`3:2`、`2:3`
 
 ## 与官方线路的区别
 
@@ -182,8 +204,8 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
 
 - **分辨率**：`1080p` 只有 `grok-imagine-video-1.5` 有，经济版最高 `720p`。
 - **时长**：官方两个模型从 1 秒起，经济版从 6 秒起，上限都是 15 秒。
-- **参考图**：官方两个模型按张另计，其中 `grok-imagine-video-1.5` 最多 1 张；`grok-imagine-video-1.5-rev` 最多 7 张，不加价。
-- **参考视频**：只有 `grok-imagine-video` 接受 `video_urls`。
+- **参考图**：官方两个模型按张另计；`grok-imagine-video-1.5-rev` 最多 7 张，不加价。
+- **视频编辑**：只有 `grok-imagine-video` 支持 `action: "edit"`。
 
 ## 相关文档
 

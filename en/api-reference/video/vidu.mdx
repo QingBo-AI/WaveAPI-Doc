@@ -97,7 +97,7 @@ A successful submission returns a `task_id`. Retrieve the result with [`GET /v1/
 <ParamField body="image_urls" type="string[]">
   Image URLs.
 
-  - `vidu-q3`, `vidu-q3-mix`: reference images, required; they decide the subject, style and setting
+  - `vidu-q3`, `vidu-q3-mix`: reference images, required, 1–7; they decide characters, subjects, props and style
   - `vidu-q3-pro`, `vidu-q3-turbo`: optional, at most 2 — one image is the start frame, two are the first and last frame
 </ParamField>
 
@@ -112,9 +112,10 @@ A successful submission returns a `task_id`. Retrieve the result with [`GET /v1/
 <ParamField body="resolution" type="string">
   Output resolution.
 
-  - `vidu-q3`: `540p`, `720p` or `1080p`
+  - `vidu-q3`, `vidu-q3-pro`, `vidu-q3-turbo`: `540p`, `720p` or `1080p`
   - `vidu-q3-mix`: `720p` or `1080p`
-  - `vidu-q3-pro`, `vidu-q3-turbo`: `540p`, `720p` or `1080p`, default `720p`
+
+  All four models default to `720p`.
 </ParamField>
 
 <ParamField body="aspect_ratio" type="string">
@@ -138,7 +139,7 @@ None of the four models accepts `first_frame_image`, `last_frame_image` (frames 
 | Model | Condition | Limit |
 |---|---|---|
 | `vidu-q3` `vidu-q3-mix` | Per request | This model produces one result per task; n is not supported |
-| `vidu-q3` `vidu-q3-mix` | Per request | `image_urls` is required |
+| `vidu-q3` `vidu-q3-mix` | Per request | `image_urls` is required, up to 7 images |
 | `vidu-q3-pro` `vidu-q3-turbo` | Per request | One video per task; at most 2 images (1 = start frame, 2 = first and last frame). |
 | `vidu-q3-pro` `vidu-q3-turbo` | `image_urls` sent | With input images the aspect ratio follows the image; aspect_ratio cannot be sent. |
 
@@ -146,12 +147,12 @@ None of the four models accepts `first_frame_image`, `last_frame_image` (frames 
 
 Billed by **resolution tier times seconds**: the resolution sets the per-second rate, `duration` sets the number of seconds, and their product is the cost of the call — known before you submit. The four models have different per-second rates, and within a model a higher resolution costs more.
 
-`generate_audio`, `seed`, the aspect ratio and the number of reference images do not affect the price. `vidu-q3-pro` and `vidu-q3-turbo` bill at their `720p` default tier when `resolution` is omitted.
+`generate_audio`, `seed`, the aspect ratio and the number of reference images do not affect the price. Without `resolution` the `720p` default tier applies.
 
 <Note>
-**This page does not list unit prices** — rates change upstream, so this section covers billing dimensions and how they are applied.
+Per-model rates are in `price_config` on `GET /v1/models`, and in the console's Model Market.
 
-Current rates are in `price_config` on `GET /v1/models` and in the console's Model Market. What a single call actually cost is the `cost` field on the task response: an integer quota, **500,000 quota = 1 USD**.
+What a single call actually cost is the `cost` field on the task response — an integer quota at 500,000 quota = 1 USD.
 </Note>
 
 You are only billed for a video that is produced. Failed and cancelled tasks, and tasks that return no usable video, are refunded in full.
@@ -190,8 +191,8 @@ You are only billed for a video that is produced. Failed and cancelled tasks, an
 
 | Model ID | Resolutions | Duration (s) | Image input | Notes |
 |---|---|---|---|---|
-| `vidu-q3` | `540p` `720p` `1080p` | 3–16 | Reference images, required | Reference-to-video with multi-shot cutting |
-| `vidu-q3-mix` | `720p` `1080p` | 1–16 | Reference images, required | Blends several references into one coherent clip |
+| `vidu-q3` | `540p` `720p` `1080p` | 3–16 | 1–7 reference images, required | Reference-to-video that keeps referenced subjects consistent, multi-shot cutting |
+| `vidu-q3-mix` | `720p` `1080p` | 1–16 | 1–7 reference images, required | Blends several references into one coherent clip |
 | `vidu-q3-pro` | `540p` `720p` `1080p` | 1–16 | Optional, at most 2 | Text / start frame / first and last frame, audio on by default |
 | `vidu-q3-turbo` | `540p` `720p` `1080p` | 1–16 | Optional, at most 2 | Same capabilities as Pro, faster tier at a lower rate |
 

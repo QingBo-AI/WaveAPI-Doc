@@ -2,6 +2,39 @@
 title: "Model Updates"
 ---
 
+<Update label="2026-09-24" description="Capability update">
+**Asset library launched · Seedance asset references**
+
+- New `/v1/assets` endpoints: upload image, video and audio links as assets; once approved, reference them in generation requests as `asset://<asset ID>`.
+- Supported models: `seedance-2.0` · `seedance-2.0-fast` · `seedance-2.0-mini` · `seedance-2.5`. Real-person portraits used as references must be uploaded as assets first.
+- Asset endpoints are free; up to 500 assets per account.
+- **Docs**: [Asset library](/en/api-reference/assets/overview) · [Seedance series](/en/api-reference/video/seedance)
+</Update>
+
+<Update label="2026-09-24" description="Model launch">
+**MiniMax H3 Max launched · Video**
+
+- **Model ID**: `minimax-h3-max`
+- The high-quality tier of MiniMax H3: 480P / 768P / 1080P, with reference images, reference video and reference audio.
+- **Docs**: [MiniMax H3](/en/api-reference/video/minimax-h3)
+</Update>
+
+<Update label="2026-09-24" description="Capability update">
+**Video models: Veo / Kling 4K, SkyReels / PixVerse extension, FLUX 3 Video finalize, Grok video editing**
+
+- Veo 3.1: 4K added to `veo3.1-fast` / `veo3.1-quality` / `veo3.1-lite` / `veo3.1-fast-rev` / `veo3.1-quality-rev`; economy extensions accept `resolution` (a 4K extension needs a 4K parent); `enable_gif` cannot be combined with 1080p / 4K.
+- Kling: 4K on `kling-v3` / `kling-v3-omni`; `kling-v3-omni` takes up to 7 reference images, cited in the prompt as `<<<image_N>>>`.
+- SkyReels V4: 1080p with a reference video; new `extend` action.
+- PixVerse V6: new `extend` action using `ref_task_id`; default resolution is now 540p.
+- FLUX 3 Video: `flux-3-video` adds `finalize` to turn a `flux-3-video-draft` draft into the final video.
+- Grok Imagine Video: `grok-imagine-video` adds `edit`; `grok-imagine-video-1.5` accepts multiple reference images (an explicit aspect ratio is required).
+- Seedance: `seedance-2.5` accepts `duration: 0` for a model-chosen length; on `seedance-1.5-pro` and the three 2.0 tiers, `image_with_roles` cannot be combined with `image_urls`.
+- Wan: `wan3.0-video` / `wan3.0-video-prime` support a model-chosen length; `wan2.7-r2v` reference clips 1–30 s each; `wan2.5-preview` always generates audio.
+- Hailuo: `minimax-hailuo-2.3` / `-2.3-fast` no longer accept `seed`.
+- Vidu: `vidu-q3` / `vidu-q3-mix` take up to 7 reference images; all four models default to 720p.
+- **Docs**: [Veo series](/en/api-reference/video/veo) · [Kling series](/en/api-reference/video/kling) · [SkyReels V4 series](/en/api-reference/video/skyreels) · [PixVerse V6](/en/api-reference/video/pixverse) · [FLUX 3 Video](/en/api-reference/video/flux/flux-3-video) · [Grok Imagine Video series](/en/api-reference/video/grok-imagine-video) · [Seedance series](/en/api-reference/video/seedance) · [Wan series](/en/api-reference/video/wan) · [Hailuo series](/en/api-reference/video/hailuo) · [Vidu Q3 series](/en/api-reference/video/vidu)
+</Update>
+
 <Update label="2026-09-24" description="Model delisted">
 **Sora 2 series delisted · Video**
 

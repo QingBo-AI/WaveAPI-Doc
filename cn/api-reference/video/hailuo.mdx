@@ -1,6 +1,6 @@
 ---
 title: "Hailuo 系列"
-description: "MiniMax 海螺视频：Hailuo 02、2.3 与 2.3 Fast，文生视频与首帧 / 首尾帧生视频"
+description: "MiniMax 海螺视频：Hailuo 02、2.3 与 2.3 Fast，文生视频与首帧 / 首尾帧生视频，按分辨率 × 时长档整片计费"
 api: "POST https://api.qingbo.ai/v1/tasks"
 ---
 
@@ -108,10 +108,6 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
   尾帧图片 URL，与 `first_frame_image` 配合做「从 A 变到 B」。只有 `minimax-hailuo-02` 支持。
 </ParamField>
 
-<ParamField body="seed" type="integer">
-  随机种子。同一组参数配同一个种子会得到接近的结果。只有 `minimax-hailuo-2.3` 和 `minimax-hailuo-2.3-fast` 支持。
-</ParamField>
-
 <ParamField body="prompt_optimizer" type="boolean" default="true">
   自动优化提示词。
 </ParamField>
@@ -126,7 +122,7 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
 
 通用的 `callback_url`、`callback_events`、`Prefer: wait`、`Idempotency-Key` 和费用上限请求头见[提交任务](/cn/api-reference/task/submit)。
 
-本页三个模型都不接受 `image_urls`、`video_urls`、`audio_urls`、`aspect_ratio`、`n` 和 `negative_prompt`；`minimax-hailuo-02` 另外不接受 `seed`，`minimax-hailuo-2.3` 与 `minimax-hailuo-2.3-fast` 不接受 `last_frame_image`。以上之外的参数会返回 `400`，不计费。
+本页三个模型都不接受 `image_urls`、`video_urls`、`audio_urls`、`aspect_ratio`、`n`、`seed` 和 `negative_prompt`；`minimax-hailuo-2.3` 与 `minimax-hailuo-2.3-fast` 不接受 `last_frame_image`。以上之外的参数会返回 `400`，不计费。
 
 ## 限制
 
@@ -144,17 +140,23 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
 
 ## 计费
 
-按**分辨率档 × 秒数**计费：分辨率决定每秒单价，`duration` 决定秒数，两者相乘就是这一单的费用，提交前即可确定。三个模型的每秒单价各不相同，同一个模型内 `1080p` 比 `768p` 贵、`768p` 比 `512p` 贵。
+按**分辨率 × 时长档的整片价**计费，不按秒：每个分辨率与时长的组合是一档固定价，提交前即可确定单次费用。
 
-`prompt_optimizer`、`fast_pretreatment`、`watermark`、`seed` 和首帧 / 尾帧图片都不影响价格。
+| 模型 ID | 计费档位 |
+|---|---|
+| `minimax-hailuo-02` | `512p` 5 秒 / 10 秒，`768p` 5 秒 / 10 秒，`1080p` 5 秒 |
+| `minimax-hailuo-2.3` | `768p` 6 秒 / 10 秒，`1080p` 6 秒 |
+| `minimax-hailuo-2.3-fast` | `768p` 6 秒 / 10 秒，`1080p` 6 秒 |
+
+不传 `resolution` 或 `duration` 时按默认值（`768p`，5 秒或 6 秒）对应的档位计。`prompt_optimizer`、`fast_pretreatment`、`watermark` 和首帧 / 尾帧图片都不影响价格。
 
 <Note>
-**本页不列具体单价**——单价会随上游调整，这里只讲计费维度与口径。
+各模型的单价见 `GET /v1/models` 返回的 `price_config`，或控制台「模型市场」。
 
-实时单价见 `GET /v1/models` 返回的 `price_config`，或控制台「模型市场」。单次调用的实际费用见任务响应里的 `cost`：整数 quota，**500,000 quota = 1 USD**。
+看这一单实际花了多少：任务响应里的 `cost`（整数 quota，500,000 quota = 1 USD）。
 </Note>
 
-只有成功出片才计费。任务失败、取消，或没有返回可用视频时，全额退款。
+只有成功出片才计费。任务失败、取消，或没有返回可用视频时，全额退款。最终费用以任务响应里的 `cost` 为准，它是整数 quota 不是美元。
 
 ## 响应
 
@@ -191,7 +193,7 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
 | 模型 ID | 分辨率 | 时长（秒） | 模式 | 备注 |
 |---|---|---|---|---|
 | `minimax-hailuo-02` | `512p` `768p`（默认）`1080p` | 5（默认）/ 10 | 文生视频、首帧、首尾帧 | `512p` 需要首帧；`1080p` 仅 5 秒 |
-| `minimax-hailuo-2.3` | `768p`（默认）`1080p` | 6（默认）/ 10 | 文生视频、首帧 | 支持运镜标签与 `seed` |
+| `minimax-hailuo-2.3` | `768p`（默认）`1080p` | 6（默认）/ 10 | 文生视频、首帧 | 支持运镜标签 |
 | `minimax-hailuo-2.3-fast` | `768p`（默认）`1080p` | 6（默认）/ 10 | 首帧（必填） | 2.3 的加速档，单价更低 |
 
 ## 使用示例

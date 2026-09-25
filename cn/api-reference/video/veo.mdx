@@ -1,10 +1,10 @@
 ---
 title: "Veo 系列"
-description: "Google Veo 3.1：官方版按秒计费的 4 / 6 / 8 秒生成，经济版按整片固定价并支持续写"
+description: "Google Veo 3.1：官方版按秒计费的 4 / 6 / 8 秒生成，经济版按整片固定价并支持续写，两条线路都支持 4K"
 api: "POST https://api.qingbo.ai/v1/tasks"
 ---
 
-Google Veo 3.1 的视频模型线，分两条线路。官方版 `veo3.1-fast` 与 `veo3.1-quality` 支持 4 / 6 / 8 秒、首尾帧、原生音频和 `seed`，按秒计费；经济版 `veo3.1-lite`、`veo3.1-fast-rev`、`veo3.1-quality-rev` 通过聚合供应商接入，固定输出 8 秒、按整片固定价计费，两个 `-rev` 档还能把自己生成的视频接着往下续写。两条线路参数集合与计费方式都不同，不会自动互相切换。
+Google Veo 3.1 的视频模型线，分两条线路。官方版 `veo3.1-fast` 与 `veo3.1-quality` 支持 4 / 6 / 8 秒、首尾帧、原生音频和 `seed`，按秒计费；经济版 `veo3.1-lite`、`veo3.1-fast-rev`、`veo3.1-quality-rev` 通过聚合供应商接入，固定输出 8 秒、按整片固定价计费，两个 `-rev` 档还能把自己生成的视频接着往下续写。其中 `veo3.1-lite`（Veo 3.1 Lite 经济版）属于经济版，不是 Google 官方版的 Veo 3.1 Lite。两条线路都提供 `720p`、`1080p`、`4k` 三档分辨率；参数集合与计费方式都不同，不会自动互相切换。
 
 ## 快速开始
 
@@ -117,6 +117,7 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
     "action": "extend",
     "ref_task_id": "task-wave1775285160b950328499",
     "prompt": "镜头继续向前，走进店内",
+    "resolution": "720p",
     "raw": false
   }'
 ```
@@ -125,7 +126,7 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
 
 提交成功后返回 `task_id`。用 [`GET /v1/tasks/{task_id}`](/cn/api-reference/task/status) 查询结果，也可以用 [`Prefer: wait`](/cn/api-reference/task/submit#请求内等待prefer-wait) 在一次调用里等待，或配置 Webhook。
 
-**接着往下做**：续写分两步。先用 `veo3.1-fast-rev` 或 `veo3.1-quality-rev` 提交 `action: "generate"` 拿到 `task_id`；等这个任务 `completed` 之后，把它的 `task_id` 作为 `ref_task_id` 提交 `action: "extend"`。`ref_task_id` 用的是上一步任务返回的 `task_id`，不是上游 ID，且必须是同一个模型、同一个 API Key 下已完成的 `generate` 任务。
+**接着往下做**：续写分两步。先用 `veo3.1-fast-rev` 或 `veo3.1-quality-rev` 提交 `action: "generate"` 拿到 `task_id`；等这个任务 `completed` 之后，把它的 `task_id` 作为 `ref_task_id` 提交 `action: "extend"`。`ref_task_id` 用的是上一步任务返回的 `task_id`，不是上游 ID，且必须是同一个模型、同一个 API Key 下已完成的 `generate` 任务。续写默认输出 `720p`；要 `4k` 续写，父任务本身也必须是 `4k`。
 
 ## 请求参数
 
@@ -145,11 +146,11 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
 </ParamField>
 
 <ParamField body="duration" type="integer">
-  输出时长（秒），`action: "generate"` 时必填。官方版取 `4`、`6` 或 `8`，其中 `resolution: "1080p"` 只支持 `8`；经济版固定为 `8`。`action: "extend"` 不接受这个参数，续写时长由上游决定。
+  输出时长（秒），`action: "generate"` 时必填。官方版取 `4`、`6` 或 `8`，其中 `resolution` 为 `1080p` 或 `4k` 时只支持 `8`；经济版固定为 `8`。`action: "extend"` 不接受这个参数，续写时长由上游决定。
 </ParamField>
 
 <ParamField body="resolution" type="string" default="720p">
-  输出分辨率：`720p` 或 `1080p`。
+  输出分辨率：`720p`、`1080p` 或 `4k`。`action: "extend"` 时同样可传，默认 `720p`；`4k` 续写要求父任务也是 `4k`。
 </ParamField>
 
 <ParamField body="aspect_ratio" type="string" default="16:9">
@@ -200,7 +201,7 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
 </ParamField>
 
 <ParamField body="enable_gif" type="boolean" default="false">
-  额外输出一份 GIF。不能与 `resolution: "1080p"` 同时使用。
+  额外输出一份 GIF。不能与 `resolution` 为 `1080p` 或 `4k` 同时使用。
 </ParamField>
 
 <ParamField body="ref_task_id" type="string" required>
@@ -221,12 +222,13 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
 |---|---|---|
 | 全部 | `action: "generate"` | 视频生成必须提供提示词和时长。 |
 | `veo3.1-fast`、`veo3.1-quality` | 提供了 `last_frame_image` | 尾帧必须与首帧一起提供。 |
-| `veo3.1-fast`、`veo3.1-quality` | `resolution: "1080p"` | 1080p 仅支持 8 秒。 |
+| `veo3.1-fast`、`veo3.1-quality` | `resolution` 为 `1080p` 或 `4k` | 1080p 与 4K 仅支持 8 秒。 |
 | `veo3.1-fast-rev`、`veo3.1-quality-rev` | `action: "generate"` | 经济版生成固定为 8 秒。 |
-| `veo3.1-fast-rev`、`veo3.1-quality-rev` | `action: "extend"` | 续写只接受父任务、提示词和 raw。 |
+| `veo3.1-fast-rev`、`veo3.1-quality-rev` | `action: "extend"` | 续写只接受父任务、提示词、raw 与分辨率（默认 720p）；4K 续写要求父任务也是 4K。 |
 | `veo3.1-fast-rev`、`veo3.1-quality-rev` | 提供了 `image_urls` | 提供图片时必须声明 generation_type。 |
 | `veo3.1-fast-rev`、`veo3.1-quality-rev` | `generation_type: "frame"` | frame 模式接受一至两张图片。 |
 | `veo3.1-fast-rev` | `generation_type: "reference"` | reference 模式最多接受三张图片。 |
+| `veo3.1-lite`、`veo3.1-fast-rev`、`veo3.1-quality-rev` | `enable_gif: true` 且 `resolution` 为 `1080p` 或 `4k` | GIF 输出不能与 1080p 或 4K 同时使用。 |
 
 | 项目 | 模型 | 上限 |
 |---|---|---|
@@ -234,26 +236,24 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
 | 参考图张数 | `veo3.1-quality-rev` | 2 张 |
 | 参考图张数 | `veo3.1-lite` | 不接受图片 |
 | 首尾帧 | `veo3.1-fast`、`veo3.1-quality` | 首帧、尾帧各 1 张 |
-| 时长 | `veo3.1-fast`、`veo3.1-quality` | 4 / 6 / 8 秒，最长 8 秒 |
+| 时长 | `veo3.1-fast`、`veo3.1-quality` | 4 / 6 / 8 秒，最长 8 秒；`1080p`、`4k` 仅 8 秒 |
 | 时长 | `veo3.1-lite`、`veo3.1-fast-rev`、`veo3.1-quality-rev` | 固定 8 秒 |
 
 `action: "extend"` 的 `ref_task_id` 必须指向同一个模型下、状态已经是完成的 `generate` 任务；指向别的模型、别的动作或尚未完成的任务会返回 `400`，不计费。
 
 ## 计费
 
-两条线路的计费方式不同，选型时先看这一节。
-
 ### 官方版
 
-`veo3.1-fast` 与 `veo3.1-quality` 按**分辨率档 × 秒数**计费：`resolution` 决定档位（`720p` / `1080p`），秒数取请求里的 `duration`（`4`、`6` 或 `8`）。
+`veo3.1-fast` 与 `veo3.1-quality` 按**分辨率档 × 秒数**计费：`resolution` 决定档位（`720p` / `1080p` / `4k`），秒数取请求里的 `duration`（`4`、`6` 或 `8`；`1080p`、`4k` 只有 `8`）。
 
-`generate_audio: true` 时换成带声档的每秒单价，仍然只乘 `duration`。两个分辨率都有带声档。首尾帧、`negative_prompt`、`seed` 不影响价格。
+`generate_audio: true` 时换成带声档的每秒单价，仍然只乘 `duration`。三个分辨率都有带声档。首尾帧、`negative_prompt`、`seed` 不影响价格。
 
 ### 经济版
 
 `veo3.1-lite`、`veo3.1-fast-rev`、`veo3.1-quality-rev` 按**整片固定价**计费：一次生成一次收费，与时长无关（输出固定 8 秒），分辨率是唯一的分档维度，参考图张数与 `generation_type` 不影响价格。
 
-`action: "extend"` 同样按整片固定价计一次费用，与续写出来的长度无关；`raw` 取 `true` 或 `false` 不影响价格。
+`action: "extend"` 同样按整片固定价计一次费用，与续写出来的长度无关，档位取请求里的 `resolution`（不传按 `720p`）；`raw` 取 `true` 或 `false` 不影响价格。
 
 <Note>
 各模型的单价见 `GET /v1/models` 返回的 `price_config`，或控制台「模型市场」。
@@ -299,16 +299,16 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
 
 | 模型 ID | 时长 | 分辨率 | 图片输入 | 原生音频 |
 |---|---|---|---|---|
-| `veo3.1-fast` | 4 / 6 / 8 秒 | `720p` `1080p`（1080p 仅 8 秒） | 首帧 + 尾帧 | 支持 |
-| `veo3.1-quality` | 4 / 6 / 8 秒 | `720p` `1080p`（1080p 仅 8 秒） | 首帧 + 尾帧 | 支持 |
+| `veo3.1-fast` | 4 / 6 / 8 秒 | `720p` `1080p` `4k`（1080p、4k 仅 8 秒） | 首帧 + 尾帧 | 支持 |
+| `veo3.1-quality` | 4 / 6 / 8 秒 | `720p` `1080p` `4k`（1080p、4k 仅 8 秒） | 首帧 + 尾帧 | 支持 |
 
 **经济版** —— 整片固定价，固定输出 8 秒，不支持原生音频。
 
 | 模型 ID | 动作 | 分辨率 | 图片输入 | GIF |
 |---|---|---|---|---|
-| `veo3.1-lite` | `generate` | `720p` `1080p` | 不接受 | `enable_gif` |
-| `veo3.1-fast-rev` | `generate` `extend` | `720p` `1080p` | `frame` 1–2 张 / `reference` 1–3 张 | `enable_gif` |
-| `veo3.1-quality-rev` | `generate` `extend` | `720p` `1080p` | `frame` 1–2 张 | `enable_gif` |
+| `veo3.1-lite` | `generate` | `720p` `1080p` `4k` | 不接受 | `enable_gif`（仅 720p） |
+| `veo3.1-fast-rev` | `generate` `extend` | `720p` `1080p` `4k` | `frame` 1–2 张 / `reference` 1–3 张 | `enable_gif`（仅 720p） |
+| `veo3.1-quality-rev` | `generate` `extend` | `720p` `1080p` `4k` | `frame` 1–2 张 | `enable_gif`（仅 720p） |
 
 ## 相关文档
 

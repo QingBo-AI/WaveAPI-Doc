@@ -1,0 +1,147 @@
+---
+title: "Get asset"
+description: "GET /v1/assets/{asset_id} — get an asset's review status"
+api: "GET https://api.qingbo.ai/v1/assets/{asset_id}"
+---
+
+Get one of the account's assets. When `status` is `active`, the response includes `asset_url` for use in generation requests.
+
+<RequestExample>
+```bash cURL
+curl https://api.qingbo.ai/v1/assets/ast_3f9c2a7d1e8b4c6a5f0e9d21 \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+```python Python
+import requests
+
+response = requests.get(
+    "https://api.qingbo.ai/v1/assets/ast_3f9c2a7d1e8b4c6a5f0e9d21",
+    headers={"Authorization": "Bearer YOUR_API_KEY"}
+)
+
+asset = response.json()
+if asset["status"] == "active":
+    print(asset["asset_url"])
+```
+</RequestExample>
+
+<ResponseExample>
+```json 200 active
+{
+  "id": "ast_3f9c2a7d1e8b4c6a5f0e9d21",
+  "object": "asset",
+  "model": "seedance-2.5",
+  "type": "video",
+  "name": "hero-walk-ref",
+  "status": "active",
+  "duration_seconds": 5.062,
+  "created_at": 1790220525,
+  "updated_at": 1790220534,
+  "asset_url": "asset://asset-20260924112839-scjs4"
+}
+```
+
+```json 200 failed
+{
+  "id": "ast_3f9c2a7d1e8b4c6a5f0e9d21",
+  "object": "asset",
+  "model": "seedance-2.5",
+  "type": "video",
+  "name": "hero-walk-ref",
+  "status": "failed",
+  "duration_seconds": 5.062,
+  "created_at": 1790220525,
+  "updated_at": 1790220540,
+  "error": {
+    "message": "素材分辨率不符合要求：总像素需在 407,696 到 8,295,044 之间"
+  }
+}
+```
+
+```json 404
+{
+  "error": {
+    "message": "素材不存在",
+    "type": "invalid_request_error",
+    "param": "asset_id",
+    "code": "asset_not_found"
+  }
+}
+```
+</ResponseExample>
+
+## Authorizations
+
+<ParamField header="Authorization" type="string" required>
+  `Bearer YOUR_API_KEY`. Also works when the API key's quota is exhausted.
+</ParamField>
+
+## Request parameters
+
+<ParamField path="asset_id" type="string" required>
+  Asset ID starting with `ast_` (the `id` from the upload response).
+</ParamField>
+
+## Response
+
+<ResponseField name="id" type="string">
+  Asset ID, starting with `ast_`.
+</ResponseField>
+
+<ResponseField name="object" type="string">
+  Always `asset`.
+</ResponseField>
+
+<ResponseField name="model" type="string">
+  The `model` sent at upload.
+</ResponseField>
+
+<ResponseField name="type" type="string">
+  `image`, `video` or `audio`.
+</ResponseField>
+
+<ResponseField name="name" type="string">
+  The label; an empty string if not sent.
+</ResponseField>
+
+<ResponseField name="status" type="string">
+  - `processing`: under review
+  - `active`: approved and referenceable
+  - `failed`: review failed; upload again
+</ResponseField>
+
+<ResponseField name="duration_seconds" type="number">
+  Duration of a video or audio asset in seconds, read at upload. Absent for images.
+</ResponseField>
+
+<ResponseField name="created_at" type="integer">
+  Creation time (Unix seconds).
+</ResponseField>
+
+<ResponseField name="updated_at" type="integer">
+  Last update time (Unix seconds).
+</ResponseField>
+
+<ResponseField name="asset_url" type="string">
+  `asset://<asset ID>`, returned only when `active`. Put it as-is into a media field of a generation request.
+</ResponseField>
+
+<ResponseField name="error" type="object">
+  Returned only when `failed`. `message` is the failure reason; see [Asset library](/en/api-reference/assets/overview) for the values.
+</ResponseField>
+
+## Error codes
+
+| HTTP | `code` | Meaning |
+|---|---|---|
+| 401 | — | API key missing or invalid |
+| 404 | `asset_not_found` | The asset does not exist, belongs to another account, or was deleted |
+| 500 | `asset_store_error` | The asset record could not be read; retry |
+
+## Related
+
+- [Asset library](/en/api-reference/assets/overview)
+- [Upload asset](/en/api-reference/assets/create)
+- [List assets](/en/api-reference/assets/list)
+- [Delete asset](/en/api-reference/assets/delete)

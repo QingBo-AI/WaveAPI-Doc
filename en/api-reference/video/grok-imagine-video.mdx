@@ -1,10 +1,10 @@
 ---
 title: "Grok Imagine Video Series"
-description: "xAI Grok Imagine video generation: three models across the official and economy routes, billed by resolution tier × seconds"
+description: "xAI Grok Imagine video generation: three models across the official and economy routes, text-to-video, image-to-video and video edit, billed by resolution tier × seconds"
 api: "POST https://api.qingbo.ai/v1/tasks"
 ---
 
-The xAI Grok Imagine video line currently offers three model IDs. All of them are submitted through the unified task endpoint `POST /v1/tasks`, all of them expose the single action `generate`, and all of them are billed by the output resolution tier multiplied by the generated seconds. On the official route, `grok-imagine-video-1.5` reaches 1080p and starts at 1 second, and `grok-imagine-video` also accepts a reference video; both charge reference images per image. The economy model `grok-imagine-video-1.5-rev` offers 480p / 720p only, starts at 6 seconds, and adds no fee for reference images. For images, see [Grok Imagine Series](/en/api-reference/image/grok-imagine).
+The xAI Grok Imagine video line offers three model IDs. The official `grok-imagine-video-1.5` reaches 1080p, starts at 1 second and takes multiple reference images; the official `grok-imagine-video` generates at 480p / 720p and adds a video edit action, `edit`; the economy `grok-imagine-video-1.5-rev` offers 480p / 720p only, starts at 6 seconds, and takes up to 7 reference images with no extra fee. For images, see [Grok Imagine Series](/en/api-reference/image/grok-imagine).
 
 ## Quick start
 
@@ -18,14 +18,14 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
   -d '{
     "model": "grok-imagine-video-1.5",
     "action": "generate",
-    "prompt": "Aurora over a snowfield, slow lateral camera move, no text",
+    "prompt": "A snowfield under the aurora, slow lateral pan, no text",
     "duration": 8,
     "resolution": "1080p",
     "aspect_ratio": "16:9"
   }'
 ```
 
-```bash Image to video
+```bash Multi-image reference
 curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
@@ -33,22 +33,37 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
   -d '{
     "model": "grok-imagine-video-1.5",
     "action": "generate",
-    "prompt": "The subject slowly turns toward the camera, lighting unchanged",
-    "image_urls": ["https://cdn.example.com/portrait.jpg"],
+    "prompt": "The person in the first image wears the coat from the second, slowly turning toward the camera",
+    "image_urls": [
+      "https://cdn.example.com/portrait.jpg",
+      "https://cdn.example.com/coat.jpg"
+    ],
     "duration": 6,
     "resolution": "720p",
     "aspect_ratio": "9:16"
   }'
 ```
 
-```bash Economy multi-reference
+```bash Video edit
+curl -X POST https://api.qingbo.ai/v1/tasks \
+  -H "Authorization: Bearer $WAVE_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "grok-imagine-video",
+    "action": "edit",
+    "prompt": "Restyle the footage as watercolor, keep the motion unchanged",
+    "video_urls": ["https://cdn.example.com/source.mp4"]
+  }'
+```
+
+```bash Economy multi-image reference
 curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "model": "grok-imagine-video-1.5-rev",
     "action": "generate",
-    "prompt": "Keep the character consistent, running through a forest",
+    "prompt": "Keep the character consistent while running through a forest",
     "image_urls": [
       "https://cdn.example.com/ref-1.jpg",
       "https://cdn.example.com/ref-2.jpg",
@@ -62,7 +77,7 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
 
 </CodeGroup>
 
-A successful submission returns a `task_id`. Retrieve the result with [`GET /v1/tasks/{task_id}`](/en/api-reference/task/status), wait inline with [`Prefer: wait`](/en/api-reference/task/submit#in-request-waiting-prefer-wait), or configure a webhook. Video tasks take a while, so production traffic is best served by `callback_url`.
+A successful submission returns a `task_id`. Retrieve the result with [`GET /v1/tasks/{task_id}`](/en/api-reference/task/status), wait inline with [`Prefer: wait`](/en/api-reference/task/submit#in-request-waiting-prefer-wait), or configure a webhook.
 
 ## Request parameters
 
@@ -71,31 +86,32 @@ A successful submission returns a `task_id`. Retrieve the result with [`GET /v1/
 </ParamField>
 
 <ParamField body="action" type="string" default="generate">
-  `generate` is the only action these three models support. Text-to-video and image-to-video both use it; the only difference is whether `image_urls` is present.
+  - `generate` — text-to-video or image-to-video, on all three models; sending `image_urls` makes it image-to-video
+  - `edit` — video edit, `grok-imagine-video` only; `video_urls` is required
 </ParamField>
 
 <ParamField body="prompt" type="string" required>
-  Description of the video, in English or Chinese. With reference images it guides motion and style.
+  Description of the video or the edit instruction, in English or Chinese.
 </ParamField>
 
-<ParamField body="duration" type="integer" required>
-  Output length in whole seconds. `grok-imagine-video` and `grok-imagine-video-1.5` accept `1`–`15`; `grok-imagine-video-1.5-rev` accepts `6`–`15`. Duration is a billing dimension, so a request without it cannot be priced.
+<ParamField body="duration" type="integer">
+  Output length in whole seconds; required under `action: "generate"`. `grok-imagine-video` and `grok-imagine-video-1.5` accept `1`–`15`; `grok-imagine-video-1.5-rev` accepts `6`–`15`. Under `action: "edit"`, omit it or send `0`; the output length follows the source video.
 </ParamField>
 
 <ParamField body="resolution" type="string" default="480p">
-  Output resolution. `grok-imagine-video-1.5` supports `480p`, `720p` and `1080p`; the other two models support `480p` and `720p`.
+  Output resolution. `grok-imagine-video-1.5` supports `480p`, `720p` and `1080p`; the other two models support `480p` and `720p`. No effect under `action: "edit"`, where the output keeps the source resolution (up to `720p`).
 </ParamField>
 
 <ParamField body="aspect_ratio" type="string">
-  Frame ratio; the accepted set differs by model, see [Available models](#available-models). `grok-imagine-video-1.5` defaults to `auto`, letting the model choose the framing; `grok-imagine-video` and `grok-imagine-video-1.5-rev` default to `16:9`.
+  Frame ratio; the accepted set differs by model, see [Available models](#available-models). `grok-imagine-video-1.5` defaults to `auto` and needs an explicit ratio when reference images are sent; `grok-imagine-video` and `grok-imagine-video-1.5-rev` default to `16:9`. No effect under `action: "edit"`, where the source ratio is kept.
 </ParamField>
 
 <ParamField body="image_urls" type="string[]">
-  Reference image URLs, publicly reachable. Supplying them makes the request image-to-video. `grok-imagine-video-1.5` takes up to 1, `grok-imagine-video-1.5-rev` up to 7.
+  Reference image URLs, publicly reachable, for `action: "generate"` only. `grok-imagine-video` and `grok-imagine-video-1.5` take multiple images; `grok-imagine-video-1.5-rev` takes up to 7.
 </ParamField>
 
 <ParamField body="video_urls" type="string[]">
-  Reference video URLs. Only `grok-imagine-video` accepts them.
+  Source video URLs, accepted only by `action: "edit"` on `grok-imagine-video`; one clip, up to 8.7 seconds.
 </ParamField>
 
 See [Submit Task](/en/api-reference/task/submit) for `callback_url`, `callback_events`, `Prefer: wait`, `Idempotency-Key` and the maximum-cost header.
@@ -106,29 +122,37 @@ See [Submit Task](/en/api-reference/task/submit) for `callback_url`, `callback_e
 
 | Model | Condition | Limit |
 |---|---|---|
-| `grok-imagine-video` | Per request | This model produces one result per task; n is not supported |
-| `grok-imagine-video-1.5` | Per request | The video endpoint does not accept n. |
-| `grok-imagine-video-1.5` | Material inputs | This group does not accept video or audio inputs. |
+| `grok-imagine-video` | Every request | This model produces one result per task; n is not supported |
+| `grok-imagine-video` | `action: "generate"` | generate does not take a source video; use the edit action to edit a video. |
+| `grok-imagine-video` | `action: "edit"` | Video edit takes exactly one source video (up to 8.7 s) and no reference images. The output keeps the source length, aspect ratio and resolution (capped at 720p), so duration cannot be set (omit it or send 0) and resolution / aspect_ratio have no effect. |
+| `grok-imagine-video-1.5` | Every request | The video endpoint does not accept n. |
+| `grok-imagine-video-1.5` | Media inputs | This group does not accept video or audio inputs. |
 | `grok-imagine-video-1.5` | Audio generation | The supplier does not document an audio-control parameter. |
-| `grok-imagine-video-1.5-rev` | Per request | The video endpoint does not accept n. |
-| `grok-imagine-video-1.5-rev` | Material inputs | This group does not accept video or audio inputs. |
+| `grok-imagine-video-1.5` | `image_urls` provided | With reference images, set an explicit aspect ratio (1:1 / 16:9 / 9:16 / 4:3 / 3:4 / 3:2 / 2:3); auto cannot be used. |
+| `grok-imagine-video-1.5-rev` | Every request | The video endpoint does not accept n. |
+| `grok-imagine-video-1.5-rev` | Media inputs | This group does not accept video or audio inputs. |
 | `grok-imagine-video-1.5-rev` | Audio generation | The supplier does not document an audio-control parameter. |
 
 ## Pricing
 
-All three models are billed by **resolution tier × seconds**: each resolution has its own per-second rate, multiplied by the `duration` in the request. Resolution and duration are the only base dimensions, so the cost of a call is known before it is sent.
+Billing is **resolution tier × seconds**; each resolution tier has its own per-second rate.
 
-| Model | Billing dimensions |
+| Model · action | Billing dimensions |
 |---|---|
-| `grok-imagine-video` | Per-second rate for `480p` / `720p` × `duration`; reference images add a separate per-image charge, independent of duration; sending `video_urls` does not change how the task is priced |
-| `grok-imagine-video-1.5` | Per-second rate for `480p` / `720p` / `1080p` × `duration`; reference images add a separate per-image charge, independent of duration |
-| `grok-imagine-video-1.5-rev` | Per-second rate for `480p` / `720p` × `duration`; reference images add no fee |
+| `grok-imagine-video` · `generate` | `480p` / `720p` per-second rate × output seconds; reference images charged per image |
+| `grok-imagine-video` · `edit` | Edit per-second rate × actual output seconds + source-video per-second rate × source seconds |
+| `grok-imagine-video-1.5` · `generate` | `480p` / `720p` / `1080p` per-second rate × `duration`; reference images charged per image |
+| `grok-imagine-video-1.5-rev` · `generate` | `480p` / `720p` per-second rate × `duration`; no fee for reference images |
 
-A `resolution` outside the tiers a model supports settles at the base per-second rate, equal to the `480p` tier.
+`grok-imagine-video` freezes quota at submission (`edit` freezes at the duration cap) and settles on the actual result when the task completes, refunding the difference.
 
-Rates are in `price_config` on `GET /v1/models` and in the console's Model Market. What a single call actually cost is the `cost` field on the task response — an integer quota at **500,000 quota = 1 USD**, not dollars.
+<Note>
+Per-model rates are in `price_config` on `GET /v1/models`, and in the console's Model Market.
 
-You are only billed for a successfully generated video. Failed and cancelled tasks, and tasks that return no usable video, are refunded in full.
+What a single call actually cost is the `cost` field on the task response — an integer quota at 500,000 quota = 1 USD.
+</Note>
+
+You are only billed for a successfully generated video. Failed and cancelled tasks, and tasks that return no usable video, are refunded in full. The final charge is the `cost` field on the task response — an integer quota, not dollars.
 
 ## Response
 
@@ -162,28 +186,26 @@ You are only billed for a successfully generated video. Failed and cancelled tas
 
 ## Available models
 
-| Model ID | Resolution | Duration (s) | Aspect ratios | Reference images |
+| Model ID | Actions | Resolution | Duration (s) | Reference images |
 |---|---|---|---|---|
-| `grok-imagine-video` | `480p` `720p` | 1–15 | 7 | Accepted, charged per image |
-| `grok-imagine-video-1.5` | `480p` `720p` `1080p` | 1–15 | 8 | Up to 1, charged per image |
-| `grok-imagine-video-1.5-rev` | `480p` `720p` | 6–15 | 5 | Up to 7, no extra fee |
-
-Only `grok-imagine-video` accepts a reference video (`video_urls`).
+| `grok-imagine-video` | `generate` `edit` | `480p` `720p` | 1–15; `edit` follows the source | Multiple, charged per image |
+| `grok-imagine-video-1.5` | `generate` | `480p` `720p` `1080p` | 1–15 | Multiple, charged per image |
+| `grok-imagine-video-1.5-rev` | `generate` | `480p` `720p` | 6–15 | Up to 7, no extra fee |
 
 Aspect ratio sets:
 
-- **8** (`grok-imagine-video-1.5`): `auto`, `1:1`, `16:9`, `9:16`, `4:3`, `3:4`, `3:2`, `2:3`
-- **7** (`grok-imagine-video`): `1:1`, `16:9`, `9:16`, `4:3`, `3:4`, `3:2`, `2:3`
-- **5** (`grok-imagine-video-1.5-rev`): `16:9`, `9:16`, `1:1`, `3:2`, `2:3`
+- `grok-imagine-video-1.5`: `auto`, `1:1`, `16:9`, `9:16`, `4:3`, `3:4`, `3:2`, `2:3` (`auto` cannot be used with reference images)
+- `grok-imagine-video`: `1:1`, `16:9`, `9:16`, `4:3`, `3:4`, `3:2`, `2:3`
+- `grok-imagine-video-1.5-rev`: `16:9`, `9:16`, `1:1`, `3:2`, `2:3`
 
 ## Official vs reverse
 
-The economy models share the task endpoint and the parameter names with the official ones. Four things differ:
+The economy model shares the task endpoint and the parameter names with the official ones. Four things differ:
 
-- **Resolution** — `1080p` exists only on `grok-imagine-video-1.5`; the economy models top out at `720p`.
+- **Resolution** — `1080p` exists only on `grok-imagine-video-1.5`; the economy model tops out at `720p`.
 - **Duration** — the two official models start at 1 second, the economy model at 6 seconds; all cap at 15.
-- **Reference images** — both official models charge per image, and `grok-imagine-video-1.5` takes up to 1; `grok-imagine-video-1.5-rev` takes up to 7 with no extra fee.
-- **Reference video** — only `grok-imagine-video` accepts `video_urls`.
+- **Reference images** — both official models charge per image; `grok-imagine-video-1.5-rev` takes up to 7 with no extra fee.
+- **Video edit** — only `grok-imagine-video` supports `action: "edit"`.
 
 ## Related
 

@@ -2,6 +2,39 @@
 title: "模型动态"
 ---
 
+<Update label="2026-09-24" description="能力更新">
+**素材库上线 · Seedance 素材引用**
+
+- 新增 `/v1/assets` 接口：把图片、视频、音频链接上传为素材，审核通过后在生成请求中以 `asset://<素材 ID>` 引用。
+- 支持模型：`seedance-2.0`　·　`seedance-2.0-fast`　·　`seedance-2.0-mini`　·　`seedance-2.5`。真人人像作为参考时须先上传为素材。
+- 素材接口不计费；每个账号最多 500 个素材。
+- **文档**：[素材库](/cn/api-reference/assets/overview) · [Seedance 系列](/cn/api-reference/video/seedance)
+</Update>
+
+<Update label="2026-09-24" description="模型上架">
+**MiniMax H3 Max 上架 · 视频**
+
+- **模型 ID**：`minimax-h3-max`
+- MiniMax H3 高质量版：480P / 768P / 1080P，支持参考图、参考视频与参考音频。
+- **文档**：[MiniMax H3](/cn/api-reference/video/minimax-h3)
+</Update>
+
+<Update label="2026-09-24" description="能力更新">
+**视频模型：Veo / Kling 4K、SkyReels / PixVerse 续写、FLUX 3 Video 转终稿、Grok 视频编辑**
+
+- Veo 3.1：`veo3.1-fast` / `veo3.1-quality` / `veo3.1-lite` / `veo3.1-fast-rev` / `veo3.1-quality-rev` 新增 4K；经济版续写可指定 `resolution`（4K 续写要求父任务为 4K）；`enable_gif` 不能与 1080p / 4K 同用。
+- Kling：`kling-v3` / `kling-v3-omni` 新增 4K；`kling-v3-omni` 参考图最多 7 张，提示词用 `<<<image_N>>>` 引用。
+- SkyReels V4：带参考视频支持 1080p；新增 `extend` 视频续写。
+- PixVerse V6：新增 `extend`，以 `ref_task_id` 指定源任务；默认分辨率改为 540p。
+- FLUX 3 Video：`flux-3-video` 新增 `finalize`，把 `flux-3-video-draft` 草稿转为终稿。
+- Grok Imagine Video：`grok-imagine-video` 新增 `edit` 视频编辑；`grok-imagine-video-1.5` 支持多张参考图（需指定画幅）。
+- Seedance：`seedance-2.5` 支持 `duration: 0`，由模型决定时长；`seedance-1.5-pro` 与 2.0 三档的 `image_with_roles` 不能与 `image_urls` 同用。
+- Wan：`wan3.0-video` / `wan3.0-video-prime` 支持由模型决定时长；`wan2.7-r2v` 参考视频单段 1–30 秒；`wan2.5-preview` 只生成有声视频。
+- Hailuo：`minimax-hailuo-2.3` / `-2.3-fast` 不再接受 `seed`。
+- Vidu：`vidu-q3` / `vidu-q3-mix` 参考图最多 7 张；四个模型默认 720p。
+- **文档**：[Veo 系列](/cn/api-reference/video/veo) · [Kling 系列](/cn/api-reference/video/kling) · [SkyReels V4 系列](/cn/api-reference/video/skyreels) · [PixVerse V6](/cn/api-reference/video/pixverse) · [FLUX 3 Video](/cn/api-reference/video/flux/flux-3-video) · [Grok Imagine Video 系列](/cn/api-reference/video/grok-imagine-video) · [Seedance 系列](/cn/api-reference/video/seedance) · [万相 Wan 系列](/cn/api-reference/video/wan) · [Hailuo 系列](/cn/api-reference/video/hailuo) · [Vidu Q3 系列](/cn/api-reference/video/vidu)
+</Update>
+
 <Update label="2026-09-24" description="模型下架">
 **Sora 2 系列下架 · 视频**
 

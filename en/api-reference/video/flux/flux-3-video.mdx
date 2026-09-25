@@ -1,10 +1,10 @@
 ---
 title: "FLUX 3 Video"
-description: "Black Forest Labs FLUX 3 Video: text, keyframes and video continuation with synced audio, billed by resolution tier × seconds"
+description: "Black Forest Labs FLUX 3 Video: text, keyframes, video continuation and draft-to-final with synced audio, billed by resolution tier × seconds"
 api: "POST https://api.qingbo.ai/v1/tasks"
 ---
 
-FLUX 3 Video is Black Forest Labs' video model. It generates 5–20 second clips with synchronized audio from text, from 1–10 ordered keyframes, or from a continuation video. This page covers the standard tier `flux-3-video` and the draft tier `flux-3-video-draft`: the two take exactly the same parameters, and the draft tier is `hd` only, lower quality and cheaper — useful for previewing a shot before rendering it on the standard tier. Switching tiers means changing `model`; the two never switch automatically.
+FLUX 3 Video is Black Forest Labs' video model. It generates 5–20 second clips with synchronized audio from text, from 1–10 ordered keyframes, or from a continuation video. This page covers the standard tier `flux-3-video` and the draft tier `flux-3-video-draft`: the two take the same generation parameters, and the draft tier is `hd` only, lower quality and cheaper. A finished draft can be turned into the final video with `finalize` on `flux-3-video`.
 
 ## Quick start
 
@@ -70,9 +70,23 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
   }'
 ```
 
+```bash Draft to final
+curl -X POST https://api.qingbo.ai/v1/tasks \
+  -H "Authorization: Bearer $WAVE_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "flux-3-video",
+    "action": "finalize",
+    "ref_task_id": "task-wave1788780141b950265604",
+    "resolution": "fhd"
+  }'
+```
+
 </CodeGroup>
 
 A successful submission returns a `task_id`. Poll [`GET /v1/tasks/{task_id}`](/en/api-reference/task/status) for the result, wait inside the call with [`Prefer: wait`](/en/api-reference/task/submit#in-request-waiting-prefer-wait), or configure a webhook.
+
+**Chaining a final render**: submit `action: "generate"` on `flux-3-video-draft` and keep the `task_id`; once it is `completed`, pass that `task_id` as `ref_task_id` on an `action: "finalize"` request to `flux-3-video`. Prompt, duration, aspect ratio and assets come from the draft; only `resolution` can change.
 
 ## Request parameters
 
@@ -81,27 +95,28 @@ A successful submission returns a `task_id`. Poll [`GET /v1/tasks/{task_id}`](/e
 </ParamField>
 
 <ParamField body="action" type="string" default="generate">
-  `generate` — the only action on both tiers. Text, keyframe and continuation modes are selected by which assets you send, not by the action.
+  - `generate` — generate a video, on both tiers. Text, keyframe and continuation modes follow the assets you send.
+  - `finalize` — turn a draft into the final video, `flux-3-video` only; `ref_task_id` is required.
 </ParamField>
 
-<ParamField body="prompt" type="string" required>
-  Description of the video.
+<ParamField body="prompt" type="string">
+  Description of the video; required under `action: "generate"`; cannot be sent under `action: "finalize"`.
 </ParamField>
 
 <ParamField body="image_urls" type="string[]">
-  Keyframe images, 1–10, where order carries meaning: one image is the start frame, two are start and end frames, and with 3–10 the first and last are start and end while the middle frames are spaced evenly in time. Cannot be combined with `video_urls`.
+  Keyframe images, 1–10, where order carries meaning: one image is the start frame, two are start and end frames, and with 3–10 the first and last are start and end while the middle frames are spaced evenly in time. Cannot be combined with `video_urls`. Cannot be sent under `action: "finalize"`.
 </ParamField>
 
 <ParamField body="video_urls" type="string[]">
-  Continuation video, at most one clip, up to 20 seconds. With it set, the model continues from that clip.
+  Continuation video, at most one clip, up to 20 seconds. With it set, the model continues from that clip. Cannot be sent under `action: "finalize"`.
 </ParamField>
 
 <ParamField body="resolution" type="string" default="hd">
-  Output resolution. `flux-3-video` supports `hd` and `fhd`; `flux-3-video-draft` supports `hd` only.
+  Output resolution. `flux-3-video` supports `hd` and `fhd` (also under `finalize`); `flux-3-video-draft` supports `hd` only.
 </ParamField>
 
 <ParamField body="duration" type="integer" default="5">
-  Output length in seconds, any integer `5`–`20`.
+  Output length in seconds, any integer `5`–`20`. Cannot be sent under `action: "finalize"`, which keeps the draft's length.
 </ParamField>
 
 <ParamField body="aspect_ratio" type="string" default="auto">
@@ -113,12 +128,16 @@ A successful submission returns a `task_id`. Poll [`GET /v1/tasks/{task_id}`](/e
 </ParamField>
 
 <ParamField body="safety_tolerance" type="integer" default="2">
-  Safety tolerance `0`–`4`; higher is more permissive.
+  Safety tolerance `0`–`4`; higher is more permissive. `action: "generate"` only.
+</ParamField>
+
+<ParamField body="ref_task_id" type="string">
+  The draft to turn into the final video; required under `action: "finalize"`. Use the `task_id` of a completed `flux-3-video-draft` task in your account.
 </ParamField>
 
 See [Submit Task](/en/api-reference/task/submit) for `callback_url`, `callback_events`, `Prefer: wait`, `Idempotency-Key`, and the maximum-cost header.
 
-Neither tier supports `n`, `seed`, `quality`, `negative_prompt`, `first_frame_image` or `audio_urls`. Any other parameter returns `400` and is not billed.
+Neither tier supports `n`, `seed`, `quality`, `negative_prompt`, `first_frame_image` or `audio_urls`. Any other parameter returns `400` and is not billed. Under `action: "finalize"`, `aspect_ratio` and `generate_audio` have no effect.
 
 ## Limits
 
@@ -128,28 +147,27 @@ Neither tier supports `n`, `seed`, `quality`, `negative_prompt`, `first_frame_im
 | `video_urls` present | With a continuation video the images are ignored; do not send both |
 | Continuation video length | Up to 20 seconds |
 | `flux-3-video-draft` resolution | `hd` only |
+| `action: "finalize"` | Finalizing accepts only the draft task (ref_task_id) and a resolution; prompt, duration, images and video come from the draft and cannot be sent. |
 
 ## Pricing
 
-Both tiers are billed by **resolution tier × output seconds**. `price_config.video_prices` is keyed by resolution; a resolution with no key of its own settles at the sibling `default` tier.
+Both tiers are billed by **resolution tier × output seconds**. With `video_urls` (continuation), the same resolution's continuation tier applies instead, which is above the plain tier; the continuation video's own seconds are not billed.
 
-| Model ID | Resolution tiers | Continuation tiers |
+| Request | Rate tier | Billed seconds |
 |---|---|---|
-| `flux-3-video` | `hd`, `fhd` | `hd_video_ref`, `fhd_video_ref` |
-| `flux-3-video-draft` | `hd` | `hd_video_ref` |
+| `flux-3-video` · `generate` | `hd` / `fhd`, or its continuation tier | The requested `duration` |
+| `flux-3-video-draft` · `generate` | `hd`, or the `hd` continuation tier | The requested `duration` |
+| `flux-3-video` · `finalize` | Final `hd` / `fhd`, or its continuation tier when the draft was a continuation | The draft's length |
 
-**Continuation tier** — with `video_urls` present, output seconds settle at the `<resolution>_video_ref` rate, which is higher than the plain tier at the same resolution. The continuation video's own seconds are not charged separately.
-
-`generate_audio` has no effect on price: audio and silent output cost the same. `aspect_ratio`, keyframe count and prompt length have no effect either — **resolution tier, whether it is a continuation, and output seconds are the only three billing dimensions**.
-
-You are only billed for a successfully generated video. Failed and cancelled tasks, and tasks that return no usable video, are refunded in full. The final charge is the `cost` field on the task response — an integer quota at **500,000 quota = 1 USD**, not dollars.
+`finalize` is charged as its own final render; the draft fee is not credited. `generate_audio`, `aspect_ratio`, keyframe count and prompt length do not affect the price.
 
 <Note>
-**Unit prices are not listed here.** They track upstream changes; this section covers billing dimensions only.
+Per-model rates are in `price_config` on `GET /v1/models`, and in the console's Model Market.
 
-Live rates: the `price_config` field of `GET /v1/models`, or the console's Model Market.
-What one call cost: the `cost` field on the task response (integer quota, 500,000 quota = 1 USD).
+What a single call actually cost is the `cost` field on the task response — an integer quota at 500,000 quota = 1 USD.
 </Note>
+
+You are only billed for a successfully generated video. Failed and cancelled tasks, and tasks that return no usable video, are refunded in full. The final charge is the `cost` field on the task response — an integer quota, not dollars.
 
 ## Response
 
@@ -183,12 +201,10 @@ Generated videos are returned in `result.videos`; `url` is an array and `expires
 
 ## Available models
 
-| Model ID | Tier | Resolution | Duration (s) | Media inputs accepted |
+| Model ID | Actions | Resolution | Duration (s) | Media inputs accepted |
 |---|---|---|---|---|
-| `flux-3-video` | Standard | `hd` `fhd` | `5`–`20` | `image_urls` 1–10 · `video_urls` ≤1 |
-| `flux-3-video-draft` | Draft | `hd` only | `5`–`20` | `image_urls` 1–10 · `video_urls` ≤1 |
-
-Both tiers share one parameter set, the same keyframe semantics and the same aspect ratios; they differ only in available resolutions and price.
+| `flux-3-video` | `generate` `finalize` | `hd` `fhd` | `5`–`20` | `image_urls` 1–10 · `video_urls` ≤1 |
+| `flux-3-video-draft` | `generate` | `hd` only | `5`–`20` | `image_urls` 1–10 · `video_urls` ≤1 |
 
 ## Related
 

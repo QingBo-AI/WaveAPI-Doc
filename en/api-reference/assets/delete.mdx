@@ -1,0 +1,91 @@
+---
+title: "Delete asset"
+description: "DELETE /v1/assets/{asset_id} — delete an asset"
+api: "DELETE https://api.qingbo.ai/v1/assets/{asset_id}"
+---
+
+Delete one of the account's assets. It can no longer be referenced, effective immediately; the copy in the model provider's asset library is deleted afterwards.
+
+<Note>
+Tasks already submitted that reference the asset may fail.
+</Note>
+
+<RequestExample>
+```bash cURL
+curl -X DELETE https://api.qingbo.ai/v1/assets/ast_3f9c2a7d1e8b4c6a5f0e9d21 \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+```python Python
+import requests
+
+response = requests.delete(
+    "https://api.qingbo.ai/v1/assets/ast_3f9c2a7d1e8b4c6a5f0e9d21",
+    headers={"Authorization": "Bearer YOUR_API_KEY"}
+)
+
+print(response.json()["deleted"])
+```
+</RequestExample>
+
+<ResponseExample>
+```json 200
+{
+  "id": "ast_3f9c2a7d1e8b4c6a5f0e9d21",
+  "object": "asset",
+  "deleted": true
+}
+```
+
+```json 404
+{
+  "error": {
+    "message": "素材不存在",
+    "type": "invalid_request_error",
+    "param": "asset_id",
+    "code": "asset_not_found"
+  }
+}
+```
+</ResponseExample>
+
+## Authorizations
+
+<ParamField header="Authorization" type="string" required>
+  `Bearer YOUR_API_KEY`. Also works when the API key's quota is exhausted.
+</ParamField>
+
+## Request parameters
+
+<ParamField path="asset_id" type="string" required>
+  Asset ID starting with `ast_` (the `id` from the upload response). Assets in any status can be deleted.
+</ParamField>
+
+## Response
+
+<ResponseField name="id" type="string">
+  ID of the deleted asset.
+</ResponseField>
+
+<ResponseField name="object" type="string">
+  Always `asset`.
+</ResponseField>
+
+<ResponseField name="deleted" type="boolean">
+  Always `true`.
+</ResponseField>
+
+## Error codes
+
+| HTTP | `code` | Meaning |
+|---|---|---|
+| 401 | — | API key missing or invalid |
+| 404 | `asset_not_found` | The asset does not exist, belongs to another account, or was deleted |
+| 500 | `asset_store_error` | The asset could not be deleted; retry |
+
+## Related
+
+- [Asset library](/en/api-reference/assets/overview)
+- [Upload asset](/en/api-reference/assets/create)
+- [List assets](/en/api-reference/assets/list)
+- [Get asset](/en/api-reference/assets/get)

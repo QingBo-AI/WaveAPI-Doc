@@ -1,0 +1,123 @@
+---
+title: "Asset library"
+description: "Upload images, videos and audio, then reference them as asset:// in Seedance generation requests"
+---
+
+Upload a publicly downloadable image, video or audio link as an asset. Once it passes review you get `asset://<asset ID>`, which you reference in the media fields of a Seedance generation request. Real-person portraits used as references must be uploaded as assets first.
+
+<Warning>
+**Assets are stored in the model provider's shared asset library, where other customers of that provider may be able to see and download them.** Do not upload private or sensitive content.
+</Warning>
+
+## Endpoints
+
+| Method | Path | Description |
+|---|---|---|
+| `POST` | `/v1/assets` | [Upload asset](/en/api-reference/assets/create) |
+| `GET` | `/v1/assets` | [List assets](/en/api-reference/assets/list) |
+| `GET` | `/v1/assets/{asset_id}` | [Get asset](/en/api-reference/assets/get) |
+| `DELETE` | `/v1/assets/{asset_id}` | [Delete asset](/en/api-reference/assets/delete) |
+
+## Quick start
+
+1. Upload with `POST /v1/assets`. The response carries an `id` (`ast_…`) and `status` is `processing`.
+2. Poll `GET /v1/assets/{id}` until `status` is `active`, then take `asset_url` from the response.
+3. Put `asset_url` as-is into the matching field of `POST /v1/tasks`.
+
+```bash
+curl -X POST https://api.qingbo.ai/v1/tasks \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "seedance-2.0",
+    "prompt": "The character walks along a city street at dusk",
+    "image_urls": ["asset://asset-20260924112839-scjs4"],
+    "duration": 5,
+    "resolution": "720p"
+  }'
+```
+
+Use `id` to manage an asset and `asset_url` to reference it in generation requests.
+
+## Supported models and fields
+
+| Model | Asset types |
+|---|---|
+| `seedance-2.0` | `image`, `video`, `audio` |
+| `seedance-2.0-fast` | `image`, `video`, `audio` |
+| `seedance-2.0-mini` | `image`, `video`, `audio` |
+| `seedance-2.5` | `image`, `video`, `audio` |
+
+| Asset type | Fields that accept it |
+|---|---|
+| `image` | `image_urls`, `first_frame_image`, `last_frame_image`, `image_with_roles[].url` |
+| `video` | `video_urls` |
+| `audio` | `audio_urls` |
+
+Assets and ordinary links can be mixed. For count limits and field combination rules, see [Seedance Series](/en/api-reference/video/seedance).
+
+## Status
+
+| `status` | Meaning | Referenceable |
+|---|---|---|
+| `processing` | Under review | No |
+| `active` | Approved; the response includes `asset_url` | Yes |
+| `failed` | Review failed; see `error.message` | No |
+
+- Transitions: `processing` → `active` or `failed`. `failed` is final; upload again.
+- An asset still under review after 24 hours becomes `failed`.
+- The review status of an asset refreshes at most once every 5 seconds, so there is no need to poll more often than that.
+
+**Failure reasons** (`error.message`, returned in Chinese)
+
+| `error.message` | Meaning and action |
+|---|---|
+| 素材分辨率不符合要求：总像素需在 407,696 到 8,295,044 之间 | Total pixel count must be 407,696 to 8,295,044; change the resolution and upload again |
+| 素材宽高比不在模型支持范围内 | Aspect ratio not supported by the model; change it and upload again |
+| 素材时长不在模型支持范围内 | Duration not supported by the model; change it and upload again |
+| 素材格式不受支持 | Format not supported; change the format and upload again |
+| 上游处理超时，请稍后重新上传 | Processing timed out; upload again later |
+| 素材未通过模型供应商审核 | Rejected by the model provider's review; use a different file |
+| 素材审核超时 | Review timed out; upload again |
+| 素材登记失败（错误码） / 素材登记失败 | Upload failed (with or without an error code); check the file and upload again |
+
+## Limits
+
+| Item | Rule |
+|---|---|
+| Source | Publicly downloadable `http(s)` link, up to 4096 characters |
+| Video / audio | Duration is read at upload; if it cannot be read the request returns `400` (`asset_duration_unknown`). Use MP4 / MOV / WebM for video and WAV / MP3 for audio |
+| Count | Up to 500 `processing` and `active` assets per account; `failed` assets do not count |
+| Upload rate | Exceeding the limit returns `429` |
+| Ownership | Assets belong to the account; any API key of the account can view, reference and delete all of its assets |
+| Other accounts | Assets of other accounts cannot be referenced; "not found" and "not yours" return the same code, `asset_not_found` |
+| Deletion | A deleted asset can no longer be referenced, effective immediately; the copy in the model provider's asset library is deleted afterwards |
+
+## Pricing
+
+| Item | Rule |
+|---|---|
+| Asset endpoints | Free |
+| Generation tasks that reference assets | Billed as usual for the model |
+| Input duration of video / audio assets | The duration read at upload |
+
+## Error codes
+
+Errors when referencing assets in `POST /v1/tasks`. All return `400` and are not billed; `param` names the offending field.
+
+| `code` | Meaning |
+|---|---|
+| `asset_reference_invalid` | The reference is not in the form `asset://<asset ID>` |
+| `asset_reference_unsupported` | The model or field does not accept asset references |
+| `asset_not_found` | The asset does not exist, belongs to another account, is not active, or was deleted |
+| `asset_type_mismatch` | The asset type does not match the field, e.g. an `image` asset in `video_urls` |
+| `asset_route_mismatch` | The asset cannot be used on the model's current route |
+
+## Related
+
+- [Upload asset](/en/api-reference/assets/create)
+- [List assets](/en/api-reference/assets/list)
+- [Get asset](/en/api-reference/assets/get)
+- [Delete asset](/en/api-reference/assets/delete)
+- [Seedance Series](/en/api-reference/video/seedance)
+- [Submit Task](/en/api-reference/task/submit)

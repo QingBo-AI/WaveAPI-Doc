@@ -1,6 +1,6 @@
 ---
 title: "Kling 系列"
-description: "快手可灵视频模型：文生视频、首尾帧、参考图与参考视频、视频编辑与动作控制"
+description: "快手可灵视频模型：文生视频、首尾帧、参考图与参考视频、视频编辑与动作控制，kling-v3 / kling-v3-omni 支持 4K"
 api: "POST https://api.qingbo.ai/v1/tasks"
 ---
 
@@ -78,6 +78,24 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
   }'
 ```
 
+```bash 多图参考（Omni）
+curl -X POST https://api.qingbo.ai/v1/tasks \
+  -H "Authorization: Bearer $WAVE_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "kling-v3-omni",
+    "action": "generate",
+    "prompt": "<<<image_1>>> 里的女孩穿着 <<<image_2>>> 里的外套，走进 <<<image_3>>> 的咖啡馆",
+    "image_urls": [
+      "https://cdn.example.com/girl.jpg",
+      "https://cdn.example.com/coat.jpg",
+      "https://cdn.example.com/cafe.jpg"
+    ],
+    "duration": 5,
+    "resolution": "4k"
+  }'
+```
+
 ```bash 参考视频生成
 curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
@@ -140,7 +158,7 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
 </ParamField>
 
 <ParamField body="prompt" type="string" required>
-  视频描述或编辑指令。`kling-v3-omni` 与 `kling-video-o1` 可以在提示词里用 `<<<image_1>>>`、`<<<image_2>>>` 引用 `image_urls` 中第 1、第 2 张图；`kling-v3` 与 `kling-v3-omni` 用 `element_list` 时用 `@主体名` 引用参考主体。
+  视频描述或编辑指令。`kling-v3-omni` 与 `kling-video-o1` 用 `<<<image_N>>>` 引用 `image_urls` 中第 N 张图（N 从 1 起）；提示词里没有任何引用时，自动在开头加 `<<<image_1>>>`。`kling-v3` 与 `kling-v3-omni` 用 `element_list` 时用 `@主体名` 引用参考主体。
 </ParamField>
 
 <ParamField body="n" type="integer" default="1">
@@ -157,7 +175,7 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
 </ParamField>
 
 <ParamField body="resolution" type="string" default="720p">
-  输出分辨率档：`720p` 或 `1080p`。7 个模型都支持这两档。
+  输出分辨率档：`720p`、`1080p`；`kling-v3`、`kling-v3-omni` 另有 `4k`。
 </ParamField>
 
 <ParamField body="aspect_ratio" type="string">
@@ -168,7 +186,8 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
   参考图 URL 数组：
 
   - `kling-3.0-turbo`：最多 1 张，作首帧
-  - `kling-v2-6`、`kling-v3`、`kling-v3-omni`、`kling-video-o1`：最多 2 张；两张时为首帧与尾帧
+  - `kling-v2-6`、`kling-v3`、`kling-video-o1`：最多 2 张；两张时为首帧与尾帧
+  - `kling-v3-omni`：最多 7 张，与 `element_list` 里的多图主体合计不超过 7 个
   - 两个 `*-motion-control`：必填，1 张角色参考图
   - 带 `video_urls` 时（`kling-v3-omni` / `kling-video-o1`）最多 1 张；`action: "edit"` 不接受参考图
 </ParamField>
@@ -239,12 +258,13 @@ Kling 系列不接受 `seed`、`quality` 和 `size`。以上之外的参数会�
 | `kling-3.0-turbo` | 提供了 `image_urls` | 图生视频跟随输入图比例，不接受 `aspect_ratio`。 |
 | `kling-3.0-turbo`、`kling-v2-6`、`kling-v3` | 每次请求 | 必须明确提供输出时长。 |
 | `kling-v2-6`、`kling-v3`、`kling-v3-omni`、`kling-video-o1` | 每次请求 | 提示词必填。 |
-| `kling-v2-6`、`kling-v3`、`kling-v3-omni`、`kling-video-o1` | 每次请求 | 最多提供两张参考图。 |
+| `kling-v2-6`、`kling-v3`、`kling-video-o1` | 每次请求 | 最多提供两张参考图。 |
+| `kling-v3-omni` | 每次请求 | 最多提供 7 张参考图；参考图与多图主体合计不能超过 7 个。 |
 | `kling-v2-6` | `generate_audio: true` | 原生音频只支持 1080p pro 档。 |
 | `kling-v2-6` | `generate_audio: true` | 原生音频不能与双图首尾帧同时使用。 |
 | `kling-v2-6` | 提供了两张 `image_urls` | 双图首尾帧只支持 1080p pro 档。 |
 | `kling-v3-omni`、`kling-video-o1` | 提供了 `video_urls` | 视频参考最多搭配一张图片，参考视频必须为一个 3–10 秒视频。 |
-| `kling-v3-omni`、`kling-video-o1` | `action: "edit"` | 首期视频编辑只接受一个源视频，输出时长沿用源视频。 |
+| `kling-v3-omni`、`kling-video-o1` | `action: "edit"` | 视频编辑只接受一个源视频，输出时长沿用源视频。 |
 | `kling-v3-omni`、`kling-video-o1` | `action: "generate"` | 视频生成必须明确提供输出时长。 |
 | `kling-v3-omni` | `generate_audio: true` 且提供了 `video_urls` | 视频参考不能与原生音频开关同时使用。 |
 | `kling-v2-6-motion-control`、`kling-v3-motion-control` | 每次请求 | 动作控制必须各提供一张参考图和一个参考视频，输出时长跟随参考视频。 |
@@ -255,7 +275,8 @@ Kling 系列不接受 `seed`、`quality` 和 `size`。以上之外的参数会�
 |---|---|---|
 | 每次任务输出 | 全部 | 1 个视频 |
 | 参考图张数 | `kling-3.0-turbo`、两个 `*-motion-control` | 1 张 |
-| 参考图张数 | `kling-v2-6`、`kling-v3`、`kling-v3-omni`、`kling-video-o1` | 2 张 |
+| 参考图张数 | `kling-v2-6`、`kling-v3`、`kling-video-o1` | 2 张 |
+| 参考图张数 | `kling-v3-omni` | 7 张；带参考视频时 1 张 |
 | 参考视频时长 | `kling-v3-omni`、`kling-video-o1` | 10 秒 |
 | 参考视频时长 | `kling-v2-6-motion-control`、`kling-v3-motion-control` | 30 秒 |
 | 分镜段数 | `kling-v3`、`kling-v3-omni` | 6 段 |
@@ -265,12 +286,14 @@ Kling 系列不接受 `seed`、`quality` 和 `size`。以上之外的参数会�
 
 ## 计费
 
-按**分辨率档 × 输出秒数**计费。`resolution` 决定档位（`720p` / `1080p`），秒数取这一单实际的输出时长。
+按**分辨率档 × 输出秒数**计费。`resolution` 决定档位（`720p` / `1080p` / `4k`），秒数取这一单实际的输出时长。参考图张数不影响价格。
 
 出现下面两种情况时，换一档每秒单价，仍然只乘输出秒数：
 
 - **原生音频**：`generate_audio: true` 时走带声档。`kling-v3`、`kling-v3-omni` 两个分辨率都有带声档，`kling-v2-6` 只有 1080p 有。
 - **参考视频**：`kling-v3-omni` 与 `kling-video-o1` 提供了 `video_urls` 时走参考视频档，`action: "generate"` 与 `action: "edit"` 都算。参考视频本身的秒数不另计费。
+
+`4k` 档（`kling-v3`、`kling-v3-omni`）只有一个每秒单价，原生音频、参考视频不改变档位。
 
 输出秒数怎么定：
 
@@ -321,8 +344,8 @@ Kling 系列不接受 `seed`、`quality` 和 `size`。以上之外的参数会�
 |---|---|---|---|---|
 | `kling-3.0-turbo` | `generate` | 3–15 秒 | `720p` `1080p` | 首帧图 1 张 |
 | `kling-v2-6` | `generate` | 5 或 10 秒 | `720p` `1080p` | 参考图最多 2 张 |
-| `kling-v3` | `generate` | 3–15 秒 | `720p` `1080p` | 参考图最多 2 张 |
-| `kling-v3-omni` | `generate` `edit` | 3–15 秒；`edit` 沿用源视频 | `720p` `1080p` | 参考图最多 2 张、参考视频 1 个 |
+| `kling-v3` | `generate` | 3–15 秒 | `720p` `1080p` `4k` | 参考图最多 2 张 |
+| `kling-v3-omni` | `generate` `edit` | 3–15 秒；`edit` 沿用源视频 | `720p` `1080p` `4k` | 参考图最多 7 张、参考视频 1 个 |
 | `kling-video-o1` | `generate` `edit` | 5 或 10 秒；`edit` 沿用源视频 | `720p` `1080p` | 参考图最多 2 张、参考视频 1 个 |
 | `kling-v2-6-motion-control` | `generate` | 跟随参考视频 | `720p` `1080p` | 参考图 1 张 + 参考视频 1 个 |
 | `kling-v3-motion-control` | `generate` | 跟随参考视频 | `720p` `1080p` | 参考图 1 张 + 参考视频 1 个 |

@@ -1,10 +1,10 @@
 ---
 title: "PixVerse V6"
-description: "PixVerse V6: text-to-video, image-to-video, first/last frame and multi-reference fusion, any integer duration from 1 to 15 seconds, optional native audio"
+description: "PixVerse V6: text-to-video, image-to-video, first/last frame, multi-reference fusion and video extension, any integer duration from 1 to 15 seconds, optional native audio"
 api: "POST https://api.qingbo.ai/v1/tasks"
 ---
 
-PixVerse V6 is PixVerse's unified video model: one model covers text-to-video, image-to-video, first/last-frame transitions and multi-image reference fusion, with a multi-shot engine for continuous narrative, native synchronized audio (dialogue, sound effects and background music) and cinematic camera control, at 360p to 1080p and 1 to 15 seconds. The generation mode is selected by the media fields you send, not by the action. Every request is submitted asynchronously through `POST /v1/tasks`.
+PixVerse V6 is PixVerse's unified video model: one model covers text-to-video, image-to-video, first/last-frame transitions and multi-image reference fusion, with a multi-shot engine for continuous narrative, native synchronized audio (dialogue, sound effects and background music) and cinematic camera control, at 360p to 1080p and 1 to 15 seconds. Under `generate` the mode follows the media fields you send; `extend` continues a completed task.
 
 ## Quick start
 
@@ -86,9 +86,25 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
   }'
 ```
 
+```bash Video extension
+curl -X POST https://api.qingbo.ai/v1/tasks \
+  -H "Authorization: Bearer $WAVE_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "pixverse-v6",
+    "action": "extend",
+    "ref_task_id": "task-wave1775285160b950328499",
+    "prompt": "The character keeps walking into a forest",
+    "resolution": "540p",
+    "duration": 5
+  }'
+```
+
 </CodeGroup>
 
 A successful submission returns a `task_id`. Retrieve the result with [`GET /v1/tasks/{task_id}`](/en/api-reference/task/status), wait inline with [`Prefer: wait`](/en/api-reference/task/submit#in-request-waiting-prefer-wait), or configure a webhook.
+
+**Chaining an extension** takes two steps. Submit `action: "generate"` and keep the `task_id`; once the task is `completed`, pass that `task_id` as `ref_task_id` on an `action: "extend"` request. `ref_task_id` is the `task_id` of a completed `pixverse-v6` task in your account, not an upstream ID.
 
 ## Request parameters
 
@@ -97,11 +113,12 @@ A successful submission returns a `task_id`. Retrieve the result with [`GET /v1/
 </ParamField>
 
 <ParamField body="action" type="string" default="generate">
-  `generate` is the only action on this model. The mode follows the media fields you send: `prompt` alone is text-to-video, `image_urls` is image-to-video, `first_frame_image` together with `last_frame_image` is a first/last-frame transition, and `img_references` is multi-image reference fusion.
+  - `generate` — generate a video. `prompt` alone is text-to-video, `image_urls` is image-to-video, `first_frame_image` together with `last_frame_image` is a first/last-frame transition, and `img_references` is multi-image reference fusion.
+  - `extend` — video extension; `ref_task_id` is required.
 </ParamField>
 
 <ParamField body="prompt" type="string" required>
-  The video description, up to 5000 characters.
+  The video description, up to 5000 characters. Under `action: "extend"` it describes the continuation.
 </ParamField>
 
 <ParamField body="negative_prompt" type="string">
@@ -112,12 +129,12 @@ A successful submission returns a `task_id`. Retrieve the result with [`GET /v1/
   Video length in seconds, an integer from `1` to `15`. First/last-frame mode accepts only `5` or `8`.
 </ParamField>
 
-<ParamField body="resolution" type="string">
-  Output resolution: `360p`, `540p`, `720p` or `1080p`. Resolution selects the price tier.
+<ParamField body="resolution" type="string" default="540p">
+  Output resolution: `360p`, `540p`, `720p` or `1080p`; defaults to `540p`. Resolution selects the price tier.
 </ParamField>
 
 <ParamField body="aspect_ratio" type="string">
-  Frame ratio: `16:9`, `4:3`, `1:1`, `3:4`, `9:16`, `2:3`, `3:2` or `21:9`. Effective in text-to-video and multi-reference fusion only; other modes follow the input image.
+  Frame ratio: `16:9`, `4:3`, `1:1`, `3:4`, `9:16`, `2:3`, `3:2` or `21:9`. Effective in text-to-video and multi-reference fusion only; other modes follow the input image, and `action: "extend"` follows the source video.
 </ParamField>
 
 <ParamField body="seed" type="integer">
@@ -125,15 +142,15 @@ A successful submission returns a `task_id`. Retrieve the result with [`GET /v1/
 </ParamField>
 
 <ParamField body="image_urls" type="string[]">
-  Input image URLs for image-to-video; only the first image is used.
+  Input image URLs for image-to-video; only the first image is used. `action: "generate"` only.
 </ParamField>
 
 <ParamField body="first_frame_image" type="string">
-  Starting frame URL for a first/last-frame transition. Must be sent together with `last_frame_image`.
+  Starting frame URL for a first/last-frame transition. Must be sent together with `last_frame_image`. `action: "generate"` only.
 </ParamField>
 
 <ParamField body="last_frame_image" type="string">
-  Closing frame URL for a first/last-frame transition. Must be sent together with `first_frame_image`.
+  Closing frame URL for a first/last-frame transition. Must be sent together with `first_frame_image`. `action: "generate"` only.
 </ParamField>
 
 <ParamField body="watermark" type="boolean" default="false">
@@ -141,7 +158,7 @@ A successful submission returns a `task_id`. Retrieve the result with [`GET /v1/
 </ParamField>
 
 <ParamField body="generate_audio" type="boolean" default="false">
-  Whether to generate a video with sound. Enabling it moves the task to the audio price tier, which costs more than the silent tier.
+  Whether to generate a video with an audio track. Enabling it moves the task to the audio price tier.
 </ParamField>
 
 <ParamField body="motion_mode" type="string">
@@ -149,11 +166,15 @@ A successful submission returns a `task_id`. Retrieve the result with [`GET /v1/
 </ParamField>
 
 <ParamField body="generate_multi_clip_switch" type="boolean" default="false">
-  Whether to generate a multi-clip continuous video. Effective in text-to-video and image-to-video only.
+  Whether to generate a multi-clip continuous video. Effective in the text-to-video and image-to-video modes of `action: "generate"` only.
 </ParamField>
 
 <ParamField body="img_references" type="string[]">
-  Reference image URLs for multi-image fusion, 1 to 7 images. Sending this field selects fusion mode.
+  Reference image URLs for multi-image fusion, 1 to 7 images. Sending this field selects fusion mode. `action: "generate"` only.
+</ParamField>
+
+<ParamField body="ref_task_id" type="string">
+  The task to extend; required under `action: "extend"`. Use the `task_id` of a completed `pixverse-v6` task in your account.
 </ParamField>
 
 See [Submit Task](/en/api-reference/task/submit) for `callback_url`, `callback_events`, `Prefer: wait`, `Idempotency-Key` and the maximum-cost header.
@@ -162,8 +183,11 @@ Any other parameter returns `400` and is not billed.
 
 ## Limits
 
-- First/last frame mode only supports 5 or 8 seconds
-- This model produces one result per task; n is not supported
+| Condition | Limit |
+|---|---|
+| `first_frame_image` provided | First/last frame mode only supports 5 or 8 seconds |
+| `action: "extend"` | Extension continues the source task: a prompt is required, images and first/last frames cannot be sent, and the aspect ratio follows the source video. |
+| Every request | This model produces one result per task; n is not supported |
 
 | Item | Limit |
 |---|---|
@@ -172,21 +196,20 @@ Any other parameter returns `400` and is not billed.
 | Fusion references `img_references` | 1 to 7 images |
 | Prompts | `prompt` up to 5000 characters, `negative_prompt` up to 2048 |
 | Duration `duration` | 1 to 15 seconds; 5 or 8 in first/last-frame mode |
-| Resolution `resolution` | `360p` / `540p` / `720p` / `1080p` |
+| Resolution `resolution` | `360p` / `540p` / `720p` / `1080p`, default `540p` |
 
 All image inputs must be publicly reachable HTTP(S) URLs; base64 and Data URIs return an error.
 
 ## Pricing
 
-Billing is **resolution tier × output seconds**, where the seconds come from the `duration` you send. Each of the four resolutions is priced separately, and higher resolutions cost more.
+Billing is **resolution tier × output seconds**, where the seconds come from the `duration` you send; without `resolution` the `540p` tier applies. Each of the four resolutions is priced separately, and higher resolutions cost more. `action: "extend"` is billed the same way, on this request's `duration` and `resolution`, independent of the source task.
 
 `generate_audio` is the second billing dimension: enabling it settles at the **audio tier** for the same resolution, which is above the silent tier. Reference images, first/last frames, the negative prompt and the aspect ratio carry no separate charge.
 
 <Note>
-Rates move with the upstream, so this section describes billing dimensions only and lists no amounts.
+Per-model rates are in `price_config` on `GET /v1/models`, and in the console's Model Market.
 
-Current rates: `price_config` on `GET /v1/models`, or the Model Market in the console.
-Actual cost of one call: the `cost` field on the task response (an integer quota; 500,000 quota = 1 USD).
+What a single call actually cost is the `cost` field on the task response — an integer quota at 500,000 quota = 1 USD.
 </Note>
 
 You are billed only for a delivered video. Failed and cancelled tasks, and upstream successes that carry no deliverable video, are refunded in full. The final charge is the `cost` field on the task response — an integer quota, not dollars (500,000 quota = 1 USD).
@@ -225,7 +248,7 @@ Generated videos are returned in `result.videos`; `url` is an array and `expires
 
 | Model ID | Resolution | Duration (s) | Action | Notes |
 |---|---|---|---|---|
-| `pixverse-v6` | `360p` / `540p` / `720p` / `1080p` | Any integer 1 to 15 | `generate` | Text, image, first/last frame and fusion in one model, with optional audio |
+| `pixverse-v6` | `360p` / `540p` / `720p` / `1080p` | Any integer 1 to 15 | `generate` `extend` | Text, image, first/last frame, fusion and extension in one model, with optional audio |
 
 ## Related
 

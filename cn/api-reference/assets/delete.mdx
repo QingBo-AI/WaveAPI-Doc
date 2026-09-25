@@ -1,0 +1,91 @@
+---
+title: "删除素材"
+description: "DELETE /v1/assets/{asset_id} — 删除素材"
+api: "DELETE https://api.qingbo.ai/v1/assets/{asset_id}"
+---
+
+删除本账号的一个素材。删除后立即不能再被引用，模型供应商素材库中的副本随后删除。
+
+<Note>
+已提交且引用了该素材的任务可能失败。
+</Note>
+
+<RequestExample>
+```bash cURL
+curl -X DELETE https://api.qingbo.ai/v1/assets/ast_3f9c2a7d1e8b4c6a5f0e9d21 \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+```python Python
+import requests
+
+response = requests.delete(
+    "https://api.qingbo.ai/v1/assets/ast_3f9c2a7d1e8b4c6a5f0e9d21",
+    headers={"Authorization": "Bearer YOUR_API_KEY"}
+)
+
+print(response.json()["deleted"])
+```
+</RequestExample>
+
+<ResponseExample>
+```json 200
+{
+  "id": "ast_3f9c2a7d1e8b4c6a5f0e9d21",
+  "object": "asset",
+  "deleted": true
+}
+```
+
+```json 404
+{
+  "error": {
+    "message": "素材不存在",
+    "type": "invalid_request_error",
+    "param": "asset_id",
+    "code": "asset_not_found"
+  }
+}
+```
+</ResponseExample>
+
+## 鉴权
+
+<ParamField header="Authorization" type="string" required>
+  `Bearer YOUR_API_KEY`。API Key 的 quota 已用尽时也可调用。
+</ParamField>
+
+## 请求参数
+
+<ParamField path="asset_id" type="string" required>
+  素材 ID，`ast_` 开头（上传响应中的 `id`）。任意状态的素材都可删除。
+</ParamField>
+
+## 响应
+
+<ResponseField name="id" type="string">
+  被删除的素材 ID。
+</ResponseField>
+
+<ResponseField name="object" type="string">
+  固定为 `asset`。
+</ResponseField>
+
+<ResponseField name="deleted" type="boolean">
+  固定为 `true`。
+</ResponseField>
+
+## 错误码
+
+| HTTP | `code` | 说明 |
+|---|---|---|
+| 401 | — | API Key 缺失或无效 |
+| 404 | `asset_not_found` | 素材不存在、不属于本账号或已删除 |
+| 500 | `asset_store_error` | 素材删除失败，可重试 |
+
+## 相关文档
+
+- [素材库](/cn/api-reference/assets/overview)
+- [上传素材](/cn/api-reference/assets/create)
+- [列出素材](/cn/api-reference/assets/list)
+- [查询素材](/cn/api-reference/assets/get)

@@ -1,0 +1,170 @@
+---
+title: "上传素材"
+description: "POST /v1/assets — 把图片、视频或音频链接上传为素材"
+api: "POST https://api.qingbo.ai/v1/assets"
+---
+
+把一个可公开下载的图片、视频或音频链接上传为素材。提交后 `status` 为 `processing`，用[查询素材](/cn/api-reference/assets/get)获取审核结果。
+
+<Warning>
+素材存放在模型供应商的共享素材库中，该供应商的其他客户可能看到并下载。请勿上传私密或敏感内容。
+</Warning>
+
+<RequestExample>
+```bash cURL
+curl -X POST https://api.qingbo.ai/v1/assets \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "seedance-2.5",
+    "type": "video",
+    "url": "https://cdn.example.com/refs/hero-walk.mp4",
+    "name": "hero-walk-ref"
+  }'
+```
+
+```python Python
+import requests
+
+response = requests.post(
+    "https://api.qingbo.ai/v1/assets",
+    headers={"Authorization": "Bearer YOUR_API_KEY"},
+    json={
+        "model": "seedance-2.5",
+        "type": "video",
+        "url": "https://cdn.example.com/refs/hero-walk.mp4",
+        "name": "hero-walk-ref"
+    }
+)
+
+asset_id = response.json()["id"]
+```
+</RequestExample>
+
+<ResponseExample>
+```json 200
+{
+  "id": "ast_3f9c2a7d1e8b4c6a5f0e9d21",
+  "object": "asset",
+  "model": "seedance-2.5",
+  "type": "video",
+  "name": "hero-walk-ref",
+  "status": "processing",
+  "duration_seconds": 5.062,
+  "created_at": 1790220525,
+  "updated_at": 1790220525
+}
+```
+
+```json 400
+{
+  "error": {
+    "message": "无法读取该文件的时长，请使用可直接下载的 MP4 / MOV / WebM 视频或 WAV / MP3 音频",
+    "type": "invalid_request_error",
+    "param": "url",
+    "code": "asset_duration_unknown"
+  }
+}
+```
+
+```json 404
+{
+  "error": {
+    "message": "Model 'seedance-9' not found or not enabled",
+    "type": "invalid_request_error",
+    "param": "model",
+    "code": "model_not_found"
+  }
+}
+```
+</ResponseExample>
+
+## 鉴权
+
+<ParamField header="Authorization" type="string" required>
+  `Bearer YOUR_API_KEY`
+</ParamField>
+
+## 请求参数
+
+<ParamField body="model" type="string" required>
+  引用该素材的模型：`seedance-2.0`、`seedance-2.0-fast`、`seedance-2.0-mini`、`seedance-2.5`。
+</ParamField>
+
+<ParamField body="type" type="string" required>
+  素材类型：`image`、`video`、`audio`。
+</ParamField>
+
+<ParamField body="url" type="string" required>
+  可公开下载的 `http(s)` 链接，不超过 4096 字符。视频、音频上传时读取时长，读不到时返回 `400`；视频用 MP4 / MOV / WebM，音频用 WAV / MP3。
+</ParamField>
+
+<ParamField body="name" type="string">
+  备注名，不超过 128 字。
+</ParamField>
+
+以上之外的字段返回 `400`（`invalid_request`）。
+
+## 响应
+
+<ResponseField name="id" type="string">
+  素材 ID，`ast_` 开头。查询、删除时使用。
+</ResponseField>
+
+<ResponseField name="object" type="string">
+  固定为 `asset`。
+</ResponseField>
+
+<ResponseField name="model" type="string">
+  上传时的 `model`。
+</ResponseField>
+
+<ResponseField name="type" type="string">
+  `image`、`video` 或 `audio`。
+</ResponseField>
+
+<ResponseField name="name" type="string">
+  备注名，未传时为空字符串。
+</ResponseField>
+
+<ResponseField name="status" type="string">
+  上传成功时固定为 `processing`。
+</ResponseField>
+
+<ResponseField name="duration_seconds" type="number">
+  视频、音频的时长（秒），上传时读取。图片无此字段。
+</ResponseField>
+
+<ResponseField name="created_at" type="integer">
+  创建时间（Unix 秒）。
+</ResponseField>
+
+<ResponseField name="updated_at" type="integer">
+  更新时间（Unix 秒）。
+</ResponseField>
+
+## 错误码
+
+| HTTP | `code` | 说明 |
+|---|---|---|
+| 400 | `invalid_request` | 请求体不是合法 JSON，或含不支持的字段 |
+| 400 | `missing_model` | 缺少 `model` |
+| 400 | `invalid_asset_type` | `type` 不是 `image` / `video` / `audio` |
+| 400 | `invalid_name` | `name` 超过 128 字 |
+| 400 | `invalid_url` | `url` 不是可公开下载的 `http(s)` 链接 |
+| 400 | `asset_type_unsupported` | 该模型不支持此类型素材 |
+| 400 | `asset_limit_exceeded` | 已达每个账号 500 个素材的上限 |
+| 400 | `asset_duration_unknown` | 无法读取视频或音频的时长 |
+| 400 | `asset_rejected` | 素材不符合模型要求（格式、大小、时长或内容） |
+| 401 | — | API Key 缺失或无效 |
+| 404 | `model_not_found` | 模型不存在或未启用 |
+| 429 | — | 上传过于频繁 |
+| 500 | `asset_store_error` | 素材记录保存失败，可重试 |
+| 502 | `asset_upstream_error` | 素材服务暂不可用，可重试 |
+
+## 相关文档
+
+- [素材库](/cn/api-reference/assets/overview)
+- [查询素材](/cn/api-reference/assets/get)
+- [列出素材](/cn/api-reference/assets/list)
+- [删除素材](/cn/api-reference/assets/delete)

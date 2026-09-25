@@ -6,7 +6,7 @@ api: "POST https://api.qingbo.ai/v1/tasks"
 
 Wan is Alibaba Tongyi's video model line. This page covers nine video models: `wan2.5-preview`, `wan2.6`, `wan2.6-i2v` and `wan2.6-i2v-flash` handle text- and image-to-video; `wan2.7` and `wan3.0-video` / `wan3.0-video-prime` are multimodal entry points (text, frames, reference assets and video continuation all use one model ID); `wan2.7-r2v` does reference-to-video; `wan2.7-videoedit` does video editing. All nine share `POST /v1/tasks` and switching models means changing `model`, but the parameter set, the media inputs each takes, and the billing dimensions differ. For Wan image models, see [Wan Image Series](/en/api-reference/image/wan-image).
 
-`wan3.0-video-prime` is the accelerated edition of `wan3.0-video`: the same parameters, value ranges, constraints and billing dimensions, with faster generation at a higher rate. Switching only changes `model`.
+`wan3.0-video-prime` is the accelerated edition of `wan3.0-video`: the same parameters, value ranges, constraints and billing dimensions, with faster generation at a higher rate.
 
 ## Quick start
 
@@ -172,7 +172,7 @@ A successful submission returns a `task_id`. Poll [`GET /v1/tasks/{task_id}`](/e
   Video input. Clip count and duration caps differ by model:
 
   - `wan2.7` — at most 1 clip, 2–10 s, for video continuation
-  - `wan2.7-r2v` — at most 5 clips, each up to 5 s, 25 s in total
+  - `wan2.7-r2v` — at most 5 clips, 1–30 s each
   - `wan2.7-videoedit` — **required**, exactly 1 clip, 2–10 s
   - `wan3.0-video` / `wan3.0-video-prime` — at most 5 clips, each up to 15 s, 15 s in total
 </ParamField>
@@ -182,7 +182,7 @@ A successful submission returns a `task_id`. Poll [`GET /v1/tasks/{task_id}`](/e
 </ParamField>
 
 <ParamField body="generate_audio" type="boolean">
-  Whether the output carries an audio track. `wan2.5-preview` and `wan2.6` default to `false`; `wan2.6-i2v-flash` and `wan3.0-video` / `wan3.0-video-prime` default to `true`. The other models do not take this parameter.
+  Whether the output carries an audio track. `wan2.6` defaults to `false`; `wan2.6-i2v-flash` and `wan3.0-video` / `wan3.0-video-prime` default to `true`; `wan2.5-preview` only generates videos with audio, defaults to `true` and does not accept `false`. The other models do not take this parameter.
 </ParamField>
 
 <ParamField body="resolution" type="string">
@@ -192,7 +192,7 @@ A successful submission returns a `task_id`. Poll [`GET /v1/tasks/{task_id}`](/e
   - `wan2.6`, `wan2.6-i2v`, `wan2.6-i2v-flash`, `wan2.7`, `wan2.7-r2v`, `wan2.7-videoedit` — `720p`, `1080p`
   - `wan3.0-video` / `wan3.0-video-prime` — `480p`, `720p`, `1080p`
 
-  Defaults: `720p` for `wan2.6-i2v`, `wan2.6-i2v-flash`, `wan2.7`, `wan2.7-r2v` and `wan2.7-videoedit`; `480p` for `wan3.0-video` / `wan3.0-video-prime`.
+  Defaults: `480p` for `wan3.0-video` / `wan3.0-video-prime`, `720p` for the other models.
 </ParamField>
 
 <ParamField body="duration" type="integer">
@@ -202,7 +202,7 @@ A successful submission returns a `task_id`. Poll [`GET /v1/tasks/{task_id}`](/e
   - `wan2.6` — `5`, `10` or `15`
   - `wan2.6-i2v`, `wan2.6-i2v-flash`, `wan2.7`, `wan2.7-r2v` — any integer `2`–`15`
   - `wan2.7-videoedit` — any integer `2`–`10`, plus `0` (keep the source video length)
-  - `wan3.0-video` / `wan3.0-video-prime` — any integer `2`–`30`
+  - `wan3.0-video` / `wan3.0-video-prime` — any integer `2`–`30`; omit it or send `0` to let the model pick the length (2–30 seconds; with a reference video, input plus output at most 30 seconds), billed on the seconds actually produced
 
   `wan2.6-i2v` defaults to `5`. With `video_urls` present the output length is capped further: 10 seconds for `wan2.7` and `wan2.7-r2v`, 15 seconds for `wan3.0-video` / `wan3.0-video-prime`.
 </ParamField>
@@ -210,7 +210,7 @@ A successful submission returns a `task_id`. Poll [`GET /v1/tasks/{task_id}`](/e
 <ParamField body="aspect_ratio" type="string">
   Aspect ratio. `wan2.5-preview`, `wan2.6`, `wan2.7`, `wan2.7-r2v` and `wan2.7-videoedit` support `16:9`, `9:16`, `1:1`, `4:3` and `3:4`; `wan3.0-video` / `wan3.0-video-prime` adds `adaptive` and defaults to it.
 
-  `wan2.6-i2v` and `wan2.6-i2v-flash` do not take this parameter — the aspect ratio follows the input image. It also cannot be sent by `wan2.6` alongside `image_urls`, by `wan2.7` alongside `first_frame_image` / `image_urls` / `video_urls`, or by `wan2.7-r2v` alongside `first_frame_image`; in those cases the aspect ratio follows the input asset.
+  `wan2.6-i2v` and `wan2.6-i2v-flash` do not take this parameter — the aspect ratio follows the input image. It also cannot be sent by `wan2.5-preview` or `wan2.6` alongside `image_urls`, by `wan2.7` alongside `first_frame_image` / `image_urls` / `video_urls`, or by `wan2.7-r2v` alongside `first_frame_image`; in those cases the aspect ratio follows the input asset.
 </ParamField>
 
 <ParamField body="seed" type="integer">
@@ -271,6 +271,8 @@ None of the nine models support `n` or `quality`. Any other parameter returns `4
 |---|---|---|
 | All nine models | Per task | This model produces one result per task; n is not supported |
 | `wan2.5-preview` | `resolution: "480p"` | 480p only supports 16:9 / 9:16 / 1:1 |
+| `wan2.5-preview` | Every task | This model only generates videos with audio; `generate_audio` cannot be `false` |
+| `wan2.5-preview` | `image_urls` present | Image-to-video follows the input image's aspect ratio; `aspect_ratio` cannot be set |
 | `wan2.6` | `image_urls` present | aspect_ratio is not supported in image-to-video mode |
 | `wan2.6-i2v` | Per task | One video per task; exactly one first-frame image, the aspect ratio follows the image |
 | `wan2.6-i2v` | `shot_type` present | prompt_extend must be true when shot_type is set |
@@ -294,39 +296,35 @@ None of the nine models support `n` or `quality`. Any other parameter returns `4
 | `wan3.0-video` / `wan3.0-video-prime` | `first_frame_image` present | Frame controls cannot be mixed with reference media |
 | `wan3.0-video` / `wan3.0-video-prime` | `generation_type: "frame"` | Frame mode accepts one or two frame images only |
 | `wan3.0-video` / `wan3.0-video-prime` | `generation_type: "reference"` | Reference mode cannot include frame controls |
-| `wan3.0-video` / `wan3.0-video-prime` | `video_urls` present | With reference video, output is limited to 15 seconds |
+| `wan3.0-video` / `wan3.0-video-prime` | `video_urls` present | With a reference video the output is at most 15 seconds (or omit `duration` / send `0` to let the model choose) |
 | `wan3.0-video` / `wan3.0-video-prime` | `file_url` present | file_url and link_url are mutually exclusive |
 
 ## Pricing
 
-The whole series is billed by **resolution tier × output seconds**. `price_config.video_prices` is keyed by resolution; a resolution with no key of its own settles at the sibling `default` tier.
+The whole series is billed by **resolution tier × output seconds**; an input video adds a charge on its **input seconds**.
 
-| Model ID | Billing dimensions |
-|---|---|
-| `wan2.5-preview` `wan2.6` `wan2.6-i2v` `wan3.0-video` `wan3.0-video-prime` | Resolution tier × output seconds |
-| `wan2.6-i2v-flash` | Resolution tier × output seconds; audio output uses the sound tier |
-| `wan2.7` `wan2.7-r2v` | Resolution tier × output seconds; a reference video adds a separate charge for its own seconds |
-| `wan2.7-videoedit` | Reference-video tier × output seconds (six-second floor); the source video's seconds are charged separately |
+| Model ID | Output seconds | Input-video seconds | Other |
+|---|---|---|---|
+| `wan2.5-preview` `wan2.6` `wan2.6-i2v` | The requested `duration` | — | — |
+| `wan2.6-i2v-flash` | The requested `duration` | — | Audio output uses the audio tier |
+| `wan2.7` | The requested `duration`; the reference-video tier with a reference video | The reference video's actual length | — |
+| `wan2.7-r2v` | The requested `duration`; the reference-video tier with a reference video | The reference videos' total length, billed at 5 seconds at most | — |
+| `wan2.7-videoedit` | The requested `duration` (`0` = the source length), at the reference-video tier | The source video's actual length | — |
+| `wan3.0-video` / `wan3.0-video-prime` | The requested `duration`; with `0` or omitted, the seconds actually produced | The reference video's actual length | Without `resolution`, the `480p` tier |
 
-**Sound tier (`wan2.6-i2v-flash`)** — besides `720p` / `1080p`, the price table carries `720p_sound` / `1080p_sound`. Audio generation (`generate_audio: true`, which is this model's default) or a supplied `audio_urls` settles at the sound tier.
+**Audio tier** (`wan2.6-i2v-flash`): enabling audio generation (`generate_audio: true`, the default on this model) or sending `audio_urls` bills at the audio tier.
 
-**Reference video (`wan2.7` / `wan2.7-r2v`)** — the price table carries two extra key groups, `<resolution>_video_ref` and `<resolution>_video_input_second`. With `video_urls` present, output seconds settle at the `_video_ref` tier, and the reference video's own seconds are charged separately at `_video_input_second`. Total reference-video length is capped at 10 seconds for `wan2.7` and 25 seconds for `wan2.7-r2v`. How input seconds are read, and what happens when they cannot be read, is in [Video Generation Overview](/en/api-reference/video/overview#input-video-duration-and-billing).
+**Input-video seconds** are read at submit time; a `wan2.7-videoedit` source whose length cannot be read returns `400` (`input_video_duration_unknown`) and is not billed. See [Video Generation Overview](/en/api-reference/video/overview#input-video-duration-and-billing) for how the length is read.
 
-**Video editing (`wan2.7-videoedit`)** — every edit carries one source video, and the charge has two parts:
-
-- **Output seconds** settle at the `<resolution>_video_ref` tier. `price_config.min_billing_duration` is `6`, so output seconds are the larger of the requested duration and 6; `duration: 0` counts the source video length, also with the six-second floor.
-- **Source video seconds** are charged separately at `<resolution>_video_input_second`, with no six-second floor. If the source video's length cannot be read, the request returns `400` (`input_video_duration_unknown`) and is not billed. How input seconds are read is in [Video Generation Overview](/en/api-reference/video/overview#input-video-duration-and-billing).
-
-**Default tier (`wan3.0-video` / `wan3.0-video-prime`)** — with no `resolution`, the task settles at the `480p` tier.
-
-You are only billed for a successfully generated video. Failed and cancelled tasks, and tasks that return no usable video, are refunded in full. The final charge is the `cost` field on the task response — an integer quota at **500,000 quota = 1 USD**, not dollars.
+**`wan3.0-video` / `wan3.0-video-prime`** freeze quota at submission (at 30 seconds when `duration` is `0` or omitted) and settle on the actual result when the task completes, refunding the difference.
 
 <Note>
-**Unit prices are not listed here.** They track upstream changes; this section covers billing dimensions only.
+Per-model rates are in `price_config` on `GET /v1/models`, and in the console's Model Market.
 
-Live rates: the `price_config` field of `GET /v1/models`, or the console's Model Market.
-What one call cost: the `cost` field on the task response (integer quota, 500,000 quota = 1 USD).
+What a single call actually cost is the `cost` field on the task response — an integer quota at 500,000 quota = 1 USD.
 </Note>
+
+You are only billed for a successfully generated video. Failed and cancelled tasks, and tasks that return no usable video, are refunded in full. The final charge is the `cost` field on the task response — an integer quota, not dollars.
 
 ## Response
 
@@ -370,7 +368,7 @@ Generated videos are returned in `result.videos`; `url` is an array and `expires
 | `wan2.6-i2v-flash` | `720p` `1080p` | `2`–`15` | `image_urls` (1 required) · `audio_urls` ≤1 |
 | `wan2.7` | `720p` `1080p` | `2`–`15` | `image_urls` ≤2 · `first_frame_image` / `last_frame_image` · `video_urls` ≤1 · `audio_urls` ≤1 |
 | `wan2.7-r2v` | `720p` `1080p` | `2`–`15` | `image_urls` ≤5 · `first_frame_image` · `video_urls` ≤5 |
-| `wan3.0-video` / `wan3.0-video-prime` | `480p` `720p` `1080p` | `2`–`30` | `image_urls` ≤10 · `first_frame_image` / `last_frame_image` · `video_urls` ≤5 · `audio_urls` ≤5 · `file_url` / `link_url` |
+| `wan3.0-video` / `wan3.0-video-prime` | `480p` `720p` `1080p` | `2`–`30`, `0` = model-chosen | `image_urls` ≤10 · `first_frame_image` / `last_frame_image` · `video_urls` ≤5 · `audio_urls` ≤5 · `file_url` / `link_url` |
 
 **Video editing (`action: "edit"`)**
 
