@@ -3,7 +3,7 @@ title: "Text Models Overview"
 description: "The catalog of every text model: what each supports, how it is billed, and where to call it"
 ---
 
-All text models are served through the OpenAI-compatible Chat Completions endpoint: switch models by changing `model`, with no per-vendor URLs or keys. This page lists every model ID, what it supports and how it is billed, grouped by vendor.
+All text models are served through the OpenAI-compatible Chat Completions endpoint (except the Responses-only models): switch models by changing `model`, with no per-vendor URLs or keys. This page lists every model ID, what it supports and how it is billed, grouped by vendor.
 
 ## Entry points
 
@@ -12,17 +12,17 @@ All text models are served through the OpenAI-compatible Chat Completions endpoi
     `POST /v1/chat/completions`. The default entry; every model on this page is called here, except the Responses-only models.
   </Card>
   <Card title="Responses" icon="layer-group" href="/en/api-reference/text/openai-multimodal">
-    `POST /v1/responses`. Text models from OpenAI, Qwen, DeepSeek and xAI can also be called here (except `deepseek-v3.1-terminus`), which is what clients such as Codex use; GPT Pro / Codex / o3-pro models accept only this entry.
+    `POST /v1/responses`. Every text model except `deepseek-v3.1-terminus` can be called here, which is what clients such as Codex use; GPT Pro / Codex / o3-pro models accept only this entry.
   </Card>
   <Card title="Claude Messages" icon="message" href="/en/api-reference/text/claude-messages">
-    `POST /v1/messages`. Native envelope kept for apps already built on the Anthropic SDK.
+    `POST /v1/messages`. Native envelope kept for apps already built on the Anthropic SDK; every text model except the GPT-5.6 / GPT-6 series and the Responses-only models can be called here.
   </Card>
   <Card title="Gemini native" icon="google" href="/en/api-reference/text/gemini-native">
     `POST /v1beta/models/{model}:generateContent`. Native envelope kept for existing Gemini clients.
   </Card>
 </CardGroup>
 
-New integrations should use Chat Completions. The native entries exist for compatibility with existing clients and expose no extra capability. All entries authenticate with a WaveAPI key (Chat / Responses via `Authorization: Bearer`, Messages via `x-api-key`, Gemini native via `x-goog-api-key`); an ecosystem login token is not a model key — see [Authentication](/en/docs/authentication).
+New integrations should use Chat Completions. The native entries exist for compatibility with existing clients and expose no extra capability. All entries authenticate with a WaveAPI key (Chat / Responses via `Authorization: Bearer`, Messages via `x-api-key` or `Authorization: Bearer`, Gemini native via `x-goog-api-key`); an ecosystem login token is not a model key — see [Authentication](/en/docs/authentication).
 
 ## Billing rules
 
@@ -33,7 +33,7 @@ These rules apply to every text model. Model-specific differences are in the ven
 - **Where rates come from**: 10% off the official list price or equal to it, never above; Batch, Flex and Priority prices are not used. For the actual numbers, read `price_config` from `GET /v1/models`.
 - **Total input includes cache**: `prompt_tokens` is total input; reported cache-hit / cache-write tokens are billed at their cache rates, the rest at the ordinary input rate. Cache tokens are part of the total, never an amount added on top.
 - **Reasoning is inside output**: `completion_tokens` already includes `completion_tokens_details.reasoning_tokens`; reasoning is billed once at the output rate.
-- **Two-rate models**: models billed as input + output have no cache rate; any cache statistics in the response are charged at the ordinary input rate, and explicit `cache_control` returns 400.
+- **Two-rate models**: models billed as input + output have no cache rate; any cache statistics in the response are charged at the ordinary input rate, and explicit `cache_control` is ignored, with all input billed at the input rate.
 - **Long-context tiers**: a tiered model picks its tier from **total input (cache included)**; once the threshold is reached the whole request — input, cache and output — moves to the higher rate, not just the excess. Thresholds and how the exact boundary value is treated are stated per vendor.
 - **Time-of-day pricing**: DeepSeek V4 is priced by the UTC slot at request start; see the DeepSeek section.
 - **Quota conversion**: the line items are summed and converted to an integer quota at **500,000 quota = 1 USD**; a request with positive usage that rounds below 1 quota is charged 1, then the account group multiplier is applied and the result truncated. `usage.cost` in the response is that integer quota, **not dollars**.
@@ -87,7 +87,7 @@ Caching is graded per model by which cache rates that model has configured. Cach
 | `claude-opus-5-5` `claude-opus-5` `claude-sonnet-5` `claude-fable-5` `claude-fable-5-1` | ✅ Allowed; all three cache rates configured (read / 5-minute write / 1-hour write) |
 | `qwen3.8-*`, `qwen3.7-flash` | ✅ Allowed; writes are billed at the cache-write rate, explicit hits at the cache-read rate |
 | every `gemini-*` | Upstream caches automatically, so `cache_control` has no effect; `cachedContent` on the native API is not supported and returns 400 |
-| two-rate models | ❌ No cache billing; sending `cache_control` returns 400 |
+| two-rate models | `cache_control` is ignored; all input is billed at the input rate |
 | everything else (`gpt-4.1*`, `gpt-5*`, `gpt-6-astra`, `o1`, `o3-mini`, `o4-mini`, `grok-4.6`, `grok-4.7`, `glm-5.3`, `kimi-k3`, `deepseek-v4-*`) | Upstream caches automatically; `cache_control` is neither needed nor used |
 
 Unsupported requests return `400` and are not billed.
@@ -144,9 +144,9 @@ The following return `400` and are not billed:
 - **Vendor built-in tools** — any entry in `tools` whose type is not `function` or `custom` (hosted web search, hosted execution, and similar). Client-executed function tools are not in this group and work normally.
 - **`web_search_options`**.
 - **`service_tier`** set to anything other than `standard` / `default`.
-- **Explicit caching** — see the allow-list above.
+- **`cachedContent`** (Gemini native) — see the allow-list above.
 
-Each model serves only the protocols it supports (Chat / Responses / Claude Messages / Gemini native). Sending a request to a protocol a model does not serve, or sending `tools`, `tool_choice` or `response_format` to a model that does not support them, also returns `400`. The protocols and capabilities each model supports are in the catalog below.
+Each model serves only the protocols it supports (Chat / Responses / Claude Messages / Gemini native). Sending a request to a protocol a model does not serve, or sending `tools`, `tool_choice` or `response_format` to a model that does not support them, also returns `400`. Which models each entry serves is under [Entry points](#entry-points); what each model supports is in the catalog below.
 
 ## Model catalog
 

@@ -581,9 +581,8 @@ curl https://api.qingbo.ai/v1/models \
 - **厂商内置工具**——`tools` 里出现 `function` / `custom` 之外的类型。由调用方自己执行的函数工具正常使用。
 - **`web_search_options`**。
 - **`service_tier`** 取 `standard` / `default` 以外的值。
-- **显式 `cache_control`**——只有 Claude 5 与 Fable 四个模型放行，见[文本模型总览 · 缓存](/cn/api-reference/text/overview#缓存)。
 
-在不支持工具调用或结构化输出的模型上传 `tools`、`tool_choice`、`response_format`，同样返回 `400`。各模型支持的能力见[文本模型总览](/cn/api-reference/text/overview)。
+在不支持工具调用或结构化输出的模型上传 `tools`、`tool_choice`、`response_format`，同样返回 `400`。各模型支持的能力见[文本模型总览](/cn/api-reference/text/overview)。计费方式为「输入输出两项」的模型会忽略显式 `cache_control`，输入全部按输入价计费；其余模型的处理见[文本模型总览 · 缓存](/cn/api-reference/text/overview#缓存)。
 
 ## 相关文档
 

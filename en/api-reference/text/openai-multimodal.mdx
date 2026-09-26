@@ -1,10 +1,10 @@
 ---
 title: "Responses API"
-description: "The OpenAI Responses protocol endpoint, serving GPT Pro / Codex and o3-pro"
+description: "The OpenAI Responses protocol endpoint, available for every text model except deepseek-v3.1-terminus"
 api: "POST https://api.qingbo.ai/v1/responses"
 ---
 
-The OpenAI Responses protocol endpoint, serving `gpt-5-pro`, `gpt-5.2-pro`, `gpt-5.4-pro`, `gpt-5.3-codex` and `o3-pro`. These five models do not accept Chat Completions; every other text model uses the [General Chat API](/en/api-reference/text/general-chat).
+The OpenAI Responses protocol endpoint. Every text model except `deepseek-v3.1-terminus` can be called here. `gpt-5-pro`, `gpt-5.2-pro`, `gpt-5.4-pro`, `gpt-5.3-codex` and `o3-pro` accept only this endpoint, not Chat Completions.
 
 <RequestExample>
 ```bash cURL
@@ -277,7 +277,7 @@ public class Main {
 <ParamField body="model" type="string" required>
   Model ID.
 
-  **Five models are served here**:
+  Every text model except `deepseek-v3.1-terminus` can be called on this endpoint. **Five models accept only this endpoint**:
 
   * `gpt-5-pro`
   * `gpt-5.2-pro`
@@ -286,7 +286,7 @@ public class Main {
   * `o3-pro`
 
   <Note>
-  These five accept only this endpoint and return `400` on `/v1/chat/completions`; every other text model is Chat-only and returns `400` here. How each model is billed is in the [Text Models Overview](/en/api-reference/text/overview).
+  These five return `400` on `/v1/chat/completions`; `deepseek-v3.1-terminus` returns `400` here. How each model is billed is in the [Text Models Overview](/en/api-reference/text/overview).
   </Note>
 </ParamField>
 
@@ -316,7 +316,7 @@ public class Main {
   Tool list.
 
   <Warning>
-  These five models do not support tool calling or structured output, so `tools`, `tool_choice` and `response_format` return `400` and are not billed. For function calling, pick a tool-capable model on the [Chat API](/en/api-reference/text/general-chat).
+  These five models do not support tool calling or structured output, so `tools`, `tool_choice` and `response_format` return `400` and are not billed. For function calling, use another model that supports tools.
   </Warning>
 </ParamField>
 
@@ -593,7 +593,7 @@ If no terminal usage arrives, the held credit stays pending reconciliation. Chec
 The following return `400` and are not billed:
 
 - **Hosted tools** — `web_search`, `file_search`, `remote_mcp` and other vendor built-ins.
-- **Tool calling and structured output** — see the `tools` note above.
+- **Tool calling and structured output on the five models above** — see the `tools` note above.
 - **`service_tier`** set to anything other than `standard` / `default`.
 - **Image and video input**.
 
