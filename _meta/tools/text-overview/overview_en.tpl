@@ -22,7 +22,7 @@ All text models are served through the OpenAI-compatible Chat Completions endpoi
   </Card>
 </CardGroup>
 
-New integrations should use Chat Completions. The native entries exist for compatibility with existing clients and expose no extra capability. All entries authenticate with a WaveAPI key (Chat / Responses via `Authorization: Bearer`, Messages via `x-api-key` or `Authorization: Bearer`, Gemini native via `x-goog-api-key`); an ecosystem login token is not a model key — see [Authentication](/en/docs/authentication).
+New integrations should use Chat Completions. The native entries exist for compatibility with existing clients and expose no extra capability except web search. All entries authenticate with a WaveAPI key (Chat / Responses via `Authorization: Bearer`, Messages via `x-api-key` or `Authorization: Bearer`, Gemini native via `x-goog-api-key`, `Authorization: Bearer` or the `key` query parameter); an ecosystem login token is not a model key — see [Authentication](/en/docs/authentication).
 
 ## Billing rules
 
@@ -36,7 +36,12 @@ These rules apply to every text model. Model-specific differences are in the ven
 - **Two-rate models**: models billed as input + output have no cache rate; any cache statistics in the response are charged at the ordinary input rate, and explicit `cache_control` is ignored, with all input billed at the input rate.
 - **Long-context tiers**: a tiered model picks its tier from **total input (cache included)**; once the threshold is reached the whole request — input, cache and output — moves to the higher rate, not just the excess. Thresholds and how the exact boundary value is treated are stated per vendor.
 - **Time-of-day pricing**: DeepSeek V4 is priced by the UTC slot at request start; see the DeepSeek section.
+- **Web search**: billed per search actually run, at `price_config.web_search_per_1k` (USD per 1,000 searches), added to the token cost before the quota conversion. On `/v1/responses` only search actions (`action.type: "search"`) count; opening a page and finding in page do not. On `/v1/messages` the count is `usage.server_tool_use.web_search_requests`. Entries and models are in the table below.
 - **Quota conversion**: the line items are summed and converted to an integer quota at **500,000 quota = 1 USD**; a request with positive usage that rounds below 1 quota is charged 1, then the account group multiplier is applied and the result truncated. `usage.cost` in the response is that integer quota, **not dollars**.
+
+{{WEB_SEARCH}}
+
+On `/v1/responses`, a web search tool sent to a model not in the table is ignored: no search runs and no search fee is charged (`gpt-5-pro`, `gpt-5.2-pro`, `gpt-5.4-pro`, `gpt-5.3-codex` and `o3-pro` do not support tool calling and return `400`). A `tool_choice` that forces web search returns `400`. On `/v1/messages`, a web search tool sent to a model not in the table returns `400`. The Chat endpoint offers no web search.
 
 All rates are in USD per 1 million tokens:
 
@@ -46,6 +51,7 @@ cost (USD) = ( ordinary input tokens × input rate
              + cached_tokens × cache-read rate
              + cache_write_tokens × cache-write rate
              + completion_tokens × output rate ) / 1,000,000
+             + web searches × web_search_per_1k / 1,000
 quota      = cost (USD) × 500,000, truncated, minimum 1
 ```
 
@@ -72,7 +78,7 @@ Caching is graded per model by which cache rates that model has configured. Cach
 | No cache discount | `cache_billing: "input_output"` | every other model in the catalog; any cache statistics in the response bill at the ordinary input rate |
 | Cache read only | has `cache_read` | `gpt-5.5` `gpt-5.4` `gpt-5.4-mini` `gpt-5.4-nano` `gpt-5.2` `gpt-5.1` `gpt-5` `gpt-5-mini` `gpt-5-nano` `gpt-4.1` `gpt-4.1-mini` `gpt-4.1-nano` `o4-mini` `o3-mini` `o1` `grok-4.7` `grok-4.6` `gemini-3.6-flash` `gemini-3.7-flash` `gemini-3.8-flash` `kimi-k3` `glm-5.3` |
 | Cache read + write | also `cache_write` | `gpt-5.6-luna` `gpt-5.6-terra` `gpt-5.6-sol` `gpt-6-astra` `gpt-6-sol` `gpt-6-luna` `qwen3.8-max` `qwen3.8-max-0902` `qwen3.8-2.4t-a95b` `qwen3.8-27b` `qwen3.8-flash` `qwen3.7-flash` |
-| Cache read + 5-min write + 1-hour write | also `cache_write_1h` | `claude-opus-5-5` `claude-opus-5` `claude-sonnet-5` `claude-fable-5` `claude-fable-5-1` |
+| Cache read + 5-min write + 1-hour write | also `cache_write_1h` | `claude-opus-5-5` `claude-opus-5` `claude-sonnet-5` `claude-fable-5` `claude-fable-5-1` `claude-opus-4-8` `claude-opus-4-7` `claude-opus-4-6` `claude-sonnet-4-6` `claude-sonnet-4-5` `claude-haiku-4-5` |
 | Time-of-day cache rate | `cache_read` inside each `text_schedule` window | `deepseek-v4-pro` `deepseek-v4-flash` |
 
 ### Automatic vs explicit caching
@@ -84,7 +90,7 @@ Caching is graded per model by which cache rates that model has configured. Cach
 
 | Models | Explicit `cache_control` |
 |---|---|
-| `claude-opus-5-5` `claude-opus-5` `claude-sonnet-5` `claude-fable-5` `claude-fable-5-1` | ✅ Allowed; all three cache rates configured (read / 5-minute write / 1-hour write) |
+| `claude-opus-5-5` `claude-opus-5` `claude-sonnet-5` `claude-fable-5` `claude-fable-5-1` `claude-opus-4-8` `claude-opus-4-7` `claude-opus-4-6` `claude-sonnet-4-6` `claude-sonnet-4-5` `claude-haiku-4-5` | ✅ Allowed; all three cache rates configured (read / 5-minute write / 1-hour write) |
 | `qwen3.8-*`, `qwen3.7-flash` | ✅ Allowed; writes are billed at the cache-write rate, explicit hits at the cache-read rate |
 | every `gemini-*` | Upstream caches automatically, so `cache_control` has no effect; `cachedContent` on the native API is not supported and returns 400 |
 | two-rate models | `cache_control` is ignored; all input is billed at the input rate |
@@ -141,7 +147,7 @@ Written tokens bill at the cache-write rate, which is higher than ordinary input
 
 The following return `400` and are not billed:
 
-- **Vendor built-in tools** — any entry in `tools` whose type is not `function` or `custom` (hosted web search, hosted execution, and similar). Client-executed function tools are not in this group and work normally.
+- **Vendor built-in tools** — any entry in `tools` whose type is not `function` or `custom` (hosted execution, file search, and similar). Client-executed function tools are not in this group and work normally; for web search see [Billing rules](#billing-rules).
 - **`web_search_options`**.
 - **`service_tier`** set to anything other than `standard` / `default`.
 - **`cachedContent`** (Gemini native) — see the allow-list above.

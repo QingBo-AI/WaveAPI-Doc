@@ -104,8 +104,8 @@ VENDOR_NOTES = {
 "en": """GPT-5 and later use `max_completion_tokens` to cap output and `reasoning_effort` to pick a reasoning tier (GPT-6 Astra supports `"low"` only). `max_tokens` is rejected. `gpt-5-pro`, `gpt-5.2-pro`, `gpt-5.4-pro`, `gpt-5.3-codex` and `o3-pro` are served only on the [Responses API](/en/api-reference/text/openai-multimodal) and return 400 on Chat. The 272K tier is judged on **total input**: exactly 272,000 stays on the base rate, anything above moves the whole request (cache and output included) to the long-context rate. GPT-5.6 cache writes cost 1.25× the tier's input rate and replace the ordinary input charge rather than adding to it; GPT-5.4 / 5.5 have no separate cache-write rate.""",
 },
 "anthropic": {
-"cn": """Chat 接口用 `max_tokens` 限制输出；GPT 专用的 `reasoning_effort` 与 `max_completion_tokens` 不适用于 Claude 模型。Claude 5、Claude 5.5 与 Fable 五个模型是三段缓存价（读 / 5 分钟写 / 1 小时写），放行显式 `cache_control`，写法见[缓存](#缓存)；这五个模型**不支持结构化输出**，`response_format` 的 `json_schema` 与 `json_object` 会返回 400。Fable 系列与 `claude-opus-5-5` 的 `tool_choice` 只接受 `"auto"`，`"required"` 或指定函数名会返回 400。计费方式为「输入输出两项」的模型会忽略 `cache_control`，输入全部按输入价计费。已有 Anthropic SDK 的应用可走原生 [Messages 接口](/cn/api-reference/text/claude-messages)，全部 Claude 模型都可调用。""",
-"en": """Use `max_tokens` on the Chat endpoint to cap output; the GPT-only `reasoning_effort` and `max_completion_tokens` do not apply to Claude models. The five Claude 5 / Claude 5.5 / Fable models carry three cache rates (read / 5-minute write / 1-hour write) and allow explicit `cache_control` — see [Caching](#caching) for the request shape. These five do **not support structured output**: `response_format` with `json_schema` or `json_object` returns 400. On the Fable models and `claude-opus-5-5` `tool_choice` accepts only `"auto"`; `"required"` or a named function returns 400. Models billed as input + output ignore `cache_control` and bill all input at the input rate. Apps built on the Anthropic SDK can use the native [Messages endpoint](/en/api-reference/text/claude-messages) with every Claude model.""",
+"cn": """Chat 接口用 `max_tokens` 限制输出；GPT 专用的 `reasoning_effort` 与 `max_completion_tokens` 不适用于 Claude 模型。除 `claude-opus-4-5` 外的 Claude 模型都是三段缓存价（读 / 5 分钟写 / 1 小时写），放行显式 `cache_control`，写法见[缓存](#缓存)；Claude 5、Claude 5.5 与 Fable 五个模型**不支持结构化输出**，`response_format` 的 `json_schema` 与 `json_object` 会返回 400。Fable 系列与 `claude-opus-5-5` 的 `tool_choice` 只接受 `"auto"`，`"required"` 或指定函数名会返回 400。`claude-opus-4-5` 只有输入 / 输出两项计价，会忽略 `cache_control`，输入全部按输入价计费。已有 Anthropic SDK 的应用可走原生 [Messages 接口](/cn/api-reference/text/claude-messages)，全部 Claude 模型都可调用。""",
+"en": """Use `max_tokens` on the Chat endpoint to cap output; the GPT-only `reasoning_effort` and `max_completion_tokens` do not apply to Claude models. Every Claude model except `claude-opus-4-5` carries three cache rates (read / 5-minute write / 1-hour write) and allows explicit `cache_control` — see [Caching](#caching) for the request shape. The five Claude 5 / Claude 5.5 / Fable models do **not support structured output**: `response_format` with `json_schema` or `json_object` returns 400. On the Fable models and `claude-opus-5-5` `tool_choice` accepts only `"auto"`; `"required"` or a named function returns 400. `claude-opus-4-5` bills input and output only; it ignores `cache_control` and bills all input at the input rate. Apps built on the Anthropic SDK can use the native [Messages endpoint](/en/api-reference/text/claude-messages) with every Claude model.""",
 },
 "google": {
 "cn": """OpenAI 兼容接口之外，下列模型还可以走 Gemini 原生接口：`gemini-2.5-flash-lite` `gemini-2.5-pro` `gemini-3-flash-preview` `gemini-3.1-pro-preview` `gemini-3.5-flash` `gemini-3.6-flash` `gemini-3.7-flash` `gemini-3.8-flash`（`gemini-3.5-flash-lite` 不支持 Gemini 原生接口）。原生入口是 `POST /v1beta/models/{model}:generateContent`（流式 `:streamGenerateContent?alt=sse`），见 [Gemini 原生接口](/cn/api-reference/text/gemini-native)。原生响应用 `usageMetadata` 报告用量、不带 `usage.cost`；`candidatesTokenCount` 与 `thoughtsTokenCount` 分开报告，计费输出是两者之和。Pro 模型（`gemini-2.5-pro` / `gemini-3.1-pro-preview`）有 200K 长上下文分档，超过 200,000 输入总量后整单切换。3.6 / 3.7 / 3.8 Flash 有隐式缓存读价，是否命中由上游决定；其余模型两项计价。Gemini 全系只支持自动缓存：`cache_control` 不生效，原生接口的 `cachedContent` 会返回 400；内置工具、`web_search_options` 以及 `standard` / `default` 以外的 `service_tier` 同样返回 400。""",
@@ -148,6 +148,21 @@ Beijing time is UTC+8. The per-slot input / output / cache-read rates for each m
 "other": {"cn": """只有输入 / 输出两项计价，`cache_control` 会被忽略，输入全部按输入价计费。""", "en": """Input and output are the only two rates; `cache_control` is ignored and all input is billed at the input rate."""},
 }
 
+def web_search_table(lang):
+    """联网搜索可用模型：配了搜索单价且支持工具调用。Messages 只有 Claude 模型可用。"""
+    usable = [mo for mo in MODELS if mo["ws"] is not None and "F" in caps(mo["ver"])]
+    ids = lambda ms: " ".join(f"`{mo['id']}`" for mo in ms)
+    claude = [mo for mo in usable if mo["vendor"] == "anthropic"]
+    if lang == "cn":
+        rows = ["| 入口 | 工具类型 | 模型 |", "|---|---|---|",
+                f"| `POST /v1/responses` | `web_search`、`web_search_preview` | {ids(usable)} |",
+                f"| `POST /v1/messages` | `web_search_20250305` | {ids(claude)} |"]
+    else:
+        rows = ["| Entry | Tool type | Models |", "|---|---|---|",
+                f"| `POST /v1/responses` | `web_search`, `web_search_preview` | {ids(usable)} |",
+                f"| `POST /v1/messages` | `web_search_20250305` | {ids(claude)} |"]
+    return "\n".join(rows)
+
 def catalog(lang):
     parts = []
     for vkey, cn_name, en_name in VENDORS:
@@ -157,4 +172,4 @@ def catalog(lang):
 if __name__ == "__main__":
     lang = sys.argv[1]
     tpl = open(os.path.join(os.path.dirname(__file__), f"overview_{lang}.tpl"), encoding="utf-8").read()
-    print(tpl.replace("{{CATALOG}}", catalog(lang)))
+    print(tpl.replace("{{CATALOG}}", catalog(lang)).replace("{{WEB_SEARCH}}", web_search_table(lang)))

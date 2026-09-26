@@ -22,7 +22,7 @@ description: "全部文本模型的目录：支持的能力、计费方式与调
   </Card>
 </CardGroup>
 
-新接入建议使用 Chat Completions。原生入口用于兼容已有客户端，不提供额外能力。所有入口都用 WaveAPI Key 作为凭据（Chat / Responses 走 `Authorization: Bearer`，Messages 走 `x-api-key` 或 `Authorization: Bearer`，Gemini 原生走 `x-goog-api-key`），生态登录 token 不能代替模型 Key，见[认证](/cn/docs/authentication)。
+新接入建议使用 Chat Completions。原生入口用于兼容已有客户端，除联网搜索外不提供额外能力。所有入口都用 WaveAPI Key 作为凭据（Chat / Responses 走 `Authorization: Bearer`，Messages 走 `x-api-key` 或 `Authorization: Bearer`，Gemini 原生走 `x-goog-api-key`、`Authorization: Bearer` 或查询参数 `key`），生态登录 token 不能代替模型 Key，见[认证](/cn/docs/authentication)。
 
 ## 计费口径
 
@@ -36,7 +36,12 @@ description: "全部文本模型的目录：支持的能力、计费方式与调
 - **两项计价模型**：计费方式为「输入输出两项」的模型没有缓存价，响应里的缓存统计按普通输入价计，显式 `cache_control` 会被忽略，输入全部按输入价计费。
 - **长上下文分档**：有分档的模型以**输入总量**（含缓存）判断档位，达到阈值后整单（输入、缓存、输出）切换到高档价，不是只对超出部分加价。阈值与「恰好等于阈值」的归属见各厂商段落。
 - **时段价**：DeepSeek V4 按请求开始时刻的 UTC 时段定价，见 DeepSeek 段落。
+- **联网搜索**：按实际执行的搜索次数计费，单价是 `price_config.web_search_per_1k`（USD / 1,000 次），与 token 费用合计后一起换算 quota。`/v1/responses` 只计搜索动作（`action.type: "search"`），打开网页与页内查找不计；`/v1/messages` 按 `usage.server_tool_use.web_search_requests` 计。可用入口与模型见下表。
 - **额度换算**：分项费用合计后换算成整数 quota，**500,000 quota = 1 USD**；有正用量但不足 1 quota 的请求按 1 quota 计，再应用账户分组倍率并取整。响应里的 `usage.cost` 就是这个整数 quota，**不是美元**。
+
+{{WEB_SEARCH}}
+
+表外模型在 `/v1/responses` 上带联网搜索工具时，该工具被忽略，不执行搜索、不收搜索费（`gpt-5-pro`、`gpt-5.2-pro`、`gpt-5.4-pro`、`gpt-5.3-codex`、`o3-pro` 不支持工具调用，返回 `400`）；`tool_choice` 强制指定联网搜索时返回 `400`。表外模型在 `/v1/messages` 上带联网搜索工具返回 `400`。Chat 接口不提供联网搜索。
 
 各项单价的单位是 USD / 100 万 token：
 
@@ -46,6 +51,7 @@ description: "全部文本模型的目录：支持的能力、计费方式与调
              + cached_tokens × 缓存读价
              + cache_write_tokens × 缓存写价
              + completion_tokens × 输出价 ) / 1,000,000
+             + 联网搜索次数 × web_search_per_1k / 1,000
 quota      = 费用（USD） × 500,000，向下取整，最低 1
 ```
 
@@ -72,7 +78,7 @@ quota      = 费用（USD） × 500,000，向下取整，最低 1
 | 无缓存优惠 | `cache_billing: "input_output"` | 目录中其余全部模型；响应里若带缓存统计，一律按普通输入价计 |
 | 只有缓存读 | 配了 `cache_read` | `gpt-5.5` `gpt-5.4` `gpt-5.4-mini` `gpt-5.4-nano` `gpt-5.2` `gpt-5.1` `gpt-5` `gpt-5-mini` `gpt-5-nano` `gpt-4.1` `gpt-4.1-mini` `gpt-4.1-nano` `o4-mini` `o3-mini` `o1` `grok-4.7` `grok-4.6` `gemini-3.6-flash` `gemini-3.7-flash` `gemini-3.8-flash` `kimi-k3` `glm-5.3` |
 | 缓存读 + 写 | 再配 `cache_write` | `gpt-5.6-luna` `gpt-5.6-terra` `gpt-5.6-sol` `gpt-6-astra` `gpt-6-sol` `gpt-6-luna` `qwen3.8-max` `qwen3.8-max-0902` `qwen3.8-2.4t-a95b` `qwen3.8-27b` `qwen3.8-flash` `qwen3.7-flash` |
-| 缓存读 + 5 分钟写 + 1 小时写 | 再配 `cache_write_1h` | `claude-opus-5-5` `claude-opus-5` `claude-sonnet-5` `claude-fable-5` `claude-fable-5-1` |
+| 缓存读 + 5 分钟写 + 1 小时写 | 再配 `cache_write_1h` | `claude-opus-5-5` `claude-opus-5` `claude-sonnet-5` `claude-fable-5` `claude-fable-5-1` `claude-opus-4-8` `claude-opus-4-7` `claude-opus-4-6` `claude-sonnet-4-6` `claude-sonnet-4-5` `claude-haiku-4-5` |
 | 时段缓存价 | `text_schedule` 各时段带 `cache_read` | `deepseek-v4-pro` `deepseek-v4-flash` |
 
 ### 自动缓存与显式缓存
@@ -84,7 +90,7 @@ quota      = 费用（USD） × 500,000，向下取整，最低 1
 
 | 模型 | 显式 `cache_control` |
 |---|---|
-| `claude-opus-5-5` `claude-opus-5` `claude-sonnet-5` `claude-fable-5` `claude-fable-5-1` | ✅ 放行，三档缓存价齐备（读 / 5 分钟写 / 1 小时写） |
+| `claude-opus-5-5` `claude-opus-5` `claude-sonnet-5` `claude-fable-5` `claude-fable-5-1` `claude-opus-4-8` `claude-opus-4-7` `claude-opus-4-6` `claude-sonnet-4-6` `claude-sonnet-4-5` `claude-haiku-4-5` | ✅ 放行，三档缓存价齐备（读 / 5 分钟写 / 1 小时写） |
 | `qwen3.8-*`、`qwen3.7-flash` | ✅ 放行，写入按缓存写入价计，显式命中按缓存读价计 |
 | 所有 `gemini-*` | 上游只有自动缓存，`cache_control` 不生效；原生接口的 `cachedContent` 不支持，传入返回 400 |
 | 两项计价模型 | `cache_control` 会被忽略，输入全部按输入价计费 |
@@ -139,7 +145,7 @@ Chat 响应里 `usage.prompt_tokens_details.cached_tokens` 是命中量；原生
 
 以下请求会返回 `400`，不计费：
 
-- **厂商内置工具**——`tools` 里出现 `function` / `custom` 之外的类型（内置联网、托管搜索、托管执行等）。由调用方自己执行的函数工具不在此列，正常使用。
+- **厂商内置工具**——`tools` 里出现 `function` / `custom` 之外的类型（托管执行、文件检索等）。由调用方自己执行的函数工具不在此列，正常使用；联网搜索见[计费口径](#计费口径)。
 - **`web_search_options`**。
 - **`service_tier`** 取 `standard` / `default` 以外的值。
 - **`cachedContent`**（Gemini 原生接口）——见上文的放行表。

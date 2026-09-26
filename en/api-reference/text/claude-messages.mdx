@@ -4,7 +4,7 @@ description: "The native Messages endpoint, kept for apps already built on the A
 api: "POST https://api.qingbo.ai/v1/messages"
 ---
 
-The native Anthropic Messages endpoint, kept for apps already built on the Anthropic SDK. Every text model except the GPT-5.6 / GPT-6 series and the Responses-only models can be called here. It exposes nothing beyond what Chat offers, so new integrations should use the [General Chat API](/en/api-reference/text/general-chat).
+The native Anthropic Messages endpoint, kept for apps already built on the Anthropic SDK. Every text model except the GPT-5.6 / GPT-6 series and the Responses-only models can be called here. Apart from web search (see [Text Models Overview · Billing rules](/en/api-reference/text/overview#billing-rules)), it exposes nothing beyond what Chat offers, so new integrations should use the [General Chat API](/en/api-reference/text/general-chat).
 
 <RequestExample>
 ```bash cURL
@@ -241,7 +241,7 @@ Set the Anthropic SDK base URL to `https://api.qingbo.ai`; the SDK appends `/v1/
 
   Cache tiers and supported capabilities for each model are in the [Text Models Overview](/en/api-reference/text/overview).
 
-  Function-call argument generation is verified on the Chat endpoint only; native multi-turn tool workflows and image input are outside the accepted scope.
+  Image input is outside the accepted scope.
 </ParamField>
 
 <ParamField body="messages" type="array" required>
@@ -473,7 +473,7 @@ Native `input_tokens` differs from Chat's `prompt_tokens`: the native field **ex
 ## Not supported
 
 - **Structured output** — Claude models do not accept `response_format` with `json_schema` or `json_object`.
-- **Function calling and multi-turn tool workflows** — use the [General Chat API](/en/api-reference/text/general-chat).
+- **Tool limits** — `tools` / `tool_choice` on a model without tool calling (see the JSON / Tools column in the [Text Models Overview](/en/api-reference/text/overview)); `tool_choice` of `any` or `tool` on the Fable models and `claude-opus-5-5` (they accept only `auto`).
 - **Image input**.
 
 These return `400` and are not billed. Explicit `cache_control` does work here: put the reusable long prefix in the `system` array — request shape and hit conditions are in the [Text Models Overview · Caching](/en/api-reference/text/overview#caching).
