@@ -1,0 +1,97 @@
+---
+title: "Codex"
+description: "Use WaveAPI text models in Codex CLI and the Codex desktop app"
+---
+
+Add WaveAPI as a model provider in Codex's `config.toml` to use GPT, Claude, Gemini, DeepSeek, GLM, Kimi, Qwen and other text models in Codex. Codex CLI and the Codex desktop app read the same configuration.
+
+## Prerequisites
+
+- Codex CLI installed (`codex --version` prints a version) or the Codex desktop app. See the [Codex docs](https://developers.openai.com/codex) for installation.
+- An API key created in the [console](https://wave.qingbo.ai/dashboard/keys).
+
+## Configure
+
+### 1. Set the API key
+
+Codex reads the key from the `WAVEAPI_API_KEY` environment variable.
+
+<CodeGroup>
+
+```zsh macOS
+read -s "WAVEAPI_API_KEY?WaveAPI API Key: "; echo
+echo "export WAVEAPI_API_KEY=\"$WAVEAPI_API_KEY\"" >> ~/.zshrc
+launchctl setenv WAVEAPI_API_KEY "$WAVEAPI_API_KEY"
+```
+
+```bash Linux
+read -rs -p "WaveAPI API Key: " WAVEAPI_API_KEY; echo
+echo "export WAVEAPI_API_KEY=\"$WAVEAPI_API_KEY\"" >> ~/.bashrc
+```
+
+```powershell Windows (PowerShell)
+$key = Read-Host "WaveAPI API Key" -AsSecureString
+[Environment]::SetEnvironmentVariable("WAVEAPI_API_KEY", [System.Net.NetworkCredential]::new("", $key).Password, "User")
+```
+
+</CodeGroup>
+
+`launchctl setenv` makes the variable visible to the Codex desktop app; restart the app afterwards. On Windows, open a new terminal after setting it.
+
+### 2. Edit config.toml
+
+Edit `~/.codex/config.toml` (Windows: `%USERPROFILE%\.codex\config.toml`):
+
+```toml
+model = "gpt-5.4"
+model_provider = "waveapi"
+
+[model_providers.waveapi]
+name = "WaveAPI"
+base_url = "https://api.qingbo.ai/v1"
+env_key = "WAVEAPI_API_KEY"
+wire_api = "responses"
+```
+
+| Field | Value |
+|---|---|
+| `model` | Default model ID |
+| `model_provider` | `waveapi`, matching `[model_providers.waveapi]` below |
+| `base_url` | `https://api.qingbo.ai/v1` |
+| `env_key` | Name of the environment variable holding the key |
+| `wire_api` | `responses` |
+
+<Warning>
+`model` and `model_provider` must be at the top of the file, before any `[...]` table. Inside a table they become fields of that table, and Codex keeps asking you to sign in to ChatGPT.
+</Warning>
+
+## Verify
+
+```bash
+codex exec "Introduce yourself in one sentence."
+```
+
+A reply means the configuration works.
+
+## Available models
+
+Every text model except `deepseek-v3.1-terminus` can be used in Codex. Model IDs and prices are in the [Text models overview](/en/api-reference/text/overview).
+
+Switch models with `/model` in Codex, or pick one at launch:
+
+```bash
+codex -m claude-sonnet-5
+```
+
+## Generate images and videos
+
+Codex can also generate images, videos and audio through WaveAPI's MCP tools; see [MCP & Skill](/en/integrations/agent-tools).
+
+## Common errors
+
+| Symptom | Cause | Fix |
+|---|---|---|
+| Asks you to sign in to ChatGPT on start | `model_provider` did not take effect | Make sure `model_provider = "waveapi"` is at the top of the file, before any `[...]` table |
+| Says the `WAVEAPI_API_KEY` environment variable is missing | The Codex process cannot see the variable | Terminal: open a new terminal or run `source ~/.zshrc`. Desktop app: run `launchctl setenv`, then restart the app |
+| `401` | The API key is invalid or disabled | Check the key in the console |
+| `400` saying the model is unavailable | The model does not support the Responses endpoint | Use any model other than `deepseek-v3.1-terminus` |

@@ -1,0 +1,97 @@
+---
+title: "Codex"
+description: "在 Codex CLI 与 Codex 桌面端中使用 WaveAPI 的文本模型"
+---
+
+在 Codex 的 `config.toml` 中把 WaveAPI 添加为模型服务商，即可在 Codex 中使用 GPT、Claude、Gemini、DeepSeek、GLM、Kimi、Qwen 等文本模型。Codex CLI 与 Codex 桌面端读取同一份配置。
+
+## 准备
+
+- 已安装 Codex CLI（`codex --version` 能输出版本号）或 Codex 桌面端。安装方法见 [Codex 文档](https://developers.openai.com/codex)。
+- 在 [控制台](https://wave.qingbo.ai/dashboard/keys) 创建 API Key。
+
+## 配置
+
+### 1. 设置 API Key
+
+Codex 从环境变量 `WAVEAPI_API_KEY` 读取 Key。
+
+<CodeGroup>
+
+```zsh macOS
+read -s "WAVEAPI_API_KEY?WaveAPI API Key: "; echo
+echo "export WAVEAPI_API_KEY=\"$WAVEAPI_API_KEY\"" >> ~/.zshrc
+launchctl setenv WAVEAPI_API_KEY "$WAVEAPI_API_KEY"
+```
+
+```bash Linux
+read -rs -p "WaveAPI API Key: " WAVEAPI_API_KEY; echo
+echo "export WAVEAPI_API_KEY=\"$WAVEAPI_API_KEY\"" >> ~/.bashrc
+```
+
+```powershell Windows (PowerShell)
+$key = Read-Host "WaveAPI API Key" -AsSecureString
+[Environment]::SetEnvironmentVariable("WAVEAPI_API_KEY", [System.Net.NetworkCredential]::new("", $key).Password, "User")
+```
+
+</CodeGroup>
+
+`launchctl setenv` 让 Codex 桌面端读到变量，执行后重启桌面端。Windows 设置后重新打开终端。
+
+### 2. 编辑 config.toml
+
+编辑 `~/.codex/config.toml`（Windows：`%USERPROFILE%\.codex\config.toml`）：
+
+```toml
+model = "gpt-5.4"
+model_provider = "waveapi"
+
+[model_providers.waveapi]
+name = "WaveAPI"
+base_url = "https://api.qingbo.ai/v1"
+env_key = "WAVEAPI_API_KEY"
+wire_api = "responses"
+```
+
+| 字段 | 值 |
+|---|---|
+| `model` | 默认模型 ID |
+| `model_provider` | `waveapi`，与下方 `[model_providers.waveapi]` 一致 |
+| `base_url` | `https://api.qingbo.ai/v1` |
+| `env_key` | 保存 Key 的环境变量名 |
+| `wire_api` | `responses` |
+
+<Warning>
+`model` 与 `model_provider` 必须写在文件开头，位于任何 `[...]` 段之前；写在段内会被当成该段的字段，Codex 会继续要求登录 ChatGPT。
+</Warning>
+
+## 验证
+
+```bash
+codex exec "用一句话介绍你自己"
+```
+
+收到回复即配置成功。
+
+## 可用模型
+
+除 `deepseek-v3.1-terminus` 外，全部文本模型都可在 Codex 中使用。模型 ID 与价格见 [文本模型总览](/cn/api-reference/text/overview)。
+
+在 Codex 中用 `/model` 切换，或启动时指定：
+
+```bash
+codex -m claude-sonnet-5
+```
+
+## 生成图像与视频
+
+Codex 还可以通过 WaveAPI 的 MCP 工具生成图像、视频和音频，见 [MCP 与 Skill](/cn/integrations/agent-tools)。
+
+## 常见错误
+
+| 现象 | 原因 | 处理 |
+|---|---|---|
+| 启动后要求登录 ChatGPT | `model_provider` 没有生效 | 确认 `model_provider = "waveapi"` 位于文件开头、任何 `[...]` 段之前 |
+| 提示缺少环境变量 `WAVEAPI_API_KEY` | Codex 进程读不到变量 | 终端：重新打开终端或 `source ~/.zshrc`；桌面端：执行 `launchctl setenv` 后重启 |
+| `401` | API Key 无效或已禁用 | 在控制台检查 Key |
+| `400`，提示模型不可用 | 模型不支持 Responses 接口 | 换用 `deepseek-v3.1-terminus` 以外的模型 |
