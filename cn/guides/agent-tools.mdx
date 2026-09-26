@@ -1,0 +1,108 @@
+---
+title: "Agent 接入"
+description: "让 Codex、Claude Code、Cursor 等 Agent 直接查模型、读参数、报价并提交图像、视频、音频任务"
+---
+
+三种接入方式，按客户端选一种：
+
+| 方式 | 适合 | 需要 |
+|---|---|---|
+| 远程 MCP | 支持远程 MCP 的客户端（Codex、Claude Code、Cursor 等） | API Key |
+| Agent Skill | 支持 Skill 的客户端，或不想配置 MCP | API Key、Node.js 18+ |
+| AI 文档 | 只需要 Agent 读文档、写调用代码 | 无 |
+
+MCP 与 Skill 调用的是同一套接口，价格、校验和计费与直接调用 [`POST /v1/tasks`](/cn/api-reference/task/submit) 相同。
+
+## 设置 API Key
+
+在 [控制台](https://wave.qingbo.ai/dashboard/keys) 创建 API Key，保存到环境变量 `WAVEAPI_API_KEY`。不要把 Key 写进命令、配置文件或对话。
+
+macOS（zsh）：
+
+```zsh
+read -s "WAVEAPI_API_KEY?WaveAPI API Key: "; echo
+launchctl setenv WAVEAPI_API_KEY "$WAVEAPI_API_KEY"
+```
+
+`launchctl setenv` 让 Codex、Cursor 等图形应用读到变量，执行后重启应用。终端里使用时，另在 `~/.zshrc` 中 `export WAVEAPI_API_KEY`。
+
+## 远程 MCP
+
+| 项 | 值 |
+|---|---|
+| 地址 | `https://api.qingbo.ai/v1/mcp` |
+| 传输 | Streamable HTTP |
+| 鉴权 | `Authorization: Bearer <API Key>` |
+
+<CodeGroup>
+
+```bash Codex
+codex mcp add waveapi \
+  --url https://api.qingbo.ai/v1/mcp \
+  --bearer-token-env-var WAVEAPI_API_KEY
+```
+
+```bash Claude Code
+claude mcp add --transport http waveapi https://api.qingbo.ai/v1/mcp \
+  --header 'Authorization: Bearer ${WAVEAPI_API_KEY}'
+```
+
+```json Cursor (~/.cursor/mcp.json)
+{
+  "mcpServers": {
+    "waveapi": {
+      "url": "https://api.qingbo.ai/v1/mcp",
+      "headers": { "Authorization": "Bearer ${env:WAVEAPI_API_KEY}" }
+    }
+  }
+}
+```
+
+</CodeGroup>
+
+Claude Code 的命令用单引号，`${WAVEAPI_API_KEY}` 原样写进配置，运行时再读环境变量。
+
+配好后发一句测试：
+
+```text
+用 WaveAPI 列出 5 个视频模型，不要生成内容。
+```
+
+### 工具
+
+| 工具 | 作用 | 计费 |
+|---|---|---|
+| `list_models` | 列出这把 Key 可用的图像、视频、音频模型，可按模态、关键词筛选 | 否 |
+| `get_model_docs` | 读取模型文档页（Markdown） | 否 |
+| `get_model_schema` | 读取模型能力：动作、参数、取值、默认值、约束，以及标价 | 否 |
+| `estimate_cost` | 按请求参数报价，不建任务 | 否 |
+| `create_task` | 提交生成任务，参数同 `POST /v1/tasks` | 是 |
+| `get_task` | 查询任务状态与结果 | 否 |
+| `cancel_task` | 取消排队中的任务，预扣费用退回 | 否 |
+
+- `create_task` 支持 `idempotency_key`：重试时用同一个值和同样的参数，不会重复建任务。
+- `create_task` 支持 `wait_seconds`（0–45），在时限内完成的任务直接返回结果。
+- `get_task` 返回 `terminal`、`should_poll`、`next_poll_after_seconds`。结果链接的过期时间见 `result` 里的 `expires_at`（Unix 秒）。
+- 费用字段 `cost`、`pre_consumed_cost` 是 quota，另给出折合美元的 `cost_usd`、`pre_consumed_cost_usd`。
+
+## Agent Skill
+
+```bash
+npx skills add QingBo-AI/skills --skill waveapi-media
+```
+
+Skill 自带一个零依赖脚本，读取 `WAVEAPI_API_KEY`，客户端不用配置 MCP。说明见 [waveapi-media](https://github.com/QingBo-AI/skills/tree/main/skills/waveapi-media)。
+
+## AI 文档
+
+- 文档索引：[`https://docs.qingbo.dev/llms.txt`](https://docs.qingbo.dev/llms.txt)
+- 任一文档页地址后加 `.md` 即为 Markdown 原文，如 `https://docs.qingbo.dev/cn/api-reference/video/seedance.md`
+- 不能联网的对话类应用（豆包、元宝等），把 [PROMPT.md](https://github.com/QingBo-AI/skills/blob/main/skills/waveapi-media/PROMPT.md) 粘贴到对话开头
+
+## 限制
+
+| 项目 | 规则 |
+|---|---|
+| 模型 | 只含通过 `/v1/tasks` 调用的图像、视频、音频模型；文本模型用 [OpenAI 兼容接口](/cn/api-reference/text/overview) |
+| 媒体输入 | 公开的 `http(s)` 链接，或支持的模型上的 `asset://`；不接受本地路径、`file://`、base64 |
+| 模型范围 | 与 API Key 的模型限制一致 |

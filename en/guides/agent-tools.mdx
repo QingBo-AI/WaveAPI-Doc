@@ -1,0 +1,108 @@
+---
+title: "Agent Tools"
+description: "Let Codex, Claude Code, Cursor and other agents find models, read parameters, get prices and submit image, video and audio tasks"
+---
+
+Three ways to connect. Pick one per client:
+
+| Option | For | Needs |
+|---|---|---|
+| Remote MCP | Clients that support remote MCP (Codex, Claude Code, Cursor, …) | API key |
+| Agent Skill | Clients that support skills, or when you don't want to configure MCP | API key, Node.js 18+ |
+| AI docs | Agents that only read the docs and write calling code | Nothing |
+
+MCP and the skill call the same endpoints. Prices, validation and billing are the same as calling [`POST /v1/tasks`](/en/api-reference/task/submit) directly.
+
+## Set the API key
+
+Create an API key in the [console](https://wave.qingbo.ai/dashboard/keys) and store it in the `WAVEAPI_API_KEY` environment variable. Do not put the key in commands, config files or chats.
+
+macOS (zsh):
+
+```zsh
+read -s "WAVEAPI_API_KEY?WaveAPI API Key: "; echo
+launchctl setenv WAVEAPI_API_KEY "$WAVEAPI_API_KEY"
+```
+
+`launchctl setenv` makes the variable visible to GUI apps such as Codex and Cursor; restart the app afterwards. For terminal use, also `export WAVEAPI_API_KEY` in `~/.zshrc`.
+
+## Remote MCP
+
+| Item | Value |
+|---|---|
+| URL | `https://api.qingbo.ai/v1/mcp` |
+| Transport | Streamable HTTP |
+| Auth | `Authorization: Bearer <API key>` |
+
+<CodeGroup>
+
+```bash Codex
+codex mcp add waveapi \
+  --url https://api.qingbo.ai/v1/mcp \
+  --bearer-token-env-var WAVEAPI_API_KEY
+```
+
+```bash Claude Code
+claude mcp add --transport http waveapi https://api.qingbo.ai/v1/mcp \
+  --header 'Authorization: Bearer ${WAVEAPI_API_KEY}'
+```
+
+```json Cursor (~/.cursor/mcp.json)
+{
+  "mcpServers": {
+    "waveapi": {
+      "url": "https://api.qingbo.ai/v1/mcp",
+      "headers": { "Authorization": "Bearer ${env:WAVEAPI_API_KEY}" }
+    }
+  }
+}
+```
+
+</CodeGroup>
+
+The Claude Code command uses single quotes, so `${WAVEAPI_API_KEY}` is stored as written and read from the environment at run time.
+
+Test it with:
+
+```text
+Use WaveAPI to list 5 video models. Don't generate anything.
+```
+
+### Tools
+
+| Tool | Does | Billed |
+|---|---|---|
+| `list_models` | Lists the image, video and audio models this key can use; filter by modality or keyword | No |
+| `get_model_docs` | Returns the model's documentation page as Markdown | No |
+| `get_model_schema` | Returns the model's capabilities (actions, parameters, allowed values, defaults, constraints) and list prices | No |
+| `estimate_cost` | Prices a request without creating a task | No |
+| `create_task` | Submits a generation task; same parameters as `POST /v1/tasks` | Yes |
+| `get_task` | Returns task status and results | No |
+| `cancel_task` | Cancels a queued task and refunds its reservation | No |
+
+- `create_task` accepts `idempotency_key`. Retrying with the same key and the same input does not create a second task.
+- `create_task` accepts `wait_seconds` (0–45). A task that finishes within that time returns its result directly.
+- `get_task` returns `terminal`, `should_poll` and `next_poll_after_seconds`. Result URLs expire at `expires_at` (Unix seconds) in `result`.
+- The cost fields `cost` and `pre_consumed_cost` are in quota. `cost_usd` and `pre_consumed_cost_usd` give the USD amounts.
+
+## Agent Skill
+
+```bash
+npx skills add QingBo-AI/skills --skill waveapi-media
+```
+
+The skill ships a zero-dependency script that reads `WAVEAPI_API_KEY`; the client needs no MCP setup. See [waveapi-media](https://github.com/QingBo-AI/skills/tree/main/skills/waveapi-media).
+
+## AI docs
+
+- Documentation index: [`https://docs.qingbo.dev/llms.txt`](https://docs.qingbo.dev/llms.txt)
+- Append `.md` to any page URL for its Markdown source, e.g. `https://docs.qingbo.dev/en/api-reference/video/seedance.md`
+- For chat apps without web access, paste [PROMPT.md](https://github.com/QingBo-AI/skills/blob/main/skills/waveapi-media/PROMPT.md) at the start of the chat
+
+## Limits
+
+| Item | Rule |
+|---|---|
+| Models | Image, video and audio models called through `/v1/tasks`. For text models use the [OpenAI-compatible endpoints](/en/api-reference/text/overview) |
+| Media inputs | Public `http(s)` URLs, or `asset://` on models that support it. Local paths, `file://` and base64 are not accepted |
+| Model scope | Follows the API key's model restrictions |

@@ -120,6 +120,7 @@
                 "pages": [
                   "cn/index",
                   "cn/guides/quickstart",
+                  "cn/guides/agent-tools",
                   "cn/docs/authentication"
                 ]
               },
@@ -292,6 +293,7 @@
                 "pages": [
                   "en/index",
                   "en/guides/quickstart",
+                  "en/guides/agent-tools",
                   "en/docs/authentication"
                 ]
               },
