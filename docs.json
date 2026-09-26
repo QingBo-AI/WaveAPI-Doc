@@ -120,7 +120,6 @@
                 "pages": [
                   "cn/index",
                   "cn/guides/quickstart",
-                  "cn/guides/agent-tools",
                   "cn/docs/authentication"
                 ]
               },
@@ -261,6 +260,25 @@
             ]
           },
           {
+            "tab": "集成",
+            "icon": "plug",
+            "groups": [
+              {
+                "group": "开发工具",
+                "pages": [
+                  "cn/integrations/claude-code",
+                  "cn/integrations/codex"
+                ]
+              },
+              {
+                "group": "Agent 工具",
+                "pages": [
+                  "cn/integrations/agent-tools"
+                ]
+              }
+            ]
+          },
+          {
             "tab": "产品动态",
             "groups": [
               {
@@ -293,7 +311,6 @@
                 "pages": [
                   "en/index",
                   "en/guides/quickstart",
-                  "en/guides/agent-tools",
                   "en/docs/authentication"
                 ]
               },
@@ -429,6 +446,25 @@
                   "en/api-reference/account/balance",
                   "en/api-reference/account/usage",
                   "en/api-reference/account/subscription"
+                ]
+              }
+            ]
+          },
+          {
+            "tab": "Integrations",
+            "icon": "plug",
+            "groups": [
+              {
+                "group": "Developer Tools",
+                "pages": [
+                  "en/integrations/claude-code",
+                  "en/integrations/codex"
+                ]
+              },
+              {
+                "group": "Agent Tools",
+                "pages": [
+                  "en/integrations/agent-tools"
                 ]
               }
             ]

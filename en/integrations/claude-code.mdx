@@ -1,0 +1,115 @@
+---
+title: "Claude Code"
+description: "Use WaveAPI text models in Claude Code"
+---
+
+Point Claude Code's model endpoint at WaveAPI to use Claude, GPT, Gemini, DeepSeek, GLM, Kimi, Qwen and other text models in Claude Code.
+
+## Prerequisites
+
+- Claude Code CLI installed; `claude --version` prints a version. See the [Claude Code docs](https://code.claude.com/docs/en/setup) for installation.
+- An API key created in the [console](https://wave.qingbo.ai/dashboard/keys).
+
+## Configure
+
+### Option 1: settings.json (recommended)
+
+Edit `~/.claude/settings.json` (Windows: `%USERPROFILE%\.claude\settings.json`) and add `env`:
+
+```json
+{
+  "env": {
+    "ANTHROPIC_BASE_URL": "https://api.qingbo.ai",
+    "ANTHROPIC_AUTH_TOKEN": "sk-xxxxxxxx",
+    "ANTHROPIC_MODEL": "claude-sonnet-5",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "claude-opus-5-5",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL": "claude-sonnet-5",
+    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "claude-haiku-4-5"
+  }
+}
+```
+
+| Variable | Value |
+|---|---|
+| `ANTHROPIC_BASE_URL` | `https://api.qingbo.ai`, without `/v1` |
+| `ANTHROPIC_AUTH_TOKEN` | Your WaveAPI API key, sent as `Authorization: Bearer` |
+| `ANTHROPIC_MODEL` | Default model ID |
+| `ANTHROPIC_DEFAULT_OPUS_MODEL` / `_SONNET_MODEL` / `_HAIKU_MODEL` | Model IDs behind `/model opus`, `sonnet` and `haiku`; background tasks use `_HAIKU_MODEL` |
+
+Restart Claude Code after saving.
+
+<Warning>
+Do not put these in a project's `.claude/settings.json`; that file is committed with the repository.
+</Warning>
+
+### Option 2: environment variables
+
+<CodeGroup>
+
+```zsh macOS / Linux
+export ANTHROPIC_BASE_URL="https://api.qingbo.ai"
+export ANTHROPIC_AUTH_TOKEN="sk-xxxxxxxx"
+export ANTHROPIC_MODEL="glm-5.3"
+export ANTHROPIC_DEFAULT_OPUS_MODEL="glm-5.3"
+export ANTHROPIC_DEFAULT_SONNET_MODEL="glm-5.3"
+export ANTHROPIC_DEFAULT_HAIKU_MODEL="glm-5.3"
+```
+
+```powershell Windows (PowerShell)
+$env:ANTHROPIC_BASE_URL = "https://api.qingbo.ai"
+$env:ANTHROPIC_AUTH_TOKEN = "sk-xxxxxxxx"
+$env:ANTHROPIC_MODEL = "glm-5.3"
+$env:ANTHROPIC_DEFAULT_OPUS_MODEL = "glm-5.3"
+$env:ANTHROPIC_DEFAULT_SONNET_MODEL = "glm-5.3"
+$env:ANTHROPIC_DEFAULT_HAIKU_MODEL = "glm-5.3"
+```
+
+</CodeGroup>
+
+These apply to the current terminal only; for permanent use add them to `~/.zshrc` or the system environment.
+
+<Note>
+When using a non-Claude model, set `ANTHROPIC_MODEL` and all three `ANTHROPIC_DEFAULT_*_MODEL` variables to WaveAPI model IDs. Otherwise Claude Code sends background requests with its built-in Claude model names.
+</Note>
+
+### VS Code extension
+
+Set the same variables in your VS Code user settings (`Preferences: Open User Settings (JSON)`):
+
+```json
+"claudeCode.environmentVariables": [
+  { "name": "ANTHROPIC_BASE_URL", "value": "https://api.qingbo.ai" },
+  { "name": "ANTHROPIC_AUTH_TOKEN", "value": "sk-xxxxxxxx" },
+  { "name": "ANTHROPIC_MODEL", "value": "claude-sonnet-5" }
+]
+```
+
+## Verify
+
+```bash
+claude -p "Introduce yourself in one sentence."
+```
+
+A reply means the configuration works.
+
+## Available models
+
+Every text model can be used in Claude Code except:
+
+- The GPT-5.6 and GPT-6 series: `gpt-5.6-luna`, `gpt-5.6-sol`, `gpt-5.6-terra`, `gpt-6-astra`, `gpt-6-luna`, `gpt-6-sol`
+- `gpt-5-pro`, `gpt-5.2-pro`, `gpt-5.4-pro`, `gpt-5.3-codex`, `o3-pro`
+
+Model IDs and prices are in the [Text models overview](/en/api-reference/text/overview). Switch models in Claude Code with `/model <model ID>`.
+
+## Generate images and videos
+
+Claude Code can also generate images, videos and audio through WaveAPI's MCP tools; see [MCP & Skill](/en/integrations/agent-tools).
+
+## Common errors
+
+| Symptom | Cause | Fix |
+|---|---|---|
+| Asks you to log in to a Claude account on start | `ANTHROPIC_AUTH_TOKEN` was not read | Check the location and JSON syntax of `settings.json`, or set the variables again in the current terminal |
+| `401` | The API key is invalid or disabled | Check the key in the console. If you switched to `ANTHROPIC_API_KEY`, approve it once in interactive mode |
+| `400` saying the model is unavailable | The model is not in the available range above | Use an available model |
+| Background tasks fail while the main chat works | `ANTHROPIC_DEFAULT_HAIKU_MODEL` is not set | Set it to an available model ID |

@@ -1,0 +1,115 @@
+---
+title: "Claude Code"
+description: "在 Claude Code 中使用 WaveAPI 的文本模型"
+---
+
+把 Claude Code 的模型服务地址指向 WaveAPI，即可在 Claude Code 中使用 Claude、GPT、Gemini、DeepSeek、GLM、Kimi、Qwen 等文本模型。
+
+## 准备
+
+- 已安装 Claude Code 命令行版，`claude --version` 能输出版本号。安装方法见 [Claude Code 文档](https://code.claude.com/docs/en/setup)。
+- 在 [控制台](https://wave.qingbo.ai/dashboard/keys) 创建 API Key。
+
+## 配置
+
+### 方式一：settings.json（推荐）
+
+编辑 `~/.claude/settings.json`（Windows：`%USERPROFILE%\.claude\settings.json`），加入 `env`：
+
+```json
+{
+  "env": {
+    "ANTHROPIC_BASE_URL": "https://api.qingbo.ai",
+    "ANTHROPIC_AUTH_TOKEN": "sk-xxxxxxxx",
+    "ANTHROPIC_MODEL": "claude-sonnet-5",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "claude-opus-5-5",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL": "claude-sonnet-5",
+    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "claude-haiku-4-5"
+  }
+}
+```
+
+| 变量 | 值 |
+|---|---|
+| `ANTHROPIC_BASE_URL` | `https://api.qingbo.ai`，不带 `/v1` |
+| `ANTHROPIC_AUTH_TOKEN` | WaveAPI API Key，以 `Authorization: Bearer` 发送 |
+| `ANTHROPIC_MODEL` | 默认模型 ID |
+| `ANTHROPIC_DEFAULT_OPUS_MODEL` / `_SONNET_MODEL` / `_HAIKU_MODEL` | `/model opus`、`sonnet`、`haiku` 对应的模型 ID；后台任务使用 `_HAIKU_MODEL` |
+
+保存后重新启动 Claude Code。
+
+<Warning>
+不要写进项目目录下的 `.claude/settings.json`，该文件会随代码仓库提交。
+</Warning>
+
+### 方式二：环境变量
+
+<CodeGroup>
+
+```zsh macOS / Linux
+export ANTHROPIC_BASE_URL="https://api.qingbo.ai"
+export ANTHROPIC_AUTH_TOKEN="sk-xxxxxxxx"
+export ANTHROPIC_MODEL="glm-5.3"
+export ANTHROPIC_DEFAULT_OPUS_MODEL="glm-5.3"
+export ANTHROPIC_DEFAULT_SONNET_MODEL="glm-5.3"
+export ANTHROPIC_DEFAULT_HAIKU_MODEL="glm-5.3"
+```
+
+```powershell Windows (PowerShell)
+$env:ANTHROPIC_BASE_URL = "https://api.qingbo.ai"
+$env:ANTHROPIC_AUTH_TOKEN = "sk-xxxxxxxx"
+$env:ANTHROPIC_MODEL = "glm-5.3"
+$env:ANTHROPIC_DEFAULT_OPUS_MODEL = "glm-5.3"
+$env:ANTHROPIC_DEFAULT_SONNET_MODEL = "glm-5.3"
+$env:ANTHROPIC_DEFAULT_HAIKU_MODEL = "glm-5.3"
+```
+
+</CodeGroup>
+
+只在当前终端生效；长期使用写入 `~/.zshrc` 或系统环境变量。
+
+<Note>
+使用 Claude 以外的模型时，`ANTHROPIC_MODEL` 与三个 `ANTHROPIC_DEFAULT_*_MODEL` 都要设成 WaveAPI 的模型 ID。未设置时 Claude Code 会用自带的 Claude 模型名发起后台请求。
+</Note>
+
+### VS Code 扩展
+
+在 VS Code 用户设置（`Preferences: Open User Settings (JSON)`）中配置同样的变量：
+
+```json
+"claudeCode.environmentVariables": [
+  { "name": "ANTHROPIC_BASE_URL", "value": "https://api.qingbo.ai" },
+  { "name": "ANTHROPIC_AUTH_TOKEN", "value": "sk-xxxxxxxx" },
+  { "name": "ANTHROPIC_MODEL", "value": "claude-sonnet-5" }
+]
+```
+
+## 验证
+
+```bash
+claude -p "用一句话介绍你自己"
+```
+
+收到回复即配置成功。
+
+## 可用模型
+
+除以下模型外，全部文本模型都可在 Claude Code 中使用：
+
+- GPT-5.6 与 GPT-6 系列：`gpt-5.6-luna`、`gpt-5.6-sol`、`gpt-5.6-terra`、`gpt-6-astra`、`gpt-6-luna`、`gpt-6-sol`
+- `gpt-5-pro`、`gpt-5.2-pro`、`gpt-5.4-pro`、`gpt-5.3-codex`、`o3-pro`
+
+模型 ID 与价格见 [文本模型总览](/cn/api-reference/text/overview)。在 Claude Code 中用 `/model <模型 ID>` 切换。
+
+## 生成图像与视频
+
+Claude Code 还可以通过 WaveAPI 的 MCP 工具生成图像、视频和音频，见 [MCP 与 Skill](/cn/integrations/agent-tools)。
+
+## 常见错误
+
+| 现象 | 原因 | 处理 |
+|---|---|---|
+| 启动后要求登录 Claude 账号 | 没有读到 `ANTHROPIC_AUTH_TOKEN` | 检查 `settings.json` 的位置与 JSON 格式，或在当前终端重新设置环境变量 |
+| `401` | API Key 无效或已禁用 | 在控制台检查 Key。改用了 `ANTHROPIC_API_KEY` 时，首次需要在交互界面批准 |
+| `400`，提示模型不可用 | 该模型不在上方可用范围内 | 换用可用模型 |
+| 后台任务报错、主对话正常 | 没有设置 `ANTHROPIC_DEFAULT_HAIKU_MODEL` | 设为可用的模型 ID |
