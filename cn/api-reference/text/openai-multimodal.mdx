@@ -1,10 +1,10 @@
 ---
 title: "Responses 接口"
-description: "OpenAI Responses 协议入口，服务 GPT Pro / Codex 与 o3-pro"
+description: "OpenAI Responses 协议入口，除 deepseek-v3.1-terminus 外的全部文本模型可用"
 api: "POST https://api.qingbo.ai/v1/responses"
 ---
 
-OpenAI Responses 协议入口，服务 `gpt-5-pro`、`gpt-5.2-pro`、`gpt-5.4-pro`、`gpt-5.3-codex` 与 `o3-pro` 五个模型。这五个模型不接受 Chat Completions，其余文本模型走[通用对话接口](/cn/api-reference/text/general-chat)。
+OpenAI Responses 协议入口，除 `deepseek-v3.1-terminus` 外的全部文本模型都可调用。`gpt-5-pro`、`gpt-5.2-pro`、`gpt-5.4-pro`、`gpt-5.3-codex` 与 `o3-pro` 五个模型只接受本接口，不接受 Chat Completions。
 
 <RequestExample>
 ```bash cURL
@@ -277,7 +277,7 @@ public class Main {
 <ParamField body="model" type="string" required>
   模型 ID
 
-  **走这个接口的共五个模型**：
+  除 `deepseek-v3.1-terminus` 外的全部文本模型都可调用本接口。**只接受本接口的五个模型**：
 
   * `gpt-5-pro`
   * `gpt-5.2-pro`
@@ -286,7 +286,7 @@ public class Main {
   * `o3-pro`
 
   <Note>
-  这五个模型只接受本接口，发到 `/v1/chat/completions` 会返回 `400`；其余文本模型只走 Chat，发到本接口同样返回 `400`。各模型的计费方式见[文本模型总览](/cn/api-reference/text/overview)。
+  这五个模型发到 `/v1/chat/completions` 会返回 `400`；`deepseek-v3.1-terminus` 发到本接口同样返回 `400`。各模型的计费方式见[文本模型总览](/cn/api-reference/text/overview)。
   </Note>
 </ParamField>
 
@@ -316,7 +316,7 @@ public class Main {
   工具列表
 
   <Warning>
-  这五个模型不支持工具调用与结构化输出，`tools`、`tool_choice`、`response_format` 都会返回 `400`，不计费。需要函数调用请在 [Chat 接口](/cn/api-reference/text/general-chat)上选支持工具的模型。
+  这五个模型不支持工具调用与结构化输出，`tools`、`tool_choice`、`response_format` 都会返回 `400`，不计费。需要函数调用请改用支持工具的其他模型。
   </Warning>
 </ParamField>
 
@@ -592,8 +592,8 @@ public class Main {
 
 以下请求会返回 `400`，不计费：
 
-- **托管工具** —— `web_search`、`file_search`、`remote_mcp` 等厂商内置工具。
-- **工具调用与结构化输出** —— 见上方 `tools` 说明。
+- **托管工具** —— `file_search`、`remote_mcp` 等厂商内置工具；`web_search` 的可用模型与计费见[文本模型总览 · 计费口径](/cn/api-reference/text/overview#计费口径)。
+- **上述五个模型的工具调用与结构化输出** —— 见上方 `tools` 说明。
 - **`service_tier`** 取 `standard` / `default` 以外的值。
 - **图像与视频输入**。
 

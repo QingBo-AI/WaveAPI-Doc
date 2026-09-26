@@ -581,9 +581,8 @@ The following return `400` and are not billed:
 - **Vendor built-in tools** — any entry in `tools` whose type is not `function` or `custom`. Client-executed function tools work normally.
 - **`web_search_options`**.
 - **`service_tier`** set to anything other than `standard` / `default`.
-- **Explicit `cache_control`** — allowed only on the four Claude 5 / Fable models, see [Text Models Overview · Caching](/en/api-reference/text/overview#caching).
 
-Sending `tools`, `tool_choice` or `response_format` to a model that does not support tool calling or structured output also returns `400`. What each model supports is in the [Text Models Overview](/en/api-reference/text/overview).
+Sending `tools`, `tool_choice` or `response_format` to a model that does not support tool calling or structured output also returns `400`. What each model supports is in the [Text Models Overview](/en/api-reference/text/overview). Models billed as input + output ignore explicit `cache_control` and bill all input at the input rate; how other models handle it is in [Text Models Overview · Caching](/en/api-reference/text/overview#caching).
 
 ## Related
 

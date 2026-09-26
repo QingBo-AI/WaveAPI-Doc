@@ -155,14 +155,30 @@ public class Main {
 
 ## Authorizations
 
-<ParamField header="x-goog-api-key" type="string" required>
-  Your WaveAPI key. The native endpoint keeps Gemini's header name — it is **not** `Authorization: Bearer`.
+<ParamField header="x-goog-api-key" type="string">
+  Your WaveAPI key. Use one of this header, `Authorization` or the `key` query parameter.
 
   ```
   x-goog-api-key: YOUR_API_KEY
   ```
 
   Create a key in the [console](https://wave.qingbo.ai/dashboard/keys); see [Authentication](/en/docs/authentication) for details.
+</ParamField>
+
+<ParamField header="Authorization" type="string">
+  Your WaveAPI key. Use one of this header, `x-goog-api-key` or the `key` query parameter.
+
+  ```
+  Authorization: Bearer YOUR_API_KEY
+  ```
+</ParamField>
+
+<ParamField query="key" type="string">
+  Your WaveAPI key. Use one of this parameter, `x-goog-api-key` or `Authorization`.
+
+  ```
+  ?key=YOUR_API_KEY
+  ```
 </ParamField>
 
 ## Body
@@ -180,7 +196,7 @@ public class Main {
   - `gemini-2.5-flash-lite`
 
   <Note>
-  `gemini-3.5-flash-lite` is Chat-only and returns `400` here. How each model is billed and what it supports are in the [Text Models Overview · Google Gemini](/en/api-reference/text/overview#google-gemini).
+  `gemini-3.5-flash-lite` is not available on this endpoint and returns `400` here. How each model is billed and what it supports are in the [Text Models Overview · Google Gemini](/en/api-reference/text/overview#google-gemini).
   </Note>
 </ParamField>
 
@@ -345,7 +361,7 @@ Rates and the shared rules are in the [Text Models Overview · Billing rules](/e
 
 The following return `400` and are not billed:
 
-- **Explicit context caching** — `cachedContent` / `cached_content` / `cache_control` are rejected across the whole Gemini line; only automatic caching is open, see [Caching](/en/api-reference/text/overview#caching).
+- **Explicit context caching** — `cachedContent` / `cached_content` are rejected across the whole Gemini line; only automatic caching is open. `cache_control` is ignored and does not return `400`. See [Caching](/en/api-reference/text/overview#caching).
 - **Built-in tools** — grounding, hosted search and other vendor built-ins. Client-executed function tools are not in this group.
 - **`service_tier`** set to anything other than `standard` / `default`.
 - **Function calling and structured output** — use the [General Chat API](/en/api-reference/text/general-chat) when you need either.

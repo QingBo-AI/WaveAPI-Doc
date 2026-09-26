@@ -4,7 +4,7 @@ description: "The native Messages endpoint, kept for apps already built on the A
 api: "POST https://api.qingbo.ai/v1/messages"
 ---
 
-The native Anthropic Messages endpoint, kept for apps already built on the Anthropic SDK. It serves `claude-sonnet-5` and `claude-opus-5` only, and exposes nothing beyond what Chat offers, so new integrations should use the [General Chat API](/en/api-reference/text/general-chat).
+The native Anthropic Messages endpoint, kept for apps already built on the Anthropic SDK. Every text model except the GPT-5.6 / GPT-6 series and the Responses-only models can be called here. Apart from web search (see [Text Models Overview · Billing rules](/en/api-reference/text/overview#billing-rules)), it exposes nothing beyond what Chat offers, so new integrations should use the [General Chat API](/en/api-reference/text/general-chat).
 
 <RequestExample>
 ```bash cURL
@@ -202,8 +202,8 @@ public class Main {
 
 ## Authorizations
 
-<ParamField header="x-api-key" type="string" required>
-  API key used for authentication.
+<ParamField header="x-api-key" type="string">
+  API key used for authentication. Send either this header or `Authorization`.
 
   Visit the [API Key management page](https://wave.qingbo.ai/dashboard/keys) to obtain your API Key.
 
@@ -211,6 +211,14 @@ public class Main {
 
   ```
   x-api-key: YOUR_API_KEY
+  ```
+</ParamField>
+
+<ParamField header="Authorization" type="string">
+  API key used for authentication. Send either this header or `x-api-key`.
+
+  ```
+  Authorization: Bearer YOUR_API_KEY
   ```
 </ParamField>
 
@@ -229,11 +237,11 @@ Set the Anthropic SDK base URL to `https://api.qingbo.ai`; the SDK appends `/v1/
 <ParamField body="model" type="string" required>
   Model ID.
 
-  This endpoint serves `claude-sonnet-5` and `claude-opus-5` only. Every other Claude model (the Fable family and the whole 4.x line) is Chat-only and returns `400` here — use the [General Chat API](/en/api-reference/text/general-chat) instead.
+  Every text model can be called on this endpoint except the GPT-5.6 and GPT-6 series (`gpt-5.6-luna`, `gpt-5.6-sol`, `gpt-5.6-terra`, `gpt-6-astra`, `gpt-6-luna`, `gpt-6-sol`) and the models that accept only the [Responses API](/en/api-reference/text/openai-multimodal): `gpt-5-pro`, `gpt-5.2-pro`, `gpt-5.4-pro`, `gpt-5.3-codex`, `o3-pro`. These models return `400` here.
 
-  Cache tiers and supported capabilities for these two are in the [Text Models Overview · Anthropic](/en/api-reference/text/overview#anthropic).
+  Cache tiers and supported capabilities for each model are in the [Text Models Overview](/en/api-reference/text/overview).
 
-  Function-call argument generation is verified on the Chat endpoint only; native multi-turn tool workflows and image input are outside the accepted scope.
+  Image input is outside the accepted scope.
 </ParamField>
 
 <ParamField body="messages" type="array" required>
@@ -464,8 +472,8 @@ Native `input_tokens` differs from Chat's `prompt_tokens`: the native field **ex
 
 ## Not supported
 
-- **Structured output** — neither model accepts `response_format` with `json_schema` or `json_object`.
-- **Function calling and multi-turn tool workflows** — use the [General Chat API](/en/api-reference/text/general-chat).
+- **Structured output** — Claude models do not accept `response_format` with `json_schema` or `json_object`.
+- **Tool limits** — `tools` / `tool_choice` on a model without tool calling (see the JSON / Tools column in the [Text Models Overview](/en/api-reference/text/overview)); `tool_choice` of `any` or `tool` on the Fable models and `claude-opus-5-5` (they accept only `auto`).
 - **Image input**.
 
 These return `400` and are not billed. Explicit `cache_control` does work here: put the reusable long prefix in the `system` array — request shape and hit conditions are in the [Text Models Overview · Caching](/en/api-reference/text/overview#caching).

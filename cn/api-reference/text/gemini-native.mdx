@@ -155,14 +155,30 @@ public class Main {
 
 ## 鉴权
 
-<ParamField header="x-goog-api-key" type="string" required>
-  你的 WaveAPI Key。原生接口沿用 Gemini 的请求头名，**不是** `Authorization: Bearer`。
+<ParamField header="x-goog-api-key" type="string">
+  你的 WaveAPI Key，与 `Authorization`、查询参数 `key` 三选一。
 
   ```
   x-goog-api-key: YOUR_API_KEY
   ```
 
   Key 在[控制台](https://wave.qingbo.ai/dashboard/keys)获取，用法见[认证](/cn/docs/authentication)。
+</ParamField>
+
+<ParamField header="Authorization" type="string">
+  你的 WaveAPI Key，与 `x-goog-api-key`、查询参数 `key` 三选一。
+
+  ```
+  Authorization: Bearer YOUR_API_KEY
+  ```
+</ParamField>
+
+<ParamField query="key" type="string">
+  你的 WaveAPI Key，与 `x-goog-api-key`、`Authorization` 三选一。
+
+  ```
+  ?key=YOUR_API_KEY
+  ```
 </ParamField>
 
 ## 请求参数
@@ -180,7 +196,7 @@ public class Main {
   - `gemini-2.5-flash-lite`
 
   <Note>
-  `gemini-3.5-flash-lite` 只走 Chat，发到本接口会返回 `400`。各模型的计费方式与支持的能力见[文本模型总览 · Google Gemini](/cn/api-reference/text/overview#google-gemini)。
+  `gemini-3.5-flash-lite` 不支持本接口，发到本接口会返回 `400`。各模型的计费方式与支持的能力见[文本模型总览 · Google Gemini](/cn/api-reference/text/overview#google-gemini)。
   </Note>
 </ParamField>
 
@@ -343,7 +359,7 @@ for chunk in response:
 
 以下请求会返回 `400`，不计费：
 
-- **显式上下文缓存** —— `cachedContent` / `cached_content` / `cache_control` 在 Gemini 全系拒绝，只开放自动缓存，见[缓存](/cn/api-reference/text/overview#缓存)。
+- **显式上下文缓存** —— `cachedContent` / `cached_content` 在 Gemini 全系拒绝，只开放自动缓存；`cache_control` 会被忽略，不返回 `400`。见[缓存](/cn/api-reference/text/overview#缓存)。
 - **内置工具** —— grounding、托管搜索等厂商内置工具；由调用方自己执行的函数工具不在此列。
 - **`service_tier`** 取 `standard` / `default` 以外的值。
 - **函数调用与结构化输出**——需要这两项时走[通用对话接口](/cn/api-reference/text/general-chat)。
