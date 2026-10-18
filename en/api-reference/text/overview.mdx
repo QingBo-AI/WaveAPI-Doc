@@ -269,6 +269,7 @@ Use `max_tokens` on the Chat endpoint to cap output; the GPT-only `reasoning_eff
 
 | Model ID | Billing | JSON / Tools |
 |---|---|:---:|
+| `gemini-4-argon` | + cache read | — / ✓ |
 | `gemini-3.8-flash` | + cache read | ✓ / ✓ |
 | `gemini-3.7-flash` | + cache read | ✓ / ✓ |
 | `gemini-3.6-flash` | + cache read | ✓ / ✓ |
@@ -281,6 +282,7 @@ Use `max_tokens` on the Chat endpoint to cap output; the GPT-only `reasoning_eff
 
 **Model notes**
 
+- `gemini-4-argon` — max input 1M, max output 65K; the Gemini native endpoint is available; JSON Schema structured output is not supported; requests with `tools` must stream (`stream: true`); non-streaming requests return an error
 - `gemini-3.8-flash` — max input 1M, max output 65K; the Gemini native endpoint is available
 - `gemini-3.7-flash` — max input 1M, max output 65K; the Gemini native endpoint is available
 - `gemini-3.6-flash` — max input 1M, max output 65K; the Gemini native endpoint is available
@@ -290,7 +292,7 @@ Use `max_tokens` on the Chat endpoint to cap output; the GPT-only `reasoning_eff
 - `gemini-2.5-pro` — 200K long-context tier; the Gemini native endpoint is available
 - `gemini-2.5-flash-lite` — the Gemini native endpoint is available
 
-Besides the OpenAI-compatible endpoint, these models can also be called on the Gemini native endpoint: `gemini-2.5-flash-lite`, `gemini-2.5-pro`, `gemini-3-flash-preview`, `gemini-3.1-pro-preview`, `gemini-3.5-flash`, `gemini-3.6-flash`, `gemini-3.7-flash`, `gemini-3.8-flash` (`gemini-3.5-flash-lite` is not available on the native endpoint). The native entry is `POST /v1beta/models/{model}:generateContent` (streaming: `:streamGenerateContent?alt=sse`), see [Gemini native API](/en/api-reference/text/gemini-native). Native responses report usage in `usageMetadata` without `usage.cost`; `candidatesTokenCount` and `thoughtsTokenCount` are reported separately and billed output is their sum. The Pro models (`gemini-2.5-pro` / `gemini-3.1-pro-preview`) have a 200K long-context tier that switches the whole request above 200,000 total input. 3.6 / 3.7 / 3.8 Flash have an implicit cache-read rate whose hits are decided upstream; the other models bill two rates. The whole Gemini line supports automatic caching only: `cache_control` has no effect, and `cachedContent` on the native endpoint returns 400, as do built-in tools, `web_search_options` and any `service_tier` other than `standard` / `default`.
+Besides the OpenAI-compatible endpoint, these models can also be called on the Gemini native endpoint: `gemini-2.5-flash-lite`, `gemini-2.5-pro`, `gemini-3-flash-preview`, `gemini-3.1-pro-preview`, `gemini-3.5-flash`, `gemini-3.6-flash`, `gemini-3.7-flash`, `gemini-3.8-flash`, `gemini-4-argon` (`gemini-3.5-flash-lite` is not available on the native endpoint). The native entry is `POST /v1beta/models/{model}:generateContent` (streaming: `:streamGenerateContent?alt=sse`), see [Gemini native API](/en/api-reference/text/gemini-native). Native responses report usage in `usageMetadata` without `usage.cost`; `candidatesTokenCount` and `thoughtsTokenCount` are reported separately and billed output is their sum. The Pro models (`gemini-2.5-pro` / `gemini-3.1-pro-preview`) have a 200K long-context tier that switches the whole request above 200,000 total input. 3.6 / 3.7 / 3.8 Flash and `gemini-4-argon` have an implicit cache-read rate whose hits are decided upstream; the other models bill two rates. The whole Gemini line supports automatic caching only: `cache_control` has no effect, and `cachedContent` on the native endpoint returns 400, as do built-in tools, `web_search_options` and any `service_tier` other than `standard` / `default`.
 
 ### DeepSeek
 
