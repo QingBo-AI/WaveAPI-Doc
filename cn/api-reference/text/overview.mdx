@@ -267,6 +267,7 @@ Chat 接口用 `max_tokens` 限制输出；GPT 专用的 `reasoning_effort` 与 
 
 | 模型 ID | 计费方式 | JSON / 工具 |
 |---|---|:---:|
+| `gemini-4-argon` | 含缓存读 | — / ✓ |
 | `gemini-3.8-flash` | 含缓存读 | ✓ / ✓ |
 | `gemini-3.7-flash` | 含缓存读 | ✓ / ✓ |
 | `gemini-3.6-flash` | 含缓存读 | ✓ / ✓ |
@@ -279,6 +280,7 @@ Chat 接口用 `max_tokens` 限制输出；GPT 专用的 `reasoning_effort` 与 
 
 **模型备注**
 
+- `gemini-4-argon` — 最大输入 1M、最大输出 65K；支持 Gemini 原生接口；不支持 JSON Schema 结构化输出；带 `tools` 的请求需使用流式输出（`stream: true`），非流式会返回错误
 - `gemini-3.8-flash` — 最大输入 1M、最大输出 65K；支持 Gemini 原生接口
 - `gemini-3.7-flash` — 最大输入 1M、最大输出 65K；支持 Gemini 原生接口
 - `gemini-3.6-flash` — 最大输入 1M、最大输出 65K；支持 Gemini 原生接口
@@ -288,7 +290,7 @@ Chat 接口用 `max_tokens` 限制输出；GPT 专用的 `reasoning_effort` 与 
 - `gemini-2.5-pro` — 200K 长上下文分档；支持 Gemini 原生接口
 - `gemini-2.5-flash-lite` — 支持 Gemini 原生接口
 
-OpenAI 兼容接口之外，下列模型还可以走 Gemini 原生接口：`gemini-2.5-flash-lite` `gemini-2.5-pro` `gemini-3-flash-preview` `gemini-3.1-pro-preview` `gemini-3.5-flash` `gemini-3.6-flash` `gemini-3.7-flash` `gemini-3.8-flash`（`gemini-3.5-flash-lite` 不支持 Gemini 原生接口）。原生入口是 `POST /v1beta/models/{model}:generateContent`（流式 `:streamGenerateContent?alt=sse`），见 [Gemini 原生接口](/cn/api-reference/text/gemini-native)。原生响应用 `usageMetadata` 报告用量、不带 `usage.cost`；`candidatesTokenCount` 与 `thoughtsTokenCount` 分开报告，计费输出是两者之和。Pro 模型（`gemini-2.5-pro` / `gemini-3.1-pro-preview`）有 200K 长上下文分档，超过 200,000 输入总量后整单切换。3.6 / 3.7 / 3.8 Flash 有隐式缓存读价，是否命中由上游决定；其余模型两项计价。Gemini 全系只支持自动缓存：`cache_control` 不生效，原生接口的 `cachedContent` 会返回 400；内置工具、`web_search_options` 以及 `standard` / `default` 以外的 `service_tier` 同样返回 400。
+OpenAI 兼容接口之外，下列模型还可以走 Gemini 原生接口：`gemini-2.5-flash-lite` `gemini-2.5-pro` `gemini-3-flash-preview` `gemini-3.1-pro-preview` `gemini-3.5-flash` `gemini-3.6-flash` `gemini-3.7-flash` `gemini-3.8-flash` `gemini-4-argon`（`gemini-3.5-flash-lite` 不支持 Gemini 原生接口）。原生入口是 `POST /v1beta/models/{model}:generateContent`（流式 `:streamGenerateContent?alt=sse`），见 [Gemini 原生接口](/cn/api-reference/text/gemini-native)。原生响应用 `usageMetadata` 报告用量、不带 `usage.cost`；`candidatesTokenCount` 与 `thoughtsTokenCount` 分开报告，计费输出是两者之和。Pro 模型（`gemini-2.5-pro` / `gemini-3.1-pro-preview`）有 200K 长上下文分档，超过 200,000 输入总量后整单切换。3.6 / 3.7 / 3.8 Flash 与 `gemini-4-argon` 有隐式缓存读价，是否命中由上游决定；其余模型两项计价。Gemini 全系只支持自动缓存：`cache_control` 不生效，原生接口的 `cachedContent` 会返回 400；内置工具、`web_search_options` 以及 `standard` / `default` 以外的 `service_tier` 同样返回 400。
 
 ### DeepSeek
 

@@ -80,6 +80,9 @@ MODELS = [
  m("claude-sonnet-4-5","anthropic",2.7,13.5,cr=0.27,cw5=3.375,cw1=5.40,ver="TSF"),
  m("claude-haiku-4-5","anthropic",0.9,4.5,cr=0.09,cw5=1.125,cw1=1.80,ws=9,ver="TSF"),
  # ---------- Google ----------
+ m("gemini-4-argon","google",1.8,9,cr=0.09,ver="TSFN",limits=("1M","65K"),
+   notes=["不支持 JSON Schema 结构化输出","带 `tools` 的请求需使用流式输出（`stream: true`），非流式会返回错误"],
+   notes_en=["JSON Schema structured output is not supported","requests with `tools` must stream (`stream: true`); non-streaming requests return an error"]),
  m("gemini-3.8-flash","google",0.675,3.375,cr=0.0675,ver="TSJFN",limits=("1M","65K")),
  m("gemini-3.7-flash","google",0.675,3.375,cr=0.0675,ver="TSJFN",limits=("1M","65K")),
  m("gemini-3.6-flash","google",1.35,6.75,cr=0.135,ver="TSJFN",limits=("1M","65K")),
