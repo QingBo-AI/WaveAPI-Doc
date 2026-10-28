@@ -79,7 +79,7 @@ Legacy mode, negative_prompt, multi_shot, multi_prompt, element_list, video_list
 
 ## Billing and results
 
-Quotes are reservation estimates. Successful tasks settle at upstream actual cost plus 12.5%, with excess reservation refunded and no charge beyond the hold. Ordinary generation bills output seconds; extension bills only the new segment. Editing and video-reference generation use output seconds + max(output seconds, billed input seconds), with summed input duration rounded up and capped at 30 seconds. Video-input reservations include a fractional-second buffer and may exceed the final fee; omitted edit duration reserves at the 30-second cap.
+Quotes are reservation estimates. Successful tasks settle after actual fees are verified, with excess reservation refunded and no charge beyond the hold. Ordinary generation bills output seconds; extension bills only the new segment. Editing and video-reference generation use output seconds + max(output seconds, billed input seconds), with summed input duration rounded up and capped at 30 seconds. Video-input reservations include a fractional-second buffer and may exceed the final fee; omitted edit duration reserves at the 30-second cap.
 
 Read current rates in the model market or price_config from GET /v1/models. Images are in result.images and videos in result.videos; url is an array. Failed or cancelled tasks receive a full reservation refund. Read final cost in integer quota (500,000 quota = 1 USD) and confirm billing_status is settled.
 
