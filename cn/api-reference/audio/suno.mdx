@@ -18,7 +18,7 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
     "model": "suno",
     "action": "generate",
     "prompt": "一首温柔的城市民谣，雨夜，女声，吉他与钢琴",
-    "version": "v5.5"
+    "version": "v6-mini"
   }'
 ```
 
@@ -30,11 +30,13 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
     "model": "suno",
     "action": "generate",
     "custom": true,
+    "auto_lyrics": false,
+    "instrumental": false,
     "prompt": "[Verse]\n路灯把雨丝照成金线\n我把伞留给了昨天",
     "title": "雨夜城南",
     "style": "indie folk, female vocal, acoustic guitar",
     "vocal_gender": "Female",
-    "version": "v5.5"
+    "version": "v6-mini"
   }'
 ```
 
@@ -153,7 +155,7 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
 
 | 参数 | 类型 | 说明 |
 |---|---|---|
-| `version` | string | `v3.5`、`v4`、`v4.5`、`v4.5+`、`v4.5-all`、`v5`、`v5.5`，默认 `v5.5`。影响音质 |
+| `version` | string | `v6`、`v6-wild`、`v6-mini`，默认 `v6`。`remaster` 不接受此参数 |
 | `custom` | boolean | 默认 `false`，`prompt` 当描述；`true` 时 `prompt` 当歌词 |
 | `title` | string | 歌曲标题。另可用于 `fade_in`、`fade_out`、`adjust_speed` |
 | `style` | string | 风格标签，仅 `generate` |
@@ -161,7 +163,7 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
 | `negative_tags` | string | 需要避开的风格 |
 | `instrumental` | boolean | 纯音乐，无人声。仅 `generate`、`mashup`、`sample`，默认 `false` |
 | `gpt_description` | string | 灵感提示词，`custom: false` 时必填。用于 `extend`、`cover`、`mashup`、`sample`、`add_vocals`、`add_instrumental`、`add_stem` |
-| `auto_lyrics` | boolean | 自动写词。用于 `generate`、`extend`、`cover`、`inspo`、`mashup`、`sample` |
+| `auto_lyrics` | boolean | `generate` 自定义模式下，`true` 会重新创作传入的歌词；使用自己写好的歌词时传 `false`。用于 `generate`、`extend`、`cover`、`inspo`、`mashup`、`sample` |
 | `persona_id` | string | 复用 `persona` 动作创建的嗓音。用于 `generate`、`extend`、`cover`、`mashup` |
 | `vocal_gender` | string | `Male` 或 `Female` |
 | `style_weight` | number | `0`–`1`，风格权重 |
@@ -202,7 +204,7 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
 | `lyrics_model` | string | `lyrics` | 写词用的模型 |
 | `formats` | array | `download` | 下载格式数组，例如 `["mp3","wav"]`；可选值 `mp3` / `m4a` / `wav`，至少一项。必填 |
 | `audio_url` | string | `create_voice` | 用来创建音色的音频 URL。必填 |
-| `audioFilePath` | string | `upload` | 要导入的音频文件路径。必填 |
+| `audioFilePath` | string | `upload` | 要导入的公网 HTTP(S) 音频直链，不接受本地文件路径或 `blob:` URL。必填 |
 | `name` | string | `persona` | Persona 名称。必填 |
 | `describe` | string | `persona` | Persona 描述 |
 | `styles` | string | `persona` | Persona 风格 |
@@ -213,7 +215,7 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
 
 ## 限制
 
-本模型一次任务只产出一个结果，不支持用 `n` 批量生成。
+不支持用 `n` 指定批量任务数。实际返回的音轨数量以 `result.audios[]` 为准。
 
 `inspo` 动作需要 1 至 4 条参考音频 URL。
 
@@ -302,7 +304,11 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
 
 </CodeGroup>
 
-出曲类动作的产物在 `result.audios[]`：`url` 是音频地址数组，`expires_at` 是链接过期时间。`generate` 一次返回两首候选，后续动作用 `audio_index` 选 `1` 或 `2`。
+出曲类动作的产物在 `result.audios[]`：`url` 是音频地址数组，`expires_at` 是链接过期时间。后续动作的 `audio_index` 从 `1` 开始，按原结果中的音轨顺序选择，不要固定假设每次有两首。
+
+播放和下载直接使用返回的音频地址，不要按 `.mp3` 后缀筛选。已有音频地址时无需再调用 `download`；需要额外导出格式时才使用该动作。
+
+`upload` 完成后即可用其 `task_id` 作为 `ref_task_id` 发起 `cover`，`audio_index` 取 `1`。上传结果可能只有音轨标识，不保证返回可播放地址。自定义翻唱用 `custom: true`、`prompt` 放新歌词、`tags` 放风格描述；不能保证逐音符保留原旋律。
 
 `lyrics` 动作不产出音频：歌词文本在 `result.audios.lyrics[]` 的 `prompt` 字段里，同一元素还带 `title` 与 `tags`。
 
@@ -325,7 +331,18 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
   }'
 ```
 
-```bash 换风格翻唱
+```bash 上传参考音频
+curl -X POST https://api.qingbo.ai/v1/tasks \
+  -H "Authorization: Bearer $WAVE_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "suno",
+    "action": "upload",
+    "audioFilePath": "https://example.com/reference.mp3"
+  }'
+```
+
+```bash 自定义歌词翻唱
 curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
@@ -334,6 +351,10 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
     "action": "cover",
     "ref_task_id": "task-wave1789004688b950049238",
     "audio_index": 1,
+    "version": "v6-mini",
+    "custom": true,
+    "prompt": "[Verse]\n路灯把雨丝照成金线",
+    "title": "雨夜城南",
     "tags": "city pop, 80s synth, male vocal"
   }'
 ```

@@ -18,7 +18,7 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
     "model": "suno",
     "action": "generate",
     "prompt": "A gentle city folk song, rainy night, female vocal, guitar and piano",
-    "version": "v5.5"
+    "version": "v6-mini"
   }'
 ```
 
@@ -30,11 +30,13 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
     "model": "suno",
     "action": "generate",
     "custom": true,
+    "auto_lyrics": false,
+    "instrumental": false,
     "prompt": "[Verse]\nStreetlights turn the rain to golden thread\nI left my umbrella with yesterday",
     "title": "Rainy Night Southside",
     "style": "indie folk, female vocal, acoustic guitar",
     "vocal_gender": "Female",
-    "version": "v5.5"
+    "version": "v6-mini"
   }'
 ```
 
@@ -153,7 +155,7 @@ These apply to the creative actions: `generate`, `inspo`, `extend`, `cover`, `re
 
 | Parameter | Type | Description |
 |---|---|---|
-| `version` | string | `v3.5`, `v4`, `v4.5`, `v4.5+`, `v4.5-all`, `v5`, `v5.5`; default `v5.5`. Affects audio quality |
+| `version` | string | `v6`, `v6-wild`, `v6-mini`; default `v6`. Omit for `remaster` |
 | `custom` | boolean | Default `false`, `prompt` is a description; `true` makes `prompt` the lyrics |
 | `title` | string | Song title. Also available on `fade_in`, `fade_out`, `adjust_speed` |
 | `style` | string | Style tags, `generate` only |
@@ -161,7 +163,7 @@ These apply to the creative actions: `generate`, `inspo`, `extend`, `cover`, `re
 | `negative_tags` | string | Styles to avoid |
 | `instrumental` | boolean | Instrumental only, no vocals. `generate`, `mashup`, `sample` only; default `false` |
 | `gpt_description` | string | Inspiration prompt, required when `custom: false`. For `extend`, `cover`, `mashup`, `sample`, `add_vocals`, `add_instrumental`, `add_stem` |
-| `auto_lyrics` | boolean | Let the model write the lyrics. For `generate`, `extend`, `cover`, `inspo`, `mashup`, `sample` |
+| `auto_lyrics` | boolean | In custom `generate`, `true` creatively rewrites the supplied lyrics; use `false` for lyrics you have already written. For `generate`, `extend`, `cover`, `inspo`, `mashup`, `sample` |
 | `persona_id` | string | Reuse a voice created by the `persona` action. For `generate`, `extend`, `cover`, `mashup` |
 | `vocal_gender` | string | `Male` or `Female` |
 | `style_weight` | number | `0`–`1`, style weight |
@@ -202,7 +204,7 @@ Two exceptions: `create_voice` takes a publicly reachable `audio_url`, and `uplo
 | `lyrics_model` | string | `lyrics` | Model used for lyric writing |
 | `formats` | array | `download` | Requested download formats, e.g. `["mp3","wav"]`; allowed values `mp3` / `m4a` / `wav`, at least one item. Required |
 | `audio_url` | string | `create_voice` | Audio URL to build the voice from. Required |
-| `audioFilePath` | string | `upload` | Path of the audio file to import. Required |
+| `audioFilePath` | string | `upload` | Public HTTP(S) audio URL to import. Use an HTTP(S) URL rather than a local path or a `blob:` URL. Required |
 | `name` | string | `persona` | Persona name. Required |
 | `describe` | string | `persona` | Persona description |
 | `styles` | string | `persona` | Persona styles |
@@ -213,7 +215,7 @@ Parameters are validated per action: sending an action-specific parameter with a
 
 ## Limits
 
-This model produces one result per task; `n` is not supported.
+`n` cannot be used to request a batch of tasks. The number of returned tracks is determined by `result.audios[]`.
 
 The `inspo` action takes 1 to 4 reference audio URLs.
 
@@ -302,7 +304,11 @@ Only a successful result is billed. Failed and cancelled tasks, and tasks that r
 
 </CodeGroup>
 
-Audio-producing actions return their output in `result.audios[]`: `url` is an array of audio links and `expires_at` is when those links stop working. `generate` returns two candidate tracks, addressed later as `audio_index` `1` or `2`.
+Audio-producing actions return their output in `result.audios[]`: `url` is an array of audio links and `expires_at` is when those links stop working. Use a 1-based `audio_index` following the original result order for later actions; do not assume every task returns two tracks.
+
+Play or download the returned audio URL directly, regardless of its file extension. Call `download` only when an additional export format is needed.
+
+Once `upload` completes, pass its `task_id` as `ref_task_id` to `cover` with `audio_index: 1`. Upload results may contain only a track identifier, without a playable URL. For a custom cover, set `custom: true`, put the new lyrics in `prompt` and the target style in `tags`. Exact preservation of the original melody is not guaranteed.
 
 The `lyrics` action returns no audio: the lyric text sits in the `prompt` field of each `result.audios.lyrics[]` entry, alongside `title` and `tags`.
 
@@ -325,7 +331,18 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
   }'
 ```
 
-```bash Cover in another style
+```bash Upload reference audio
+curl -X POST https://api.qingbo.ai/v1/tasks \
+  -H "Authorization: Bearer $WAVE_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "suno",
+    "action": "upload",
+    "audioFilePath": "https://example.com/reference.mp3"
+  }'
+```
+
+```bash Custom-lyrics cover
 curl -X POST https://api.qingbo.ai/v1/tasks \
   -H "Authorization: Bearer $WAVE_API_KEY" \
   -H "Content-Type: application/json" \
@@ -334,6 +351,10 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
     "action": "cover",
     "ref_task_id": "task-wave1789004688b950049238",
     "audio_index": 1,
+    "version": "v6-mini",
+    "custom": true,
+    "prompt": "[Verse]\nNeon lights across the rain",
+    "title": "Midnight Drive",
     "tags": "city pop, 80s synth, male vocal"
   }'
 ```
