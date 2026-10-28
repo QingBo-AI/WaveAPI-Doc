@@ -2,6 +2,17 @@
 title: "Service Notices"
 ---
 
+<Update label="2026-10-28" description="Models and billing update">
+**New models, Nano Banana prices, and Kling / Suno fixes**
+
+FLUX 3 Image Klein, HY Image 3.5 Preview, Kling 4.0 and PixVerse V6 Max are available. Nano Banana economy prices have changed; see [pricing updates](/en/changelog/pricing).
+
+Kling 4 editing with omitted `duration` or 0 now reserves and settles from the measured source duration rounded up. A 3.04-second source at 720p reserves and successfully settles at $0.756, without a 30-second upper-bound hold. Tasks use their frozen submission tariff. Failed or cancelled tasks receive a full reservation refund.
+
+Suno custom-lyrics generation, task polling and audio downloads have been restored. See [Kling 4](/en/api-reference/video/kling-v4) and [Suno](/en/api-reference/audio/suno) for parameters and examples.
+</Update>
+
+
 <Update label="2026-09-10" description="Important · New release (tentative)">
 **The new QWave API portal, catalog and billing rules are live**
 

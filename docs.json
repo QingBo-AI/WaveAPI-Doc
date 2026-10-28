@@ -182,9 +182,11 @@
                   "cn/api-reference/image/z-image",
                   "cn/api-reference/image/flux",
                   "cn/api-reference/image/flux/flux-3-image",
+                  "cn/api-reference/image/flux/flux-3-image-klein",
                   "cn/api-reference/image/grok-imagine",
                   "cn/api-reference/image/midjourney",
-                  "cn/api-reference/image/mai-image/mai-image-2-6"
+                  "cn/api-reference/image/mai-image/mai-image-2-6",
+                  "cn/api-reference/image/hy-image-v3-5-preview"
                 ]
               },
               {
@@ -209,6 +211,7 @@
                     ]
                   },
                   "cn/api-reference/video/kling",
+                  "cn/api-reference/video/kling-v4",
                   "cn/api-reference/video/hailuo",
                   "cn/api-reference/video/minimax-h3",
                   "cn/api-reference/video/vidu",
@@ -219,6 +222,7 @@
                   "cn/api-reference/video/skyreels",
                   "cn/api-reference/video/grok-imagine-video",
                   "cn/api-reference/video/pixverse",
+                  "cn/api-reference/video/pixverse-v6-max",
                   {
                     "group": "Omni 视频系列",
                     "root": "cn/api-reference/video/omni/overview",
@@ -378,9 +382,11 @@
                   "en/api-reference/image/z-image",
                   "en/api-reference/image/flux",
                   "en/api-reference/image/flux/flux-3-image",
+                  "en/api-reference/image/flux/flux-3-image-klein",
                   "en/api-reference/image/grok-imagine",
                   "en/api-reference/image/midjourney",
-                  "en/api-reference/image/mai-image/mai-image-2-6"
+                  "en/api-reference/image/mai-image/mai-image-2-6",
+                  "en/api-reference/image/hy-image-v3-5-preview"
                 ]
               },
               {
@@ -405,6 +411,7 @@
                     ]
                   },
                   "en/api-reference/video/kling",
+                  "en/api-reference/video/kling-v4",
                   "en/api-reference/video/hailuo",
                   "en/api-reference/video/minimax-h3",
                   "en/api-reference/video/vidu",
@@ -415,6 +422,7 @@
                   "en/api-reference/video/skyreels",
                   "en/api-reference/video/grok-imagine-video",
                   "en/api-reference/video/pixverse",
+                  "en/api-reference/video/pixverse-v6-max",
                   {
                     "group": "Omni Video Series",
                     "root": "en/api-reference/video/omni/overview",

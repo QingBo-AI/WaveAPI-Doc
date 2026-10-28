@@ -2,6 +2,17 @@
 title: "运营公告"
 ---
 
+<Update label="2026-10-28" description="模型与计费更新">
+**新模型、Nano Banana 调价与 Kling / Suno 修复**
+
+新增 FLUX 3 Image Klein、HY Image 3.5 Preview、Kling 4.0、PixVerse V6 Max；Nano Banana 经济版价格已调整，见[价格调整](/cn/changelog/pricing)。
+
+Kling 4 编辑省略 `duration` 或传 0 时，按提交前探测的源片时长向上取整预扣与结算。例如 3.04 秒源片在 720p 下预扣和成功结算均为 $0.756；不再按 30 秒上限预扣。任务使用提交时冻结的费率，失败或取消全额退还预扣。
+
+Suno 自定义歌词生成、任务查询和音频下载已修复。具体参数与示例见 [Kling 4](/cn/api-reference/video/kling-v4) 和 [Suno](/cn/api-reference/audio/suno)。
+</Update>
+
+
 <Update label="2026-09-10" description="重要公告 · 新版上线（暂定）">
 **清波 API 新版门户、目录与计费口径正式上线**
 

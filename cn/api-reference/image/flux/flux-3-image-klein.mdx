@@ -1,0 +1,68 @@
+---
+title: "FLUX 3 Image Klein"
+description: "轻量图像生成与编辑，支持最多 10 张参考图、五档输出分辨率和提示词内 bbox 布局控制。"
+api: "POST https://api.qingbo.ai/v1/tasks"
+---
+
+轻量图像生成与编辑，支持最多 10 张参考图、五档输出分辨率和提示词内 bbox 布局控制。
+
+## 快速开始
+
+```bash
+curl -X POST https://api.qingbo.ai/v1/tasks \
+  -H "Authorization: Bearer $WAVE_API_KEY" \
+  -H "Content-Type: application/json" \
+  -H "Idempotency-Key: flux-3-image-klein-example-001" \
+  -d '{
+  "model": "flux-3-image-klein",
+  "action": "generate",
+  "prompt": "A blue ceramic cup on a wooden table, soft morning light",
+  "resolution": "1k",
+  "aspect_ratio": "1:1",
+  "steps": 16,
+  "output_format": "png"
+}'
+```
+
+提交返回 task_id，使用[`GET /v1/tasks/{task_id}`](/cn/api-reference/task/status)查询结果。参考素材必须是可公开下载的 URL。
+
+## 请求参数
+
+| 参数 | 类型或取值 | 说明 |
+|---|---|---|
+| model | `flux-3-image-klein` | 固定模型 ID。 |
+| `action` | generate / edit | generate 文生图不接受参考图；edit 编辑须提供参考图。 |
+| `prompt` | string | 图片描述或编辑指令，必填。可在文本中使用标签并附 bbox JSON；框采用 0–1000 归一化坐标 [y1,x1,y2,x2]。 |
+| `image_urls` | string[] | edit 时 1–10 张参考图；参考图不加价。 |
+| `resolution` | 768sq / 1k / 1.5k / 2k / 4k | 默认 1k，也是计费档位。 |
+| `aspect_ratio` | string | 默认 auto。支持 1:1、16:9、9:16、21:9、2:1、1:2、3:2、2:3、7:5、5:7、4:3、3:4、5:4、4:5、9:21。 |
+| `steps` | integer | 1–16，默认 16，不影响费用。 |
+| `seed` | integer | 可选，0–4294967295。 |
+| `output_format` | jpeg / jpg / png | 默认 jpeg；jpg 为 jpeg 的别名。 |
+| `safety_tolerance` | integer | 0–4，默认 2，0 最严格。 |
+| `n` | 1 | 每次返回 1 张图片。 |
+
+不接受 grounding、guidance、negative_prompt、prompt_upsampling、mask_url、width、height 或像素字符串 size。画幅使用 aspect_ratio；精度使用 resolution。
+
+## 参考图编辑
+
+```json
+{
+  "model": "flux-3-image-klein",
+  "action": "edit",
+  "prompt": "Change the cup to red; preserve the background and lighting.",
+  "image_urls": [
+    "https://cdn.example.com/source.png"
+  ],
+  "resolution": "1k",
+  "aspect_ratio": "auto"
+}
+```
+
+## 计费与结果
+
+成功后按分辨率档的固定张价结算。生成和编辑同价；参考图数量、步数、种子和格式不增加费用。
+
+当前单价见控制台模型市场或 GET /v1/models 的 price_config。成功图片返回 result.images，视频返回 result.videos，url 是数组。任务失败或取消，预扣全额退还。最终费用看任务响应 cost（整数 quota，500,000 quota = 1 USD），并确认 billing_status 已 settled。
+
+通用回调、等待、幂等和费用上限见[提交任务](/cn/api-reference/task/submit)。
