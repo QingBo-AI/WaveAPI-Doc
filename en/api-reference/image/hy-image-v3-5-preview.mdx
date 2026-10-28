@@ -40,7 +40,7 @@ Submission returns a task_id. Use [`GET /v1/tasks/{task_id}`](/en/api-reference/
 | `seed` | integer | Non-negative integer; omitted or 0 selects a random seed. |
 | `n` | 1 | One image per task. |
 
-This route exposes resolution and aspect-ratio tiers only. width, height and exact-pixel size are rejected: upstream exact sizes select a billing tier from the shorter side, which the current quote cannot freeze.
+Use resolution and aspect_ratio to select output specifications. width, height and exact-pixel size are not supported on this route.
 
 ## Reference-image editing
 

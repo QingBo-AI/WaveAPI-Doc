@@ -40,7 +40,7 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
 | `seed` | integer | 非负整数；省略或 0 随机生成。 |
 | `n` | 1 | 每次返回 1 张图片。 |
 
-此线路仅开放分辨率和画幅档，不接受 width、height 或像素字符串 size。上游精确尺寸会按短边重新定价，当前报价无法冻结这项推导，故在请求前拒绝。
+此线路使用 resolution 和 aspect_ratio 选择输出规格，暂不支持 width、height 或像素字符串 size。
 
 ## 参考图编辑
 

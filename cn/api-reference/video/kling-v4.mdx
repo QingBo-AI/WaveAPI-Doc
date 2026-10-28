@@ -45,7 +45,7 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
 | `generate_audio` | true | 始终有声，false 会在预扣前被拒。 |
 | `watermark` | false | 不支持开启水印。 |
 
-不接受旧版 mode、negative_prompt、multi_shot、multi_prompt、element_list、video_list、camera_control、voice_list。输入视频不可读取时拒单；短于 1 秒的视频暂不开放，避免整数秒报价失真。角色与素材组合还须符合上游规则。
+不接受旧版 mode、negative_prompt、multi_shot、multi_prompt、element_list、video_list、camera_control、voice_list。输入视频必须可直接读取，每段至少 1 秒。角色与素材组合还须符合上游规则。
 
 ## 编辑视频
 

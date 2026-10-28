@@ -45,7 +45,7 @@ Submission returns a task_id. Use [`GET /v1/tasks/{task_id}`](/en/api-reference/
 | `generate_audio` | true | Always with sound; false is rejected before reservation. |
 | `watermark` | false | Enabling watermark is unsupported. |
 
-Legacy mode, negative_prompt, multi_shot, multi_prompt, element_list, video_list, camera_control and voice_list are unsupported. Unreadable input videos are rejected. Clips shorter than one second are not exposed because integer-second quoting cannot safely represent them. Image roles and combined assets must also satisfy supplier validation.
+Legacy mode, negative_prompt, multi_shot, multi_prompt, element_list, video_list, camera_control and voice_list are unsupported. Input videos must be directly readable and at least one second long. Image roles and combined assets must also satisfy supplier validation.
 
 ## Edit a video
 
