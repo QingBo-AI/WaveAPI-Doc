@@ -32,7 +32,7 @@ Submission returns a task_id. Use [`GET /v1/tasks/{task_id}`](/en/api-reference/
 | model | `kling-v4` | Exact model ID. |
 | `action` | generate / edit / extend | generate selects a generation mode from the assets; edit edits a source video; extend continues it. |
 | `prompt` | string | Required outside image-to-video. Reference assets using @Image1, @Video1 and @Audio1 in the prompt. |
-| `duration` | integer | Required for generate/extend, 3–30 seconds. For edit, omitted or 0 follows source duration, reserving at the 30-second cap. For extension, this is the new-segment duration. |
+| `duration` | integer | Required for generate/extend, 3–30 seconds. For edit, omitted or 0 uses the measured source duration rounded up to a whole second for reservation and settlement. For extension, this is the new-segment duration. |
 | `resolution` | 720p / 1080p | Defaults to 720p. |
 | `aspect_ratio` | 16:9 / 9:16 / 1:1 / 21:9 / auto | Reference generation supports auto; ordinary text generation defaults upstream to 16:9. Not accepted for extend. |
 | `image_urls` | string[] | 1–2 first/last frames for ordinary image-to-video; up to 10 references for reference mode or editing. |
@@ -79,7 +79,14 @@ Legacy mode, negative_prompt, multi_shot, multi_prompt, element_list, video_list
 
 ## Billing and results
 
-Quotes are reservation estimates. Successful tasks settle after actual fees are verified, with excess reservation refunded and no charge beyond the hold. Ordinary generation bills output seconds; extension bills only the new segment. Editing and video-reference generation use output seconds + max(output seconds, billed input seconds), with summed input duration rounded up and capped at 30 seconds. Video-input reservations include a fractional-second buffer and may exceed the final fee; omitted edit duration reserves at the 30-second cap.
+Fixed per-second prices apply. Reservation and settlement use the tariff and measured media facts frozen at submission. Ordinary generation bills output seconds; extension bills only the new segment. Editing and video-reference generation bill output seconds + max(output seconds, billed input seconds). Raw input clip durations are summed, rounded up once, then capped at 30 seconds. Failed video probes are rejected before reservation.
+
+| Mode | 720p (USD / second) | 1080p (USD / second) |
+|---|---|---|
+| Ordinary generation / extension segment | $0.1575 | $0.23625 |
+| Billable seconds for editing / video-reference generation | $0.0945 | $0.14175 |
+
+When editing with omitted `duration` or 0, the measured source duration rounded up determines both reservation and settlement, without a 30-second upper-bound hold. A 3.04-second source produces 4 billable output seconds: 4 + max(4, 4) = 8 seconds, so both the 720p reservation and successful charge are $0.756. Container tail-frame padding does not add another billable second. Existing tasks retain their frozen tariff.
 
 Read current rates in the model market or price_config from GET /v1/models. Images are in result.images and videos in result.videos; url is an array. Failed or cancelled tasks receive a full reservation refund. Read final cost in integer quota (500,000 quota = 1 USD) and confirm billing_status is settled.
 

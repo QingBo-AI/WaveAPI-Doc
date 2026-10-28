@@ -2,6 +2,30 @@
 title: "Pricing Updates"
 ---
 
+<Update label="2026-10-28" description="Price changes and new models">
+**Nano Banana economy prices and four new models**
+
+Current Nano Banana economy prices (USD / image):
+
+| Model | 1K | 2K | 4K |
+|---|---|---|---|
+| `gemini-2.5-flash-image-rev` | $0.012 | — | — |
+| `gemini-3-pro-image-rev` | $0.03 | $0.03 | $0.04 |
+| `gemini-3.1-flash-image-rev` | $0.015 | $0.02 | $0.025 |
+| `gemini-nano-banana-2.1-rev` | $0.02 | $0.025 | $0.03 |
+| `gemini-3.1-flash-lite-image-rev` | $0.012 | — | — |
+
+Nano Banana 2 at 0.5K remains $0.016875 / image. Official token-priced variants are unchanged.
+
+- `flux-3-image-klein`: 768sq $0.0072, 1K $0.0081, 1.5K $0.0099, 2K $0.0126, 4K $0.0324 / image.
+- `hy-image-v3.5-preview`: 1K / 2K $0.0216, 4K $0.0288 / image.
+- `kling-v4`: standard generation and extension segments cost $0.1575 / $0.23625 per second at 720p / 1080p. Editing and video-reference generation cost $0.0945 / $0.14175 per billable second, with billable seconds = output seconds + max(output seconds, billed input seconds). Input durations are summed, rounded up and capped at 30 seconds. Source-length editing reserves and settles from measured source duration.
+- `pixverse-v6-max`: silent 360p / 540p / 720p / 1080p cost $0.024 / $0.036 / $0.044 / $0.088 per second; with audio, $0.036 / $0.044 / $0.06 / $0.112 per second.
+
+Applies to new calls after activation. Existing tasks retain their frozen tariff. Check the model market for live prices.
+</Update>
+
+
 <Note>
 This page lists, newest first, each model's launch pricing and the price changes that followed. Launch entries show the model's **current** unit price (earlier prices are in the corresponding "Price change" entries); retired models are kept and marked with their retirement date. Pricing changes apply only to calls made **after** the change takes effect; historical calls are unaffected. Each model's live unit price is shown in the [Models overview](/en/docs/models) and the console "Model Market"; check each call's cost fields and units against [Request & Response Format](/en/docs/request-response) and the relevant endpoint documentation.
 </Note>
