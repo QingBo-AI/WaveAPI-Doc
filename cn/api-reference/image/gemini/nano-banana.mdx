@@ -160,7 +160,7 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
 
 文本输出按上限预留，所以冻结的额度通常明显高于最终结算金额，差额在任务完成时退回。各分辨率的预计输出 token 见 `GET /v1/models` 的 `price_config.image_usage_reservation`。
 
-只有成功出图才计费。任务失败、取消，或没有返回可用图片时，全额退款。
+普通失败、取消或上游成功但没有可交付图片时，全额退还预扣；内容审核拒绝的输入费例外见下方说明。
 
 ## 响应
 
@@ -213,3 +213,7 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
 - [提交任务](/cn/api-reference/task/submit)
 - [查询任务状态](/cn/api-reference/task/status)
 - [任务系统](/cn/docs/task-system)
+
+<Warning>
+**官方渠道内容审核输入费**：新提交任务若因内容安全审核被上游拒绝，且上游明确产生输入处理费用，仅按本模型的输入 token 费率结算已处理输入，未生成的输出不收费，其余预扣自动退还。上游明确未收费时全额退款。费用或输入用量尚不能核实时，`billing_status` 为 `pending`，核实后结算，不高于预扣和用户费用上限。普通故障、取消及本页以外的经济版 / ext 路线沿用各自退款规则。历史已提交任务不追扣。
+</Warning>

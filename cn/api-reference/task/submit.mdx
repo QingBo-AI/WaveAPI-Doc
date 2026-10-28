@@ -47,7 +47,7 @@ api: "POST https://api.qingbo.ai/v1/tasks"
 
 <ResponseField name="pre_consumed_cost" type="integer">
   提交时冻结的额度（quota）。任务完成后以查询接口返回的 `cost` 为准结算：
-  成功 = 实际扣费；失败/取消 = 自动全额退款（`cost: 0`）。
+  成功按实际费用结算；普通失败或取消全额退款（`cost: 0`）。部分官方图像模型因审核拒绝且已产生输入费用时，按模型页规则仅收已处理输入费用并退还其余预扣，未生成输出不收费。
 </ResponseField>
 
 ## 请求内等待（Prefer: wait）
