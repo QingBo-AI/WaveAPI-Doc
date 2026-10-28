@@ -163,7 +163,7 @@ curl https://api.qingbo.ai/v1/tasks/task-wave1775285160b950328499 \
 <ResponseField name="cost" type="integer">
   Actual quota charged for the task. **Only present in terminal states
   (completed / failed / cancelled).** Success = settled amount; failed/cancelled
-  with automatic refund = `0`. Use this field for reconciliation.
+  with full refund = `0`. An applicable official image route may retain verified input fees after moderation rejection, so a failed task can have a non-zero cost. While `billing_status` is pending this is not final; reconcile only after settled.
 </ResponseField>
 
 <ResponseField name="error" type="object">

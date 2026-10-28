@@ -160,7 +160,7 @@ Submitting a task places a hold for the estimated usage; the task then settles f
 
 Because text output is reserved at the model's ceiling, the hold is usually well above the final settled amount, and the difference is released when the task finishes. The estimated output tokens per resolution are in `price_config.image_usage_reservation` on `GET /v1/models`.
 
-You are only billed for a successfully generated image. Failed and cancelled tasks, and tasks that return no usable image, are refunded in full.
+Ordinary failures, cancellation, or an upstream success with no deliverable image receive a full refund. Content-review input fees are the exception described below.
 
 ## Response
 
@@ -213,3 +213,7 @@ All three do text-to-image and editing with up to 14 reference images, one image
 - [Submit Task](/en/api-reference/task/submit)
 - [Query Task Status](/en/api-reference/task/status)
 - [Task System](/en/docs/task-system)
+
+<Warning>
+**Official-channel moderation input fees**: New tasks rejected by upstream content safety review may incur input processing charges. When a charge is confirmed, only verified input tokens are priced at this model's input tariff; undelivered output is not billed, and the remaining reservation is refunded. An explicitly free upstream receipt receives a full refund. Missing cost or input usage keeps `billing_status` as `pending` until verified, within the reservation and caller's cost ceiling. Ordinary failures, cancellation, and economy / ext routes retain their applicable refund rules. Existing tasks are not repriced.
+</Warning>

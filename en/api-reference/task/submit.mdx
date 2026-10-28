@@ -49,7 +49,7 @@ For more parameters, see [Image Generation Overview](/en/api-reference/image/ove
 <ResponseField name="pre_consumed_cost" type="integer">
   Quota pre-deducted at submission. The final charge is the `cost` field returned
   by the status endpoint once the task reaches a terminal state: success = actual
-  charge; failure/cancellation = automatic full refund (`cost: 0`).
+  charge; ordinary failure/cancellation = full refund (`cost: 0`). On applicable official image routes, a charged moderation rejection bills verified input only and refunds the remainder; undelivered output is not charged.
 </ResponseField>
 
 ## In-Request Waiting (Prefer: wait)

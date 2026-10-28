@@ -2,6 +2,15 @@
 title: "运营公告"
 ---
 
+<Update label="2026-10-28" description="官方图像渠道审核计费">
+**审核拒绝时，仅结算已处理输入费用**
+
+对生效后提交的 `gpt-image-1`、`gpt-image-1.5`、`gpt-image-2`、`gpt-image-2.5-flare`、`gpt-image-2.5-sunburst`、`gemini-3-pro-image`、`gemini-3.1-flash-image`、`gemini-3.1-flash-lite-image` 官方路线：内容审核被拒但已产生输入处理费用时，仅按本模型输入 token 费率收取已处理输入，未生成的输出不收费，退还剩余预扣。
+
+明确零费用时全退；费用或用量未核实时先显示 `billing_status=pending` 并对账，不猜价、不自动按零元处理。普通故障、取消和经济版 / ext 的退款规则不变；历史已提交任务不追扣。最终以任务的 `cost` 和 `billing_status=settled` 对账。
+</Update>
+
+
 <Update label="2026-10-28" description="模型与计费更新">
 **新模型、Nano Banana 调价与 Kling / Suno 修复**
 

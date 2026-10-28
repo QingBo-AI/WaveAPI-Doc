@@ -162,7 +162,7 @@ curl https://api.qingbo.ai/v1/tasks/task-wave1775285160b950328499 \
 
 <ResponseField name="cost" type="integer">
   任务实际扣费(quota),**仅终态(completed / failed / cancelled)有此字段**。
-  成功 = 实际结算额度;失败 / 取消已自动退款时为 `0`。对账以此字段为准。
+  成功 = 实际结算额度；普通失败 / 取消全退时为 `0`。适用官方图像模型的审核拒绝可能仅结算输入费，因此 `failed` 的 `cost` 也可非零。`billing_status=pending` 时仍是待核对的预扣，`settled` 才是最终金额。
 </ResponseField>
 
 <ResponseField name="error" type="object">

@@ -76,7 +76,8 @@ def wait_for_task(client, task_id, timeout=300):
 |------|------|------|
 | 提交成功 | `pre_consumed_cost` | 预扣额度（quota），从余额立即扣除 |
 | `completed` | `cost` | 实际结算额度，对账以此为准 |
-| `failed` / `cancelled` | `cost: 0` | 预扣额度**自动全额退款** |
+| 普通 `failed` / `cancelled` | `cost: 0` | 预扣自动全额退款 |
+| 官方图像渠道的审核拒绝 | `cost` 可非零 | 仅结算已处理输入，输出不收费，退还其余预扣；等待费用证据时 `billing_status: pending` |
 
 价格未配置的模型会在提交时直接拒绝（HTTP 500，`code: price_not_configured`），
 不会出现"提交成功但乱扣费"的情况。
