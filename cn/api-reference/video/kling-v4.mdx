@@ -1,0 +1,86 @@
+---
+title: "Kling 4.0"
+description: "文生、首尾/关键帧图生、多模态参考、视频编辑与延长，始终生成立体声音频。"
+api: "POST https://api.qingbo.ai/v1/tasks"
+---
+
+文生、首尾/关键帧图生、多模态参考、视频编辑与延长，始终生成立体声音频。
+
+## 快速开始
+
+```bash
+curl -X POST https://api.qingbo.ai/v1/tasks \
+  -H "Authorization: Bearer $WAVE_API_KEY" \
+  -H "Content-Type: application/json" \
+  -H "Idempotency-Key: kling-v4-example-001" \
+  -d '{
+  "model": "kling-v4",
+  "action": "generate",
+  "prompt": "A paper boat drifts slowly on a quiet pond, gentle water sounds",
+  "duration": 3,
+  "resolution": "720p",
+  "aspect_ratio": "16:9"
+}'
+```
+
+提交返回 task_id，使用[`GET /v1/tasks/{task_id}`](/cn/api-reference/task/status)查询结果。参考素材必须是可公开下载的 URL。
+
+## 请求参数
+
+| 参数 | 类型或取值 | 说明 |
+|---|---|---|
+| model | `kling-v4` | 固定模型 ID。 |
+| `action` | generate / edit / extend | generate 根据素材选择生成模式；edit 编辑输入视频；extend 延长输入视频。 |
+| `prompt` | string | 除图生视频外必填。素材可在提示词中用 @Image1、@Video1、@Audio1 引用。 |
+| `duration` | integer | 生成与延长必填，3–30 秒；编辑可省略或传 0，输出跟随输入片长，先按 30 秒封顶预扣。延长时指新增片段时长。 |
+| `resolution` | 720p / 1080p | 默认 720p。 |
+| `aspect_ratio` | 16:9 / 9:16 / 1:1 / 21:9 / auto | 参考生成支持 auto；普通文生默认跟随上游 16:9。延长不可传。 |
+| `image_urls` | string[] | 普通图生按首帧/尾帧顺序传 1–2 张；reference 参考模式和编辑最多 10 张。 |
+| `image_with_roles` | object[] | 最多 10 项 `{url, role}`，role 可为 first_frame、last_frame、keyframe、middle_frame、reference_image。图生恰好一张首帧，关键帧最多 8 张；与 image_urls、first_frame_image、last_frame_image 二选一。 |
+| `first_frame_image / last_frame_image` | string | 首尾帧 URL；extend 只接受 last_frame_image 作为目标尾帧。 |
+| `video_urls` | string[] | 生成最多 5 段参考视频；编辑或延长恰好 1 段。链接必须可读取；本线路每段至少 1 秒，编辑输入至少 3 秒。输入视频总长不得超过 30 秒，超长原片请先裁剪；计费输入时长也封顶 30 秒。 |
+| `audio_urls` | string[] | generate 最多 3 段参考音频，每段 5–30 秒。所有参考图、视频与音频合计最多 15 项。 |
+| `omni_reference_task_type` | auto / reference | 仅 generate；默认 auto，纯多图参考请显式 reference。edit/extend 的模式由 action 固定，不能用本字段切换。 |
+| `audio_setting` | origin / auto | 编辑或带视频的参考生成可用：origin 保留视频声音，auto 生成新声音。extend 不接受。 |
+| `generate_audio` | true | 始终有声，false 会在预扣前被拒。 |
+| `watermark` | false | 不支持开启水印。 |
+
+不接受旧版 mode、negative_prompt、multi_shot、multi_prompt、element_list、video_list、camera_control、voice_list。输入视频不可读取时拒单；短于 1 秒的视频暂不开放，避免整数秒报价失真。角色与素材组合还须符合上游规则。
+
+## 编辑视频
+
+```json
+{
+  "model": "kling-v4",
+  "action": "edit",
+  "prompt": "Change the scene to warm sunset light, keeping the boat.",
+  "video_urls": [
+    "https://cdn.example.com/source.mp4"
+  ],
+  "duration": 3,
+  "resolution": "720p"
+}
+```
+
+## 延长视频
+
+```json
+{
+  "model": "kling-v4",
+  "action": "extend",
+  "prompt": "Continue the boat drifting slowly on the pond.",
+  "video_urls": [
+    "https://cdn.example.com/source.mp4"
+  ],
+  "duration": 3,
+  "resolution": "720p"
+}
+```
+
+## 计费与结果
+
+报价是预扣估算，成功后按上游实际成本上浮 12.5% 结算并退差，不超过预扣。普通生成按输出秒；延长只收新增片段；编辑和带视频参考生成的上游成本按“输出秒 + max(输出秒, 输入计费秒)”计算，输入计费秒为多段时长合计向上取整、再封顶 30 秒。为覆盖小数秒，带视频输入的预扣可能高于最终费用；省略编辑时长会按 30 秒封顶预扣。
+
+当前单价见控制台模型市场或 GET /v1/models 的 price_config。成功图片返回 result.images，视频返回 result.videos，url 是数组。任务失败或取消，预扣全额退还。最终费用看任务响应 cost（整数 quota，500,000 quota = 1 USD），并确认 billing_status 已 settled。
+
+通用回调、等待、幂等和费用上限见[提交任务](/cn/api-reference/task/submit)。

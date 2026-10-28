@@ -1,0 +1,68 @@
+---
+title: "FLUX 3 Image Klein"
+description: "Compact image generation and editing with up to 10 references, five resolution tiers and prompt-based bounding-box layouts."
+api: "POST https://api.qingbo.ai/v1/tasks"
+---
+
+Compact image generation and editing with up to 10 references, five resolution tiers and prompt-based bounding-box layouts.
+
+## Quick start
+
+```bash
+curl -X POST https://api.qingbo.ai/v1/tasks \
+  -H "Authorization: Bearer $WAVE_API_KEY" \
+  -H "Content-Type: application/json" \
+  -H "Idempotency-Key: flux-3-image-klein-example-001" \
+  -d '{
+  "model": "flux-3-image-klein",
+  "action": "generate",
+  "prompt": "A blue ceramic cup on a wooden table, soft morning light",
+  "resolution": "1k",
+  "aspect_ratio": "1:1",
+  "steps": 16,
+  "output_format": "png"
+}'
+```
+
+Submission returns a task_id. Use [`GET /v1/tasks/{task_id}`](/en/api-reference/task/status) to poll the result. Reference assets must use publicly downloadable URLs.
+
+## Parameters
+
+| Parameter | Type or values | Description |
+|---|---|---|
+| model | `flux-3-image-klein` | Exact model ID. |
+| `action` | generate / edit | generate creates an image without references; edit requires references. |
+| `prompt` | string | Required description or editing instruction. Layout tags and bbox JSON may be embedded in the prompt; boxes use normalized 0–1000 [y1,x1,y2,x2] coordinates. |
+| `image_urls` | string[] | 1–10 reference images for edit; references have no extra fee. |
+| `resolution` | 768sq / 1k / 1.5k / 2k / 4k | Defaults to 1k; selects the billing tier. |
+| `aspect_ratio` | string | Defaults to auto. Supports 1:1, 16:9, 9:16, 21:9, 2:1, 1:2, 3:2, 2:3, 7:5, 5:7, 4:3, 3:4, 5:4, 4:5 and 9:21. |
+| `steps` | integer | 1–16, default 16; does not affect pricing. |
+| `seed` | integer | Optional, 0–4294967295. |
+| `output_format` | jpeg / jpg / png | Defaults to jpeg; jpg is an alias for jpeg. |
+| `safety_tolerance` | integer | 0–4, default 2; 0 is the strictest. |
+| `n` | 1 | One image per task. |
+
+grounding, guidance, negative_prompt, prompt_upsampling, mask_url, width, height and exact-pixel size are not supported. Use aspect_ratio for shape and resolution for output tier.
+
+## Reference-image editing
+
+```json
+{
+  "model": "flux-3-image-klein",
+  "action": "edit",
+  "prompt": "Change the cup to red; preserve the background and lighting.",
+  "image_urls": [
+    "https://cdn.example.com/source.png"
+  ],
+  "resolution": "1k",
+  "aspect_ratio": "auto"
+}
+```
+
+## Billing and results
+
+Successful generation and editing use the same fixed per-image rate for the resolution tier. Reference count, steps, seed and format add no fee.
+
+Read current rates in the model market or price_config from GET /v1/models. Images are in result.images and videos in result.videos; url is an array. Failed or cancelled tasks receive a full reservation refund. Read final cost in integer quota (500,000 quota = 1 USD) and confirm billing_status is settled.
+
+For callbacks, waiting, idempotency and spending limits, see [Submit a task](/en/api-reference/task/submit)。

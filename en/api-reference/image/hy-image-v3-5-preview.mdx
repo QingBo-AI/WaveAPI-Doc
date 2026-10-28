@@ -1,0 +1,66 @@
+---
+title: "HY Image 3.5 Preview"
+description: "Tencent image preview model for text-to-image, editing and composition using up to five references."
+api: "POST https://api.qingbo.ai/v1/tasks"
+---
+
+Tencent image preview model for text-to-image, editing and composition using up to five references.
+
+## Quick start
+
+```bash
+curl -X POST https://api.qingbo.ai/v1/tasks \
+  -H "Authorization: Bearer $WAVE_API_KEY" \
+  -H "Content-Type: application/json" \
+  -H "Idempotency-Key: hy-image-v3.5-preview-example-001" \
+  -d '{
+  "model": "hy-image-v3.5-preview",
+  "action": "generate",
+  "prompt": "Minimalist poster of a blue ceramic cup, cream background",
+  "resolution": "2k",
+  "aspect_ratio": "3:4",
+  "negative_prompt": "blur, noise",
+  "seed": 42
+}'
+```
+
+Submission returns a task_id. Use [`GET /v1/tasks/{task_id}`](/en/api-reference/task/status) to poll the result. Reference assets must use publicly downloadable URLs.
+
+## Parameters
+
+| Parameter | Type or values | Description |
+|---|---|---|
+| model | `hy-image-v3.5-preview` | Exact model ID. |
+| `action` | generate / edit | generate creates an image without references; edit requires references. |
+| `prompt` | string | Required description or editing instruction, in Chinese or English. |
+| `image_urls` | string[] | 1–5 publicly accessible references for edit. |
+| `resolution` | 1k / 2k / 4k | Defaults to 1k. |
+| `aspect_ratio` | string | Defaults to auto; supports 1:1, 2:3, 3:2, 3:4, 4:3, 4:5, 5:4, 9:16, 16:9 and 21:9. auto uses a square for text generation and follows the reference for edits. |
+| `negative_prompt` | string | Optional description of unwanted content. |
+| `seed` | integer | Non-negative integer; omitted or 0 selects a random seed. |
+| `n` | 1 | One image per task. |
+
+This route exposes resolution and aspect-ratio tiers only. width, height and exact-pixel size are rejected: upstream exact sizes select a billing tier from the shorter side, which the current quote cannot freeze.
+
+## Reference-image editing
+
+```json
+{
+  "model": "hy-image-v3.5-preview",
+  "action": "edit",
+  "prompt": "Change the cup to red; preserve the background and lighting.",
+  "image_urls": [
+    "https://cdn.example.com/source.png"
+  ],
+  "resolution": "1k",
+  "aspect_ratio": "auto"
+}
+```
+
+## Billing and results
+
+Successful tasks use the fixed per-image rate for 1k, 2k or 4k. Generation and editing share rates, with no reference surcharge.
+
+Read current rates in the model market or price_config from GET /v1/models. Images are in result.images and videos in result.videos; url is an array. Failed or cancelled tasks receive a full reservation refund. Read final cost in integer quota (500,000 quota = 1 USD) and confirm billing_status is settled.
+
+For callbacks, waiting, idempotency and spending limits, see [Submit a task](/en/api-reference/task/submit)。

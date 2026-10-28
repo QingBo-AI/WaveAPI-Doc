@@ -1,0 +1,51 @@
+---
+title: "PixVerse V6 Max"
+description: "高质量文生视频与单图生视频，支持 1–15 秒整数时长及可选原生音频。"
+api: "POST https://api.qingbo.ai/v1/tasks"
+---
+
+高质量文生视频与单图生视频，支持 1–15 秒整数时长及可选原生音频。
+
+## 快速开始
+
+```bash
+curl -X POST https://api.qingbo.ai/v1/tasks \
+  -H "Authorization: Bearer $WAVE_API_KEY" \
+  -H "Content-Type: application/json" \
+  -H "Idempotency-Key: pixverse-v6-max-example-001" \
+  -d '{
+  "model": "pixverse-v6-max",
+  "action": "generate",
+  "prompt": "A paper boat drifts on a pond with gentle water sounds",
+  "duration": 3,
+  "resolution": "540p",
+  "aspect_ratio": "16:9",
+  "generate_audio": true
+}'
+```
+
+提交返回 task_id，使用[`GET /v1/tasks/{task_id}`](/cn/api-reference/task/status)查询结果。参考素材必须是可公开下载的 URL。
+
+## 请求参数
+
+| 参数 | 类型或取值 | 说明 |
+|---|---|---|
+| model | `pixverse-v6-max` | 固定模型 ID。 |
+| `action` | generate | 仅支持 generate。 |
+| `prompt` | string | 文生视频必填，最多 5000 字符；图生视频可选，最多 2048 字符。 |
+| `image_urls` | string[] | 可选，图生视频只接受 1 张参考图。 |
+| `duration` | integer | 必填，1–15 秒。 |
+| `resolution` | 360p / 540p / 720p / 1080p | 默认 540p。 |
+| `aspect_ratio` | string | 文生默认 16:9，可选 9:16、4:3、3:4、1:1、2:3、3:2、21:9；图生跟随输入图，忽略该字段。 |
+| `generate_audio` | boolean | 默认 false；true 选择价格更高的原生音频档。 |
+| `seed` | integer | 可选，0–2147483647。 |
+
+不支持 extend、首尾帧转场、多图融合、img_references、motion_mode 或其他普通 V6 专用控制。声音使用 generate_audio，画质使用 resolution。
+
+## 计费与结果
+
+成功后按本次输出秒数 × 分辨率与声音档的每秒价格结算。有声和无声是不同价格档。输出像素以实际文件为准。
+
+当前单价见控制台模型市场或 GET /v1/models 的 price_config。成功图片返回 result.images，视频返回 result.videos，url 是数组。任务失败或取消，预扣全额退还。最终费用看任务响应 cost（整数 quota，500,000 quota = 1 USD），并确认 billing_status 已 settled。
+
+通用回调、等待、幂等和费用上限见[提交任务](/cn/api-reference/task/submit)。

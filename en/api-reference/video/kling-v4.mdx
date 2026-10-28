@@ -1,0 +1,86 @@
+---
+title: "Kling 4.0"
+description: "Text-to-video, first/last/keyframe animation, multimodal reference, editing and extension, always with stereo audio."
+api: "POST https://api.qingbo.ai/v1/tasks"
+---
+
+Text-to-video, first/last/keyframe animation, multimodal reference, editing and extension, always with stereo audio.
+
+## Quick start
+
+```bash
+curl -X POST https://api.qingbo.ai/v1/tasks \
+  -H "Authorization: Bearer $WAVE_API_KEY" \
+  -H "Content-Type: application/json" \
+  -H "Idempotency-Key: kling-v4-example-001" \
+  -d '{
+  "model": "kling-v4",
+  "action": "generate",
+  "prompt": "A paper boat drifts slowly on a quiet pond, gentle water sounds",
+  "duration": 3,
+  "resolution": "720p",
+  "aspect_ratio": "16:9"
+}'
+```
+
+Submission returns a task_id. Use [`GET /v1/tasks/{task_id}`](/en/api-reference/task/status) to poll the result. Reference assets must use publicly downloadable URLs.
+
+## Parameters
+
+| Parameter | Type or values | Description |
+|---|---|---|
+| model | `kling-v4` | Exact model ID. |
+| `action` | generate / edit / extend | generate selects a generation mode from the assets; edit edits a source video; extend continues it. |
+| `prompt` | string | Required outside image-to-video. Reference assets using @Image1, @Video1 and @Audio1 in the prompt. |
+| `duration` | integer | Required for generate/extend, 3–30 seconds. For edit, omitted or 0 follows source duration, reserving at the 30-second cap. For extension, this is the new-segment duration. |
+| `resolution` | 720p / 1080p | Defaults to 720p. |
+| `aspect_ratio` | 16:9 / 9:16 / 1:1 / 21:9 / auto | Reference generation supports auto; ordinary text generation defaults upstream to 16:9. Not accepted for extend. |
+| `image_urls` | string[] | 1–2 first/last frames for ordinary image-to-video; up to 10 references for reference mode or editing. |
+| `image_with_roles` | object[] | Up to 10 `{url, role}` entries: first_frame, last_frame, keyframe, middle_frame or reference_image. Image-to-video needs exactly one first frame and at most 8 keyframes. Use instead of image_urls/first_frame_image/last_frame_image. |
+| `first_frame_image / last_frame_image` | string | First/last-frame URLs; extend accepts only last_frame_image as a target end frame. |
+| `video_urls` | string[] | Up to 5 references for generate, exactly one source for edit/extend. URLs must be readable; this route requires at least one second per clip and at least three seconds for edit sources. Input videos must total no more than 30 seconds; trim longer source videos before submission. Billed input duration is also capped at 30 seconds. |
+| `audio_urls` | string[] | Up to 3 reference clips for generate, each 5–30 seconds. Images, videos and audio together must total at most 15 reference assets. |
+| `omni_reference_task_type` | auto / reference | Only for generate, default auto. Use reference explicitly for image-only reference generation. edit/extend modes are fixed by action. |
+| `audio_setting` | origin / auto | Available for editing or video-reference generation: origin preserves video sound, auto creates new sound. Not accepted for extend. |
+| `generate_audio` | true | Always with sound; false is rejected before reservation. |
+| `watermark` | false | Enabling watermark is unsupported. |
+
+Legacy mode, negative_prompt, multi_shot, multi_prompt, element_list, video_list, camera_control and voice_list are unsupported. Unreadable input videos are rejected. Clips shorter than one second are not exposed because integer-second quoting cannot safely represent them. Image roles and combined assets must also satisfy supplier validation.
+
+## Edit a video
+
+```json
+{
+  "model": "kling-v4",
+  "action": "edit",
+  "prompt": "Change the scene to warm sunset light, keeping the boat.",
+  "video_urls": [
+    "https://cdn.example.com/source.mp4"
+  ],
+  "duration": 3,
+  "resolution": "720p"
+}
+```
+
+## Extend a video
+
+```json
+{
+  "model": "kling-v4",
+  "action": "extend",
+  "prompt": "Continue the boat drifting slowly on the pond.",
+  "video_urls": [
+    "https://cdn.example.com/source.mp4"
+  ],
+  "duration": 3,
+  "resolution": "720p"
+}
+```
+
+## Billing and results
+
+Quotes are reservation estimates. Successful tasks settle at upstream actual cost plus 12.5%, with excess reservation refunded and no charge beyond the hold. Ordinary generation bills output seconds; extension bills only the new segment. Editing and video-reference generation use output seconds + max(output seconds, billed input seconds), with summed input duration rounded up and capped at 30 seconds. Video-input reservations include a fractional-second buffer and may exceed the final fee; omitted edit duration reserves at the 30-second cap.
+
+Read current rates in the model market or price_config from GET /v1/models. Images are in result.images and videos in result.videos; url is an array. Failed or cancelled tasks receive a full reservation refund. Read final cost in integer quota (500,000 quota = 1 USD) and confirm billing_status is settled.
+
+For callbacks, waiting, idempotency and spending limits, see [Submit a task](/en/api-reference/task/submit)。

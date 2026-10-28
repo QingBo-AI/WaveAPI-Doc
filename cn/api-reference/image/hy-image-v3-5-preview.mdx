@@ -1,0 +1,66 @@
+---
+title: "HY Image 3.5 Preview"
+description: "腾讯混元图像预览模型，提供文生图、最多五张参考图的编辑与融合。"
+api: "POST https://api.qingbo.ai/v1/tasks"
+---
+
+腾讯混元图像预览模型，提供文生图、最多五张参考图的编辑与融合。
+
+## 快速开始
+
+```bash
+curl -X POST https://api.qingbo.ai/v1/tasks \
+  -H "Authorization: Bearer $WAVE_API_KEY" \
+  -H "Content-Type: application/json" \
+  -H "Idempotency-Key: hy-image-v3.5-preview-example-001" \
+  -d '{
+  "model": "hy-image-v3.5-preview",
+  "action": "generate",
+  "prompt": "Minimalist poster of a blue ceramic cup, cream background",
+  "resolution": "2k",
+  "aspect_ratio": "3:4",
+  "negative_prompt": "blur, noise",
+  "seed": 42
+}'
+```
+
+提交返回 task_id，使用[`GET /v1/tasks/{task_id}`](/cn/api-reference/task/status)查询结果。参考素材必须是可公开下载的 URL。
+
+## 请求参数
+
+| 参数 | 类型或取值 | 说明 |
+|---|---|---|
+| model | `hy-image-v3.5-preview` | 固定模型 ID。 |
+| `action` | generate / edit | generate 文生图不接受参考图；edit 编辑须提供参考图。 |
+| `prompt` | string | 必填，中英文图片描述或编辑指令。 |
+| `image_urls` | string[] | edit 时 1–5 张公网可访问的参考图。 |
+| `resolution` | 1k / 2k / 4k | 默认 1k。 |
+| `aspect_ratio` | string | 默认 auto；支持 1:1、2:3、3:2、3:4、4:3、4:5、5:4、9:16、16:9、21:9。auto 在文生时默认正方形，编辑时跟随参考图。 |
+| `negative_prompt` | string | 可选，描述不希望出现的内容。 |
+| `seed` | integer | 非负整数；省略或 0 随机生成。 |
+| `n` | 1 | 每次返回 1 张图片。 |
+
+此线路仅开放分辨率和画幅档，不接受 width、height 或像素字符串 size。上游精确尺寸会按短边重新定价，当前报价无法冻结这项推导，故在请求前拒绝。
+
+## 参考图编辑
+
+```json
+{
+  "model": "hy-image-v3.5-preview",
+  "action": "edit",
+  "prompt": "Change the cup to red; preserve the background and lighting.",
+  "image_urls": [
+    "https://cdn.example.com/source.png"
+  ],
+  "resolution": "1k",
+  "aspect_ratio": "auto"
+}
+```
+
+## 计费与结果
+
+成功后按 1k、2k 或 4k 的固定张价结算；文生和编辑同价，参考图不另收费。
+
+当前单价见控制台模型市场或 GET /v1/models 的 price_config。成功图片返回 result.images，视频返回 result.videos，url 是数组。任务失败或取消，预扣全额退还。最终费用看任务响应 cost（整数 quota，500,000 quota = 1 USD），并确认 billing_status 已 settled。
+
+通用回调、等待、幂等和费用上限见[提交任务](/cn/api-reference/task/submit)。

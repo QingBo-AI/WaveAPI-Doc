@@ -1,0 +1,51 @@
+---
+title: "PixVerse V6 Max"
+description: "High-quality text-to-video and single-image-to-video with 1–15 second integer durations and optional native audio."
+api: "POST https://api.qingbo.ai/v1/tasks"
+---
+
+High-quality text-to-video and single-image-to-video with 1–15 second integer durations and optional native audio.
+
+## Quick start
+
+```bash
+curl -X POST https://api.qingbo.ai/v1/tasks \
+  -H "Authorization: Bearer $WAVE_API_KEY" \
+  -H "Content-Type: application/json" \
+  -H "Idempotency-Key: pixverse-v6-max-example-001" \
+  -d '{
+  "model": "pixverse-v6-max",
+  "action": "generate",
+  "prompt": "A paper boat drifts on a pond with gentle water sounds",
+  "duration": 3,
+  "resolution": "540p",
+  "aspect_ratio": "16:9",
+  "generate_audio": true
+}'
+```
+
+Submission returns a task_id. Use [`GET /v1/tasks/{task_id}`](/en/api-reference/task/status) to poll the result. Reference assets must use publicly downloadable URLs.
+
+## Parameters
+
+| Parameter | Type or values | Description |
+|---|---|---|
+| model | `pixverse-v6-max` | Exact model ID. |
+| `action` | generate | Only generate is supported. |
+| `prompt` | string | Required for text-to-video, up to 5000 characters; optional for image-to-video, up to 2048 characters. |
+| `image_urls` | string[] | Optional; image-to-video accepts exactly one reference. |
+| `duration` | integer | Required, 1–15 seconds. |
+| `resolution` | 360p / 540p / 720p / 1080p | Defaults to 540p. |
+| `aspect_ratio` | string | Text generation defaults to 16:9; also accepts 9:16, 4:3, 3:4, 1:1, 2:3, 3:2 and 21:9. Image-to-video follows its reference and ignores this field. |
+| `generate_audio` | boolean | Defaults to false; true selects the higher native-audio rate. |
+| `seed` | integer | Optional, 0–2147483647. |
+
+Extension, first/last-frame transitions, multi-image fusion, img_references, motion_mode and other V6-only controls are unsupported. Use generate_audio for sound and resolution for quality.
+
+## Billing and results
+
+Successful tasks charge output seconds multiplied by the resolution/audio per-second rate. Silent and audio output use different rates. Actual output pixel dimensions are authoritative.
+
+Read current rates in the model market or price_config from GET /v1/models. Images are in result.images and videos in result.videos; url is an array. Failed or cancelled tasks receive a full reservation refund. Read final cost in integer quota (500,000 quota = 1 USD) and confirm billing_status is settled.
+
+For callbacks, waiting, idempotency and spending limits, see [Submit a task](/en/api-reference/task/submit)。
