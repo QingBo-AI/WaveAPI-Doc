@@ -1,9 +1,28 @@
 ---
 title: "GPT Image Series"
-description: "Eight GPT Image models from OpenAI: five official lines billed on token usage, three reverse lines at a fixed price per image"
+description: "Compare GPT Image models: token billing on official lines and fixed per-image pricing on reverse lines"
 ---
 
-All eight models in the GPT Image series are served on `POST /v1/tasks` — the request URL does not change between them. They share the same actions and request shape; the differences are the aspect-ratio and resolution values, the line-specific parameters, and billing. Picking a model only changes the `model` field.
+All GPT Image models are served on `POST /v1/tasks` — the request URL does not change between them. They share the same actions and request shape; the differences are the aspect-ratio and resolution values, the line-specific parameters, and billing. Picking a model only changes the `model` field.
+
+## GPT Image 2.6
+
+<CardGroup cols={2}>
+  <Card title="GPT Image 2.6 Flare" href="/en/api-reference/image/gpt-image/gpt-image-2.6">
+    `gpt-image-2.6-flare` · Token billing, 1K/2K/4K, annotation and mask editing
+  </Card>
+  <Card title="GPT Image 2.6 Flare Economy" href="/en/api-reference/image/gpt-image/gpt-image-2.6-rev">
+    `gpt-image-2.6-flare-rev` · Fixed-price 1K images, six quality options, text-to-GIF
+  </Card>
+  <Card title="GPT Image 2.6 Sunburst" href="/en/api-reference/image/gpt-image/gpt-image-2.6">
+    `gpt-image-2.6-sunburst` · Token billing, 1K/2K/4K, annotation and mask editing
+  </Card>
+  <Card title="GPT Image 2.6 Sunburst Economy" href="/en/api-reference/image/gpt-image/gpt-image-2.6-rev">
+    `gpt-image-2.6-sunburst-rev` · Fixed-price 1K images, six quality options, text-to-GIF
+  </Card>
+</CardGroup>
+
+The comparison below covers GPT Image 2.5 and earlier. Use the new pages above for 2.6 parameters, defaults and billing.
 
 ## Available models
 
