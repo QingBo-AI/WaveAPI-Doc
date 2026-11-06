@@ -1,0 +1,81 @@
+---
+title: "GPT Image 2.6 官方版"
+description: "Flare 与 Sunburst，支持六档画质、规划强度、掩码和标注编辑，按实际 token 结算"
+api: "POST https://api.qingbo.ai/v1/tasks"
+---
+
+Flare 与 Sunburst，支持六档画质、规划强度、掩码和标注编辑，按实际 token 结算.
+
+可用模型：`gpt-image-2.6-flare` / `gpt-image-2.6-sunburst`.
+
+## 快速开始
+
+```bash
+curl -X POST https://api.qingbo.ai/v1/tasks \
+  -H "Authorization: Bearer $WAVE_API_KEY" \
+  -H "Content-Type: application/json" \
+  -H "Idempotency-Key: image26-demo-001" \
+  -d '{
+  "model": "gpt-image-2.6-flare",
+  "action": "generate",
+  "prompt": "A sculptural glass vase on ivory stone, soft side light, refined editorial photography",
+  "resolution": "1k",
+  "aspect_ratio": "4:5",
+  "quality": "medium",
+  "complexity": "high",
+  "n": 1
+}'
+```
+
+提交后读取 `task_id`，用 `GET /v1/tasks/{task_id}` 查询；成功后从 `result.images[].url[]` 下载文件。等待超时后继续查原任务，不要重复提交。
+
+## 参数
+
+| 参数 | 取值与规则 |
+|---|---|
+| `action` | generate 文生图；edit 编辑，必须提供 image_urls。 |
+| `prompt` | 必填，图片描述或编辑指令。 |
+| `image_urls` | 编辑时提供 1–16 张可公网读取的参考图。 |
+| `resolution` | 1k / 2k / 4k，默认 1k。 |
+| `aspect_ratio` | 1:1 / 3:2 / 2:3 / 4:3 / 3:4 / 5:4 / 4:5 / 16:9 / 9:16 / 2:1 / 1:2 / 21:9 / 9:21 / 3:1 / 1:3. Default: 1:1. |
+| `quality` | low / medium / high / xhigh / max / auto；默认 low。 |
+| `complexity` | low / medium / high，默认 high；控制规划强度，独立于画质，不单独收费。 |
+| `n` | 1–4，默认 1，预扣按张数增加。 |
+| `output_format` | png / jpeg / webp. Default: png. |
+| `mask_url` | 与参考图同尺寸的透明 PNG 蒙版，透明区表示重绘区域；必须同时传 image_urls。 |
+| `markup_url` | 透明 PNG 标注层，须与首张参考图同尺寸；仅 edit，可与参考图一起使用，不能与 mask_url 同时传。 |
+| `background` | auto / opaque / transparent；透明背景只支持 PNG / WebP。 |
+| `moderation` | auto / low，默认 low。 |
+| `output_compression` | 整数 0–100，仅 JPEG / WebP。 |
+| `safety_identifier` | 可选终端用户稳定标识，最多 128 字符，建议使用哈希。 |
+
+## 参考图编辑
+
+```json
+{
+  "model": "gpt-image-2.6-sunburst",
+  "action": "edit",
+  "prompt": "Preserve the subject and composition. Change the lighting to warm late-afternoon sunlight.",
+  "image_urls": [
+    "https://cdn.example.com/source.png"
+  ],
+  "resolution": "1k",
+  "quality": "low",
+  "complexity": "low",
+  "n": 1
+}
+```
+
+## 计费
+
+按实际分类 token 用量收费，单位为 USD / 百万 token：
+
+| 文本输入 | 缓存文本 | 图片输入 | 缓存图片 | 图片输出 |
+|---|---|---|---|---|
+| 4.5 | 1.125 | 7.2 | 1.8 | 27 |
+
+报价包含提示词、参考图和输出预留；`quality: "auto"` 按 max 档预扣，成功后按实际用量退差，不超过预扣。2.6 的 low / medium 用量与 2.5 不同，请重新报价。审核拒绝仍可能收取已处理的输入费，不收未生成的输出费；费用或用量未确认时 `billing_status` 保持 pending，应等待最终结算。
+
+## 能力边界
+
+当前不开放 GIF、SVG 和精确像素尺寸：GIF 的拼图预扣和 SVG 的额外文本模型费用尚未接入。请使用静态图片格式、aspect_ratio 和 resolution。

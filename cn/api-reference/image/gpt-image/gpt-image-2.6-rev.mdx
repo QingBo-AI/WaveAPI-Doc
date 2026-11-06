@@ -1,0 +1,87 @@
+---
+title: "GPT Image 2.6 逆向版"
+description: "Flare 与 Sunburst，1K 按张计费，支持参考图编辑与 GIF 文生图"
+api: "POST https://api.qingbo.ai/v1/tasks"
+---
+
+Flare 与 Sunburst，1K 按张计费，支持参考图编辑与 GIF 文生图.
+
+可用模型：`gpt-image-2.6-flare-rev` / `gpt-image-2.6-sunburst-rev`.
+
+## 快速开始
+
+```bash
+curl -X POST https://api.qingbo.ai/v1/tasks \
+  -H "Authorization: Bearer $WAVE_API_KEY" \
+  -H "Content-Type: application/json" \
+  -H "Idempotency-Key: image26-rev-demo-001" \
+  -d '{
+  "model": "gpt-image-2.6-flare-rev",
+  "action": "generate",
+  "prompt": "A sculptural glass vase on ivory stone, soft side light, refined editorial photography",
+  "resolution": "1k",
+  "aspect_ratio": "4:5",
+  "quality": "medium",
+  "complexity": "high",
+  "n": 1
+}'
+```
+
+提交后读取 `task_id`，用 `GET /v1/tasks/{task_id}` 查询；成功后从 `result.images[].url[]` 下载文件。等待超时后继续查原任务，不要重复提交。
+
+## 参数
+
+| 参数 | 取值与规则 |
+|---|---|
+| `action` | generate 文生图；edit 编辑，必须提供 image_urls。 |
+| `prompt` | 必填，图片描述或编辑指令。 |
+| `image_urls` | 编辑时提供 1–16 张可公网读取的参考图。 |
+| `resolution` | 仅 1k；2k / 4k 暂未开放。 |
+| `aspect_ratio` | auto / 1:1 / 16:9 / 9:16 / 4:3 / 3:4 / 3:2 / 2:3 / 5:4 / 4:5 / 21:9。GIF 必须显式传 auto。 |
+| `quality` | low / medium / high / xhigh / max / auto；默认 low。 |
+| `complexity` | low / medium / high，默认 high；控制规划强度，独立于画质，不单独收费。 |
+| `n` | 只能为 1。 |
+| `output_format` | png / jpeg / webp / gif；默认 png。GIF 仅限 generate，不接受参考图。 |
+
+## 参考图编辑
+
+```json
+{
+  "model": "gpt-image-2.6-sunburst-rev",
+  "action": "edit",
+  "prompt": "Preserve the subject and composition. Change the lighting to warm late-afternoon sunlight.",
+  "image_urls": [
+    "https://cdn.example.com/source.png"
+  ],
+  "resolution": "1k",
+  "quality": "low",
+  "complexity": "low",
+  "n": 1
+}
+```
+
+## GIF
+
+```json
+{
+  "model": "gpt-image-2.6-flare-rev",
+  "action": "generate",
+  "prompt": "A paper lantern sways gently in a breeze, seamless loop, fixed camera",
+  "resolution": "1k",
+  "aspect_ratio": "auto",
+  "output_format": "gif",
+  "quality": "medium",
+  "n": 1
+}
+```
+
+
+## 计费
+
+两个版本均为 **$0.0095625 / 张**，实际账单按最小计费单位向上取整，约 **$0.009564 / 张**。画质、格式、规划强度和参考图不加价；失败全额退还预扣。
+
+## 能力边界
+
+SVG 暂不开放：实测请求得到 PNG，待供应商修复并重新验收后开放。GIF 不开放帧数和像素尺寸控制。
+
+不接受 2K / 4K、多张输出、蒙版或标注层，也不开放 background、moderation、output_compression 等上游不生效参数。Flare / Sunburst 由 model 固定，不传 version。

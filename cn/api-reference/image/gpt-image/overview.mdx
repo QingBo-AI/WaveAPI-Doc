@@ -1,9 +1,28 @@
 ---
 title: "GPT Image 系列"
-description: "OpenAI GPT Image 的八个模型：五个官方版按 token 用量计费，三个逆向版按张固定价"
+description: "GPT Image 模型对照：官方线路按 token 用量计费，逆向线路按张固定价"
 ---
 
-GPT Image 系列的八个模型都走 `POST /v1/tasks`，请求地址不随模型变化。它们的动作和请求形状一致，差别集中在画幅与分辨率的取值、专有参数和计费方式三处，选型只改 `model` 字段。
+GPT Image 系列都走 `POST /v1/tasks`，请求地址不随模型变化。它们的动作和请求形状一致，差别集中在画幅与分辨率的取值、专有参数和计费方式三处，选型只改 `model` 字段。
+
+## GPT Image 2.6
+
+<CardGroup cols={2}>
+  <Card title="GPT Image 2.6 Flare" href="/cn/api-reference/image/gpt-image/gpt-image-2.6">
+    `gpt-image-2.6-flare` · 按 token 结算，1K / 2K / 4K，标注与掩码编辑
+  </Card>
+  <Card title="GPT Image 2.6 Flare 逆向版" href="/cn/api-reference/image/gpt-image/gpt-image-2.6-rev">
+    `gpt-image-2.6-flare-rev` · 1K 固定张价，六档画质，GIF 文生图
+  </Card>
+  <Card title="GPT Image 2.6 Sunburst" href="/cn/api-reference/image/gpt-image/gpt-image-2.6">
+    `gpt-image-2.6-sunburst` · 按 token 结算，1K / 2K / 4K，标注与掩码编辑
+  </Card>
+  <Card title="GPT Image 2.6 Sunburst 逆向版" href="/cn/api-reference/image/gpt-image/gpt-image-2.6-rev">
+    `gpt-image-2.6-sunburst-rev` · 1K 固定张价，六档画质，GIF 文生图
+  </Card>
+</CardGroup>
+
+下方为 GPT Image 2.5 及更早版本的对照。2.6 的参数、默认值与费用以上方新页面为准。
 
 ## 可用模型
 

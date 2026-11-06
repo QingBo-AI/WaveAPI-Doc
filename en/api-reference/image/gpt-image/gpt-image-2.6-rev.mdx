@@ -1,0 +1,87 @@
+---
+title: "GPT Image 2.6 Reverse"
+description: "Flare and Sunburst, fixed-price 1K images, reference editing and text-to-GIF"
+api: "POST https://api.qingbo.ai/v1/tasks"
+---
+
+Flare and Sunburst, fixed-price 1K images, reference editing and text-to-GIF.
+
+Model IDs: `gpt-image-2.6-flare-rev` / `gpt-image-2.6-sunburst-rev`.
+
+## Quick start
+
+```bash
+curl -X POST https://api.qingbo.ai/v1/tasks \
+  -H "Authorization: Bearer $WAVE_API_KEY" \
+  -H "Content-Type: application/json" \
+  -H "Idempotency-Key: image26-rev-demo-001" \
+  -d '{
+  "model": "gpt-image-2.6-flare-rev",
+  "action": "generate",
+  "prompt": "A sculptural glass vase on ivory stone, soft side light, refined editorial photography",
+  "resolution": "1k",
+  "aspect_ratio": "4:5",
+  "quality": "medium",
+  "complexity": "high",
+  "n": 1
+}'
+```
+
+Read `task_id` after submission and poll `GET /v1/tasks/{task_id}`. Download files from `result.images[].url[]` on success. Continue polling the original task after a timeout; do not submit a duplicate.
+
+## Parameters
+
+| Parameter | Values and rules |
+|---|---|
+| `action` | generate for text generation; edit requires image_urls. |
+| `prompt` | Required description or edit instruction. |
+| `image_urls` | 1–16 publicly accessible reference images for editing. |
+| `resolution` | Only 1k; 2k and 4k are unavailable. |
+| `aspect_ratio` | auto / 1:1 / 16:9 / 9:16 / 4:3 / 3:4 / 3:2 / 2:3 / 5:4 / 4:5 / 21:9. GIF requires explicit auto. |
+| `quality` | low / medium / high / xhigh / max / auto; defaults to low. |
+| `complexity` | low / medium / high, defaults to high. Planning effort is independent of quality and has no separate fee. |
+| `n` | Must be 1. |
+| `output_format` | png / jpeg / webp / gif; defaults to png. GIF require generate without references. |
+
+## Reference editing
+
+```json
+{
+  "model": "gpt-image-2.6-sunburst-rev",
+  "action": "edit",
+  "prompt": "Preserve the subject and composition. Change the lighting to warm late-afternoon sunlight.",
+  "image_urls": [
+    "https://cdn.example.com/source.png"
+  ],
+  "resolution": "1k",
+  "quality": "low",
+  "complexity": "low",
+  "n": 1
+}
+```
+
+## GIF
+
+```json
+{
+  "model": "gpt-image-2.6-flare-rev",
+  "action": "generate",
+  "prompt": "A paper lantern sways gently in a breeze, seamless loop, fixed camera",
+  "resolution": "1k",
+  "aspect_ratio": "auto",
+  "output_format": "gif",
+  "quality": "medium",
+  "n": 1
+}
+```
+
+
+## Billing
+
+Both variants cost **$0.0095625 per image**, rounded up to the billing unit (approximately **$0.009564**). Quality, format, planning effort and references have no surcharge. Failed tasks refund the reservation.
+
+## Limits
+
+SVG is unavailable: real test requests returned PNG. It will be exposed after the supplier delivers and passes acceptance. GIF frame counts and pixel sizes are not exposed.
+
+2K/4K, multiple output images, masks and annotation layers are unavailable. Ineffective upstream controls such as background, moderation and output_compression are not exposed. model pins Flare/Sunburst; do not send version.
