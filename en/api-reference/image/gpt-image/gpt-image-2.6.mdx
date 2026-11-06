@@ -41,7 +41,7 @@ Read `task_id` after submission and poll `GET /v1/tasks/{task_id}`. Download fil
 | `quality` | low / medium / high / xhigh / max / auto; defaults to low. |
 | `complexity` | low / medium / high, defaults to high. Planning effort is independent of quality and has no separate fee. |
 | `n` | 1–4, defaults to 1. Reservation scales with image count. |
-| `output_format` | png / jpeg / webp. Default: png. |
+| `output_format` | png / jpeg / webp / gif. Default: png. |
 | `mask_url` | Alpha PNG mask matching the first reference; transparent pixels mark the edit area. Requires image_urls. |
 | `markup_url` | Transparent PNG annotation layer matching the first reference. edit only, requires references, mutually exclusive with mask_url. |
 | `background` | auto / opaque / transparent. Transparent backgrounds require PNG or WebP. |
@@ -66,6 +66,37 @@ Read `task_id` after submission and poll `GET /v1/tasks/{task_id}`. Download fil
 }
 ```
 
+## GIF animation
+
+Both official routes support `output_format: "gif"` for text generation. Defaults are 512×512, 9 frames and 200ms per frame. `n` counts animations, not frames.
+
+| Parameter | GIF rules |
+|---|---|
+| `size` | Per-frame pixels: auto / 512x512 / 768x768. auto means 512x512. |
+| `frame_count` | Integer 2–16, default 9. 768x768 supports at most 12 frames. |
+| `frame_duration_ms` | Default 200, minimum 20, in multiples of 10. Does not change the price. |
+| `quality` | low / medium / high; defaults to low. |
+| `resolution` / `aspect_ratio` | Keep the defaults 1k / 1:1; size determines per-frame pixels. |
+| `n` | 1–4 animations; reserve one complete sprite sheet per animation. |
+
+```json
+{
+  "model": "gpt-image-2.6-flare",
+  "action": "generate",
+  "prompt": "An ivory paper lantern sways in a soft night breeze, warm amber light, deep navy background, seamless loop",
+  "output_format": "gif",
+  "size": "512x512",
+  "frame_count": 9,
+  "frame_duration_ms": 200,
+  "quality": "low",
+  "n": 1
+}
+```
+
+Poll the same task endpoint and download the GIF from `result.images[].url[]`. Reservation uses the full sprite-sheet output token tier plus prompt allowance for each animation. Settlement uses actual typed tokens within the hold and refunds the difference; it does not multiply a static-image price by frame count.
+
+For example, 512x512 / 9 frames / low reserves 1172 output tokens ($0.031644), plus prompt allowance. A real receipt used 68 text input + 1172 image output tokens and settled at $0.03195. This is an example receipt; obtain a fresh quote before submission. 
+
 ## Billing
 
 Charged by actual typed token usage, in USD per million tokens:
@@ -78,4 +109,4 @@ Quotes reserve prompt, reference and output usage. `quality: "auto"` reserves ma
 
 ## Limits
 
-GIF, SVG and exact pixel sizes are not exposed: GIF sprite-sheet reservation and additional SVG text-model billing are not integrated. Use static formats, aspect_ratio and resolution.
+SVG and exact pixel sizes for static images are not exposed. GIF supports only the square frame sizes and qualities listed above. Reference editing, masks, annotations, compression and transparent backgrounds are unavailable for GIF.
