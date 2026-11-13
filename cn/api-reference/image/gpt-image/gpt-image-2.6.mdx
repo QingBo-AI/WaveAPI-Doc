@@ -68,7 +68,7 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
 
 ## GIF 动画
 
-两条官方线路均支持 `output_format: "gif"`，仅用于文生图。默认 512×512、9 帧、每帧 200ms；`n` 表示动画段数，不是帧数。
+两条官方线路均支持 `output_format: "gif"`，可从文字或参考图生成动图。默认 512×512、9 帧、每帧 200ms；`n` 表示动画段数，不是帧数。
 
 | 参数 | GIF 规则 |
 |---|---|
@@ -93,9 +93,44 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
 }
 ```
 
-通过相同任务查询接口取得 `result.images[].url[]` 中的 GIF 下载地址。GIF 按整张动画拼图的输出 token 预扣，加上每段动画的提示词预留；成功后使用实际分类 token 结算并退差，不按帧数乘静态图片价格。
+通过相同任务查询接口取得 `result.images[].url[]` 中的 GIF 下载地址。GIF 按整张动画拼图的输出 token 预扣，加上每段动画的提示词和参考图输入预留；成功后使用实际分类 token 结算并退差，不按帧数乘静态图片价格。
 
 例如 512x512、9 帧、low 的输出预留为 1172 token，即 $0.031644，再加提示词预留。一次实测回执为 68 文本输入 + 1172 图片输出 token，最终 $0.03195；这是样例账单，提交前仍以实时报价为准。
+
+### 参考图生成 GIF
+
+Flare、Sunburst 官方版均支持最多 16 张参考图。使用 `action: "edit"` 时至少提供 1 张 `image_urls`；`n=2` 表示生成两段完整动图。每段动画都预留参考图输入费用，最终只按回传的实际总用量结算，不将参考图费用按帧数重复相乘。
+
+GIF 的 `size` 是单帧尺寸，不跟随参考图宽高比。
+
+```json
+{
+  "model": "gpt-image-2.6-flare",
+  "action": "edit",
+  "prompt": "Keep the amber perfume bottle and fern. A warm ray of light glides gently through the glass, creating delicate caustics; the fern sways slightly. Refined product photography, stable camera, complete bottle visible on a square canvas, seamless loop, no text.",
+  "image_urls": [
+    "https://s3.qingbo.ai/qingbo-public/waveapi/site/assets/2026/11/428b6c75-654f-4cdc-8310-ba9ac545f2de.png"
+  ],
+  "output_format": "gif",
+  "size": "512x512",
+  "frame_count": 9,
+  "frame_duration_ms": 200,
+  "quality": "medium",
+  "n": 1
+}
+```
+
+经济版暂不支持参考图 GIF。
+
+### Flare：参考图生成 16 帧动图
+
+![Flare reference GIF](https://s3.qingbo.ai/qingbo-public/waveapi/site/assets/2026/11/830db81e-5007-4508-a868-3254d06c2c17.gif)
+
+### Sunburst：参考图生成 9 帧动图
+
+![Sunburst reference GIF](https://s3.qingbo.ai/qingbo-public/waveapi/site/assets/2026/11/eaa118f2-d355-4907-8f58-ede024fc27c4.gif)
+
+均为对应模型真实生成的循环 GIF，已验证帧数、时长与下载文件。
 
 ## 计费
 
@@ -109,4 +144,4 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
 
 ## 能力边界
 
-SVG 和静态图片的精确像素尺寸暂不开放。GIF 仅开放下表所列的方形帧尺寸与画质，不支持参考图编辑、蒙版、标注层、压缩和透明背景。
+SVG 和静态图片的精确像素尺寸暂不开放。GIF 仅开放下表所列的方形帧尺寸与画质，支持参考图生成动图；不支持蒙版、标注层、压缩和透明背景。
