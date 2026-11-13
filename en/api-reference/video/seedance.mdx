@@ -4,7 +4,10 @@ description: "ByteDance Seedance video generation: text, image, first/last frame
 api: "POST https://api.qingbo.ai/v1/tasks"
 ---
 
-The ByteDance Seedance video line: the two 1.0 tiers cover text-to-video and first/last-frame control, 1.5 Pro adds multi-image reference and native audio, the three 2.0 tiers widen references to images, video and audio, and 2.5 adds video editing and video extension on top. This page covers the seven available models. They share one task endpoint and one set of parameters, and differ in the resolutions, duration ranges and reference material each accepts — switching tiers means changing `model`.
+<Warning>Seedance 1.5 Pro has been retired by the upstream provider. New `seedance-1.5-pro` requests are no longer accepted. Historical tasks, billing and download records remain available. Select another available model explicitly, such as `seedance-2.0-mini`, and review its parameters and prices; requests are not silently switched to another model. References to 1.5 Pro below document historical requests only.</Warning>
+
+
+The ByteDance Seedance video line: the two 1.0 tiers cover text-to-video and first/last-frame control, 1.5 Pro adds multi-image reference and native audio, the three 2.0 tiers widen references to images, video and audio, and 2.5 adds video editing and video extension on top. This page covers six available models and historical notes for the retired 1.5 Pro. They share one task endpoint and one set of parameters, and differ in the resolutions, duration ranges and reference material each accepts — switching tiers means changing `model`.
 
 <Note>
 Seedance is the video line; the image models under the similar name are the [Seedream Series](/en/api-reference/image/seedream), with different parameters and different billing.
@@ -344,7 +347,6 @@ Generated videos are returned in `result.videos`; `url` is an array and `expires
 |---|---|---|---|---|
 | `seedance-1.0-pro` | `480p` / `720p` / `1080p` | 2–12 | First and last frame | `generate` |
 | `seedance-1.0-pro-fast` | `480p` / `720p` / `1080p` | 2–12 | First frame | `generate` |
-| `seedance-1.5-pro` | `480p` / `720p` / `1080p` | 4–12 | First/last frame, 2 images | `generate` |
 | `seedance-2.0` | `480p` / `720p` / `1080p` / `4k` | 4–15 | First/last frame, 9 images, 3 videos, 3 audio | `generate` |
 | `seedance-2.0-fast` | `480p` / `720p` | 4–15 | First/last frame, 9 images, 3 videos, 3 audio | `generate` |
 | `seedance-2.0-mini` | `480p` / `720p` | 4–15 | First/last frame, 9 images, 3 videos, 3 audio | `generate` |

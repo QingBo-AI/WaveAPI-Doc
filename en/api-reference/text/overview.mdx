@@ -324,6 +324,10 @@ The V4 line (Pro / Flash / 4.1 Flash) is priced by the **UTC time slot at reques
 Beijing time is UTC+8. The per-slot input / output / cache-read rates for each model are in
 `price_config.text_schedule` on `GET /v1/models` — that is the complete table and the basis for settlement.
 
+
+
+After this price update takes effect on 2026-11-13, `deepseek-v4.1-flash` cache reads cost $0.005 per million tokens at peak and $0.0025 off-peak. Input/output rates and these windows are unchanged. Accepted requests retain the tariff frozen at admission.
+
 ### Qwen (Alibaba Cloud)
 
 | Model ID | Billing | JSON / Tools |
