@@ -24,6 +24,16 @@ description: "全部文本模型的目录：支持的能力、计费方式与调
 
 新接入建议使用 Chat Completions。原生入口用于兼容已有客户端，除联网搜索外不提供额外能力。所有入口都用 WaveAPI Key 作为凭据（Chat / Responses 走 `Authorization: Bearer`，Messages 走 `x-api-key` 或 `Authorization: Bearer`，Gemini 原生走 `x-goog-api-key`、`Authorization: Bearer` 或查询参数 `key`），生态登录 token 不能代替模型 Key，见[认证](/cn/docs/authentication)。
 
+## Gemini 4 Carbon
+
+新增 `gemini-4-carbon`，支持 Chat Completions 普通与流式调用；本渠道输入上限 128,000、输出上限 16,000 token。当前仅开放 `/v1/chat/completions`；Responses、Messages、Gemini 原生、工具调用和付费搜索尚未验收开放。
+
+单价（USD / 百万 token）：输入 **1.8**、缓存读取 **0.09**、输出 **9**。仅实际报告的缓存命中 token 按缓存价计费。
+
+```json
+{"model":"gemini-4-carbon","messages":[{"role":"user","content":"Explain stable list deduplication."}],"max_tokens":256,"stream":true}
+```
+
 ## 计费口径
 
 各模型的单价见 `GET /v1/models` 返回的 `price_config`，或控制台「模型市场」。单次调用的实际花费见响应里的 `usage.cost`。

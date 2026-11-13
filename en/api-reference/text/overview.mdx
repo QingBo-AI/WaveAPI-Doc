@@ -24,6 +24,16 @@ All text models are served through the OpenAI-compatible Chat Completions endpoi
 
 New integrations should use Chat Completions. The native entries exist for compatibility with existing clients and expose no extra capability except web search. All entries authenticate with a WaveAPI key (Chat / Responses via `Authorization: Bearer`, Messages via `x-api-key` or `Authorization: Bearer`, Gemini native via `x-goog-api-key`, `Authorization: Bearer` or the `key` query parameter); an ecosystem login token is not a model key — see [Authentication](/en/docs/authentication).
 
+## Gemini 4 Carbon
+
+`gemini-4-carbon` supports ordinary and streaming Chat Completions. Channel limits: 128,000 input and 16,000 output tokens. This release exposes `/v1/chat/completions` only; Responses, Messages, native Gemini, tools and paid search are not yet accepted.
+
+USD per million tokens: input **1.8**, cached input **0.09**, output **9**. Only reported cache hits receive the cached rate.
+
+```json
+{"model":"gemini-4-carbon","messages":[{"role":"user","content":"Explain stable list deduplication."}],"max_tokens":256,"stream":true}
+```
+
 ## Billing rules
 
 Per-model rates are in `price_config` on `GET /v1/models` and in the console's Model Market. What a specific call cost is the `usage.cost` field on the response.
