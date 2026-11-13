@@ -1,0 +1,49 @@
+---
+title: "Kling V4 Flash"
+description: "异步生成、参数范围、实际用量计费与真实效果示例"
+api: "POST https://api.qingbo.ai/v1/tasks"
+---
+
+模型 ID：`kling-v4-flash`.
+
+## 快速开始
+
+```bash
+curl https://api.qingbo.ai/v1/tasks \
+  -H "Authorization: Bearer $WAVE_API_KEY" \
+  -H "Content-Type: application/json" \
+  -H "Idempotency-Key: kling-v4-flash-example-001" \
+  -d '{
+    "model": "kling-v4-flash",
+    "action": "generate",
+    "prompt": "Warm sunset caustics move across an amber glass orb resting in a shallow reflecting pool, subtle camera glide, no text.",
+    "resolution": "720p",
+    "aspect_ratio": "16:9",
+    "duration": 3
+}'
+```
+
+提交后用 [`GET /v1/tasks/{task_id}`](/cn/api-reference/task/status) 查询原任务。`completed` 表示生成完成；同时检查 `billing_status`。结果链接在 `result.videos[0].url[]`，请及时下载归档；轮询超时后继续查询原任务，避免重复提交。
+
+## 参数范围
+
+| 参数 | 范围 |
+|---|---|
+| `action` | `generate` |
+| `duration` | 3–20 整数秒，默认 10 |
+| `resolution` | 720p，默认 720p |
+| `aspect_ratio` | `16:9` / `9:16`，默认 16:9 |
+| 图片输入 | `image_urls` 或 `first_frame_image`，最多 10 张 |
+| `watermark` | 默认 false |
+
+本次开放文生视频与图片输入生成；视频编辑、视频参考和续写尚未开放。 Kling 首帧输入不向上游发送画幅，输出画幅跟随首帧。
+
+## 计费
+
+按实际请求的输出片长预扣和计费，**$0.0964287 / 秒**，720p；3 秒报价约 **$0.289288**。未开放视频输入模式，不向普通生成附加参考视频费用。
+
+## 真实效果
+
+<video controls playsInline loop muted src="https://s3.qingbo.ai/qingbo-public/waveapi/site/assets/2026/11/a36bda00-e19c-474d-99f5-e94fb244f01e.mp4" />
+
+以上素材由对应型号真实生成并转存。

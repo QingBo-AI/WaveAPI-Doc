@@ -1,0 +1,51 @@
+---
+title: "Seedream 5.5"
+description: "异步生成、参数范围、实际用量计费与真实效果示例"
+api: "POST https://api.qingbo.ai/v1/tasks"
+---
+
+模型 ID：`seedream-5.5`.
+
+## 快速开始
+
+```bash
+curl https://api.qingbo.ai/v1/tasks \
+  -H "Authorization: Bearer $WAVE_API_KEY" \
+  -H "Content-Type: application/json" \
+  -H "Idempotency-Key: seedream-5.5-example-001" \
+  -d '{
+    "model": "seedream-5.5",
+    "action": "generate",
+    "prompt": "A sculptural translucent glass vase with one white calla lily on pale limestone, exquisite daylight, restrained editorial composition, no text.",
+    "resolution": "2k",
+    "aspect_ratio": "3:4",
+    "n": 1,
+    "output_format": "png"
+}'
+```
+
+提交后用 [`GET /v1/tasks/{task_id}`](/cn/api-reference/task/status) 查询原任务。`completed` 表示生成完成；同时检查 `billing_status`。结果链接在 `result.images[].url[]`，请及时下载归档；轮询超时后继续查询原任务，避免重复提交。
+
+## 参数范围
+
+| 参数 | 范围 |
+|---|---|
+| `action` | `generate` / `edit`；编辑需要 `image_urls` |
+| `resolution` | `1k` / `1.5k` / `2k`，默认 `2k` |
+| `n` | 仅 1 |
+| `image_urls` | 编辑最多 10 张参考图；第一张也计费 |
+| `output_format` | `png`（默认）/ `jpeg` |
+| `background` | `auto` / `opaque` / `transparent`；透明背景要求 PNG |
+| `watermark` | 布尔值，默认 false |
+
+精确像素尺寸、分层输出和 3K / 4K 尚未开放。上游首发限流可能造成 429 或排队，请降低并发；已提交的任务继续查询。
+
+## 计费
+
+每张输出：1K / 1.5K **$0.014625**，2K **$0.02559375**；每张输入参考图另加 **$0.00585**。首张参考图不免费。当前开放分辨率档位，未开放可能跨像素计费档的精确尺寸。
+
+## 真实效果
+
+![seedream55](https://s3.qingbo.ai/qingbo-public/waveapi/site/assets/2026/11/7ac21375-519a-4ed9-accf-351d8ba1c6c4.png)
+
+以上素材由对应型号真实生成并转存。

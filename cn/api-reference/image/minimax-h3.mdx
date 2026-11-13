@@ -1,0 +1,61 @@
+---
+title: "MiniMax H3 Image"
+description: "异步生成、参数范围、实际用量计费与真实效果示例"
+api: "POST https://api.qingbo.ai/v1/tasks"
+---
+
+模型 ID：`minimax-h3-image`, `minimax-h3-image-highspeed`.
+
+## 快速开始
+
+```bash
+curl https://api.qingbo.ai/v1/tasks \
+  -H "Authorization: Bearer $WAVE_API_KEY" \
+  -H "Content-Type: application/json" \
+  -H "Idempotency-Key: minimax-h3-image-example-001" \
+  -d '{
+    "model": "minimax-h3-image",
+    "action": "generate",
+    "prompt": "A sculptural translucent glass vase with one white calla lily on pale limestone, exquisite daylight, restrained editorial composition, no text.",
+    "resolution": "2k",
+    "aspect_ratio": "3:4",
+    "n": 1,
+    "output_format": "png"
+}'
+```
+
+提交后用 [`GET /v1/tasks/{task_id}`](/cn/api-reference/task/status) 查询原任务。`completed` 表示生成完成；同时检查 `billing_status`。结果链接在 `result.images[].url[]`，请及时下载归档；轮询超时后继续查询原任务，避免重复提交。
+
+## 参数范围
+
+| 参数 | 范围 |
+|---|---|
+| `action` | `generate` / `edit`；编辑需要参考图 |
+| `resolution` | `1k` / `2k` / `4k`，默认 **2k** |
+| `n` | 1–10 |
+| `image_urls` | 最多 16 张；JPG / PNG / WebP / HEIC / HEIF，不支持 GIF |
+| `output_format` | `png`（默认）/ `jpeg` / `webp` |
+| `output_compression` | 0–100，默认 95；PNG 不使用此项 |
+| `prompt_optimizer` | 默认 true；编辑必须为 true，纯文生图可关闭 |
+| `watermark` | 默认 false |
+
+精确像素尺寸和单独计费的预审核开关尚未开放。
+
+## 计费
+
+按实际分模态 token 用量结算，**不是固定每张收费**。单位为 USD / 百万 token。
+
+| 型号 | 文本输入 | 图片输入 | 图片输出 |
+|---|---:|---:|---:|
+| H3 Image | 2.4107139 | 1.6071426 | 4.0178574 |
+| H3 Image Highspeed | 2.4107139 | 3.2142861 | 8.0357139 |
+
+报价为预扣上限，包含输出张数、提示词增强及参考图预留；任务完成后按实际 usage 退差，最终费用不会超过预扣上限。
+
+## 真实效果
+
+![h3](https://s3.qingbo.ai/qingbo-public/waveapi/site/assets/2026/11/428b6c75-654f-4cdc-8310-ba9ac545f2de.png)
+
+![h3-highspeed](https://s3.qingbo.ai/qingbo-public/waveapi/site/assets/2026/11/566e6700-9514-4566-a386-0f9eab303f78.png)
+
+以上素材由对应型号真实生成并转存。
