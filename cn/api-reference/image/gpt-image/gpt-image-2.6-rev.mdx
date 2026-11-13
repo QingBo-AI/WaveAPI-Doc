@@ -1,10 +1,10 @@
 ---
 title: "GPT Image 2.6 经济版"
-description: "Flare 与 Sunburst，1K 按张计费，支持参考图编辑与 GIF 文生图"
+description: "Flare 与 Sunburst，1K / 2K / 4K 按张计费，支持参考图编辑与 1K GIF 文生图"
 api: "POST https://api.qingbo.ai/v1/tasks"
 ---
 
-Flare 与 Sunburst，1K 按张计费，支持参考图编辑与 GIF 文生图.
+Flare 与 Sunburst，1K / 2K / 4K 按张计费，支持参考图编辑与 1K GIF 文生图.
 
 可用模型：`gpt-image-2.6-flare-rev` / `gpt-image-2.6-sunburst-rev`.
 
@@ -19,7 +19,7 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
   "model": "gpt-image-2.6-flare-rev",
   "action": "generate",
   "prompt": "A sculptural glass vase on ivory stone, soft side light, refined editorial photography",
-  "resolution": "1k",
+  "resolution": "2k",
   "aspect_ratio": "4:5",
   "quality": "medium",
   "complexity": "high",
@@ -35,13 +35,13 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
 |---|---|
 | `action` | generate 文生图；edit 编辑，必须提供 image_urls。 |
 | `prompt` | 必填，图片描述或编辑指令。 |
-| `image_urls` | 编辑时提供 1–16 张可公网读取的参考图。 |
-| `resolution` | 仅 1k；2k / 4k 暂未开放。 |
+| `image_urls` | 编辑时提供 1–16 张可公网读取的参考图；2k / 4k 请使用 PNG / JPEG / WebP，不接受 GIF / BMP 参考图。 |
+| `resolution` | 1k / 2k / 4k，默认 1k。GIF 仅限 1k。 |
 | `aspect_ratio` | auto / 1:1 / 16:9 / 9:16 / 4:3 / 3:4 / 3:2 / 2:3 / 5:4 / 4:5 / 21:9。GIF 必须显式传 auto。 |
 | `quality` | low / medium / high / xhigh / max / auto；默认 low。 |
 | `complexity` | low / medium / high，默认 high；控制规划强度，独立于画质，不单独收费。 |
 | `n` | 只能为 1。 |
-| `output_format` | png / jpeg / webp / gif；默认 png。GIF 仅限 generate，不接受参考图。 |
+| `output_format` | png / jpeg / webp / gif；默认 png。GIF 仅限 1k generate，不接受参考图。 |
 
 ## 参考图编辑
 
@@ -78,10 +78,38 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
 
 ## 计费
 
-两个版本均为 **$0.0095625 / 张**，实际账单按最小计费单位向上取整，约 **$0.009564 / 张**。画质、格式、规划强度和参考图不加价；失败全额退还预扣。
+两个版本价格相同，按分辨率固定张价：
+
+| 分辨率 | USD / 张 |
+|---|---:|
+| 1K | $0.0095625，按最小计费单位取整约 $0.009564 |
+| 2K | $0.03375 |
+| 4K | $0.045 |
+
+画质、规划强度和参考图不另加价。预扣与成功结算使用相同固定张价；价格调整不改变已提交任务的冻结价格。失败任务以最终 `billing_status` 和退款结果为准。
+
+### 分辨率与真实像素
+
+`4k` 是上游规格档位，不代表所有画幅都是 4096 像素边长：
+
+| 画幅 | 1K | 2K | 4K |
+|---|---|---|---|
+| 1:1 | 1024×1024 | 2048×2048 | 2880×2880 |
+| 16:9 | 1536×864 | 2048×1152 | 3840×2160 |
+| 9:16 | 864×1536 | 1152×2048 | 2160×3840 |
+
+文生图 `auto` 使用 1:1；编辑的 `auto` 匹配参考图的接近画幅，不承诺保留输入像素尺寸。
+
+## 效果示例
+
+以下图片由对应经济版以 `resolution: "4k"`、`aspect_ratio: "1:1"` 实际生成，文件均为 2880×2880。
+
+![GPT Image 2.6 Flare 经济版 4K 效果](https://s3.qingbo.ai/qingbo-public/waveapi/site/assets/2026/11/7852d96e-1c72-4491-9307-96fb78713446.png)
+
+![GPT Image 2.6 Sunburst 经济版 4K 效果](https://s3.qingbo.ai/qingbo-public/waveapi/site/assets/2026/11/66207423-686b-4a77-9a5e-cd16afd19701.png)
 
 ## 能力边界
 
 SVG 暂不开放：实测请求得到 PNG，待供应商修复并重新验收后开放。GIF 不开放帧数和像素尺寸控制。
 
-不接受 2K / 4K、多张输出、蒙版或标注层，也不开放 background、moderation、output_compression 等上游不生效参数。Flare / Sunburst 由 model 固定，不传 version。
+不接受多张输出、蒙版或标注层，也不开放 background、moderation、output_compression 等上游不生效参数。Flare / Sunburst 由 model 固定，不传 version。
