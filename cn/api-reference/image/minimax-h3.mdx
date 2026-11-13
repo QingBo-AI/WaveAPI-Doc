@@ -24,7 +24,7 @@ curl https://api.qingbo.ai/v1/tasks \
 }'
 ```
 
-提交后用 [`GET /v1/tasks/{task_id}`](/cn/api-reference/task/status) 查询原任务。`completed` 表示生成完成；同时检查 `billing_status`。结果链接在 `result.images[0].url[]`，请及时下载归档；轮询超时后继续查询原任务，避免重复提交。
+提交后用 [`GET /v1/tasks/{task_id}`](/cn/api-reference/task/status) 查询原任务。`completed` 表示生成完成；同时检查 `billing_status`。结果链接在 `result.images[].url[]`，请及时下载归档；轮询超时后继续查询原任务，避免重复提交。
 
 ## 参数范围
 
