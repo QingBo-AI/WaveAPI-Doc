@@ -68,7 +68,7 @@ Read `task_id` after submission and poll `GET /v1/tasks/{task_id}`. Download fil
 
 ## GIF animation
 
-Both official routes support `output_format: "gif"` for text generation. Defaults are 512×512, 9 frames and 200ms per frame. `n` counts animations, not frames.
+Both official routes support `output_format: "gif"` for text or reference-image generation. Defaults are 512×512, 9 frames and 200ms per frame. `n` counts animations, not frames.
 
 | Parameter | GIF rules |
 |---|---|
@@ -93,9 +93,44 @@ Both official routes support `output_format: "gif"` for text generation. Default
 }
 ```
 
-Poll the same task endpoint and download the GIF from `result.images[].url[]`. Reservation uses the full sprite-sheet output token tier plus prompt allowance for each animation. Settlement uses actual typed tokens within the hold and refunds the difference; it does not multiply a static-image price by frame count.
+Poll the same task endpoint and download the GIF from `result.images[].url[]`. Reservation uses the full sprite-sheet output token tier plus prompt and reference-input allowance for each animation. Settlement uses actual typed tokens within the hold and refunds the difference; it does not multiply a static-image price by frame count.
 
 For example, 512x512 / 9 frames / low reserves 1172 output tokens ($0.031644), plus prompt allowance. A real receipt used 68 text input + 1172 image output tokens and settled at $0.03195. This is an example receipt; obtain a fresh quote before submission.
+
+### Reference image to GIF
+
+Both official variants accept up to 16 reference images. `action: "edit"` requires at least one `image_urls` entry; `n=2` requests two complete animations. Input fees are reserved for every animation, then settled from the reported aggregate usage. References are not charged once per frame.
+
+GIF `size` describes one frame and does not follow the reference image aspect ratio.
+
+```json
+{
+  "model": "gpt-image-2.6-flare",
+  "action": "edit",
+  "prompt": "Keep the amber perfume bottle and fern. A warm ray of light glides gently through the glass, creating delicate caustics; the fern sways slightly. Refined product photography, stable camera, complete bottle visible on a square canvas, seamless loop, no text.",
+  "image_urls": [
+    "https://s3.qingbo.ai/qingbo-public/waveapi/site/assets/2026/11/428b6c75-654f-4cdc-8310-ba9ac545f2de.png"
+  ],
+  "output_format": "gif",
+  "size": "512x512",
+  "frame_count": 9,
+  "frame_duration_ms": 200,
+  "quality": "medium",
+  "n": 1
+}
+```
+
+Economy variants do not support reference-image GIFs.
+
+### Flare: 16-frame GIF from a reference
+
+![Flare reference GIF](https://s3.qingbo.ai/qingbo-public/waveapi/site/assets/2026/11/830db81e-5007-4508-a868-3254d06c2c17.gif)
+
+### Sunburst: 9-frame GIF from a reference
+
+![Sunburst reference GIF](https://s3.qingbo.ai/qingbo-public/waveapi/site/assets/2026/11/eaa118f2-d355-4907-8f58-ede024fc27c4.gif)
+
+Native looping GIFs from the named models, verified for frame count, duration and downloadable output.
 
 ## Billing
 
@@ -109,4 +144,4 @@ Quotes reserve prompt, reference and output usage. `quality: "auto"` reserves ma
 
 ## Limits
 
-SVG and exact pixel sizes for static images are not exposed. GIF supports only the square frame sizes and qualities listed above. Reference editing, masks, annotations, compression and transparent backgrounds are unavailable for GIF.
+SVG and exact pixel sizes for static images are not exposed. GIF supports only the square frame sizes and qualities listed above. Reference-image GIFs are supported. Masks, annotations, compression and transparent backgrounds remain unavailable for GIF.
