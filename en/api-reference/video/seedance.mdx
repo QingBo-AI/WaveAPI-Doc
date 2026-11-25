@@ -284,9 +284,11 @@ The upstream also classifies 2.5 sub-tasks from the prompt: write `edit` prompts
 
 ## Pricing
 
-Billing is **resolution tier × output seconds**. Within one model, higher resolutions cost more; at the same resolution, `seedance-2.0-mini` is the cheapest, `seedance-2.0-fast` sits in the middle and `seedance-2.0` is the most expensive.
+Seedance 2.5 and Seedance 2.5 Flash reserve an estimated amount based on duration. The final charge uses the reported completion tokens and the matching rate in `price_config.video_completion_token_prices`, capped at the reservation. Rates are USD per million tokens. Use the resolution key for requests without reference video and `<resolution>_video_ref` for requests with reference video.
 
-With a reference video (`video_urls`, on the three 2.0 tiers and `seedance-2.5`), the charge is the sum of two parts:
+Other models are billed by **resolution tier × output seconds**. Within one model, higher resolutions cost more; at the same resolution, `seedance-2.0-mini` is the cheapest, `seedance-2.0-fast` sits in the middle and `seedance-2.0` is the most expensive.
+
+With a reference video in `video_urls`, the charge for the three 2.0 tiers and the reservation for the 2.5 series both include two parts:
 
 - the **output seconds**, at the **reference-video tier** for that resolution
 - the reference video's **input seconds**, at the **input-second** rate
@@ -294,8 +296,8 @@ With a reference video (`video_urls`, on the three 2.0 tiers and `seedance-2.5`)
 | Model | Output seconds | Input seconds |
 |---|---|---|
 | The three 2.0 tiers | The requested `duration` | The reference video's actual length |
-| `seedance-2.5` · `generate` / `extend` | The requested `duration`; with `0`, the length actually generated | The reference video's actual length, and no less than 0.75 × the output seconds (rounded up) |
-| `seedance-2.5` · `edit` | The source video's length | The source video's length |
+| 2.5 / 2.5 Flash · `generate` / `extend` | The requested `duration`; with `0`, reserve for 30 seconds | The reference video's actual length, and no less than 0.75 × the output seconds (rounded up) |
+| 2.5 / 2.5 Flash · `edit` | The source video's length | The source video's length |
 
 The reference video's length is read at submit time; when it cannot be read, the model's reference-video ceiling is used instead, and `asset://` assets use the length measured at upload. Reference images and reference audio carry no separate charge.
 
@@ -350,7 +352,8 @@ Generated videos are returned in `result.videos`; `url` is an array and `expires
 | `seedance-2.0` | `480p` / `720p` / `1080p` / `4k` | 4–15 | First/last frame, 9 images, 3 videos, 3 audio | `generate` |
 | `seedance-2.0-fast` | `480p` / `720p` | 4–15 | First/last frame, 9 images, 3 videos, 3 audio | `generate` |
 | `seedance-2.0-mini` | `480p` / `720p` | 4–15 | First/last frame, 9 images, 3 videos, 3 audio | `generate` |
-| `seedance-2.5` | `480p` / `720p` / `1080p` | 4–30, or model-chosen | First/last frame, 30 images, 10 videos, 10 audio | `generate` / `edit` / `extend` |
+| `seedance-2.5` | `480p` / `720p` / `1080p` / `4k` | 4–30, or model-chosen | First/last frame, 30 images, 10 videos, 10 audio | `generate` / `edit` / `extend` |
+| `seedance-2.5-flash` | `480p` / `720p` | 4–30, or model-chosen | First/last frame, 10 images, 5 videos, 5 audio | `generate` / `edit` / `extend` |
 
 ## Related
 

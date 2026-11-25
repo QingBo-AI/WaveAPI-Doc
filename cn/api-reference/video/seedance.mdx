@@ -284,9 +284,11 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
 
 ## 计费
 
-按**输出分辨率档 × 输出秒数**计费。同一模型下分辨率越高越贵；同一分辨率下，`seedance-2.0-mini` 最便宜、`seedance-2.0-fast` 居中、`seedance-2.0` 最贵。
+Seedance 2.5 和 Seedance 2.5 Flash 按分辨率及有无参考视频分档，提交时按时长预估并冻结额度。实际结算额按任务返回的计费用量乘以 `price_config.video_completion_token_prices` 对应档位，最高为预扣。无参考视频用分辨率键，带参考视频用 `<resolution>_video_ref`。每档费率的单位为美元 / 百万 Token。
 
-带参考视频（`video_urls`，2.0 三档与 `seedance-2.5`）时，费用由两项相加：
+其他型号按**输出分辨率档 × 输出秒数**计费。同一模型下分辨率越高越贵；同一分辨率下，`seedance-2.0-mini` 最便宜、`seedance-2.0-fast` 居中、`seedance-2.0` 最贵。
+
+通过 `video_urls` 提供参考视频时，2.0 三档的费用和 2.5 系列的预扣都包含两部分：
 
 - **输出秒数**按该分辨率的**参考视频档**单价计
 - **参考视频的输入秒数**按**输入秒**单价再计一笔
@@ -294,8 +296,8 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
 | 模型 | 输出秒数 | 输入秒数 |
 |---|---|---|
 | 2.0 三档 | 请求的 `duration` | 参考视频实际时长 |
-| `seedance-2.5` · `generate` / `extend` | 请求的 `duration`；传 `0` 时为实际生成时长 | 参考视频实际时长，且不低于输出秒数的 0.75 倍（向上取整） |
-| `seedance-2.5` · `edit` | 源视频时长 | 源视频时长 |
+| 2.5 / 2.5 Flash · `generate` / `extend` | 请求的 `duration`；传 `0` 时预估为 30 秒 | 参考视频实际时长，且不低于输出秒数的 0.75 倍（向上取整） |
+| 2.5 / 2.5 Flash · `edit` | 源视频时长 | 源视频时长 |
 
 参考视频时长在提交时读取，读不到时按该模型的参考视频时长上限计入；`asset://` 素材取上传时测得的时长。参考图与参考音频不单独计费。
 
@@ -350,7 +352,8 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
 | `seedance-2.0` | `480p` / `720p` / `1080p` / `4k` | 4–15 | 首尾帧、图 ×9、视频 ×3、音频 ×3 | `generate` |
 | `seedance-2.0-fast` | `480p` / `720p` | 4–15 | 首尾帧、图 ×9、视频 ×3、音频 ×3 | `generate` |
 | `seedance-2.0-mini` | `480p` / `720p` | 4–15 | 首尾帧、图 ×9、视频 ×3、音频 ×3 | `generate` |
-| `seedance-2.5` | `480p` / `720p` / `1080p` | 4–30，或模型自定 | 首尾帧、图 ×30、视频 ×10、音频 ×10 | `generate` / `edit` / `extend` |
+| `seedance-2.5` | `480p` / `720p` / `1080p` / `4k` | 4–30，或模型自定 | 首尾帧、图 ×30、视频 ×10、音频 ×10 | `generate` / `edit` / `extend` |
+| `seedance-2.5-flash` | `480p` / `720p` | 4–30，或模型自定 | 首尾帧、图 ×10、视频 ×5、音频 ×5 | `generate` / `edit` / `extend` |
 
 ## 相关文档
 

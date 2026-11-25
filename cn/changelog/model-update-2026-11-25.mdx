@@ -1,0 +1,36 @@
+---
+title: "模型与参数更新"
+description: "Gemini 4 Hydrogen、Kling 图像、MAI Image 2.7、Seedance 2.5 Flash 以及参考素材更新"
+---
+
+| 模型 ID | 接口与参数 |
+| --- | --- |
+| `gemini-4-hydrogen` | `POST /v1/chat/completions`，支持文本对话和流式输出 |
+| `kling-image-4.0` | `generate` 文生图或 `edit` 参考图编辑。支持 2K、4K、8K，每次生成一张，最多 10 张参考图 |
+| `kling-image-4.0-long-image` | `generate` 生成网页长图，`edit` 使用 1–3 张商品图生成电商详情页。支持 1K、2K，电商长图有短、中、长三档 |
+| `mai-image-2.7`、`mai-image-2.7-flash` | 1K、2K 文生图或最多 5 张参考图编辑。编辑的尺寸由模型决定，按实际 Token 用量结算 |
+| `seedance-2.5-flash` | 480p、720p，支持文生视频和参考素材。另见 [Seedance 指南](/cn/api-reference/video/seedance) |
+
+## 电商详情长图
+
+```json
+{
+  "model": "kling-image-4.0-long-image",
+  "action": "edit",
+  "prompt": "为参考图中的蓝色陶瓷杯生成电商详情页，包含产品主图、釉面细节和使用场景。",
+  "resolution": "2k",
+  "length": "medium",
+  "image_urls": ["https://example.com/product.png"]
+}
+```
+
+`length` 可选 `short`、`medium`、`long`，默认 `medium`。电商长图按所选分辨率和长度收取一张输出图费用，参考图逐张计费。网页模式也可在 `image_with_roles` 中添加 `{"url": "...", "role": "style"}` 或 `{"url": "...", "role": "subject"}`，每种角色最多一张，同样逐张计费。
+
+## 参考素材与高分辨率
+
+- **Grok Imagine Image 2.0 经济版** 使用 `action: "edit"` 和 1–5 张 `image_urls`，每次输出 1 张。参见 [Grok Imagine 图像指南](/cn/api-reference/image/grok-imagine)。
+- **Gemini Omni 1.2 Flash 经济版** 使用 `action: "edit"` 或 `action: "extend"`，同时传入一段不超过 15 秒的 `video_urls` 和最多 10 张 `image_urls`。编辑省略 `duration`，按源视频计费。续写传新增的 3–10 秒，只按新增时长计费。
+- **Seedance 2.5** 支持 `resolution: "4k"`。Seedance 2.5 与 Flash 提交时按秒预估，完成后按最终结算 Token 计费。带参考视频时使用对应的参考视频档位。
+- **GPT Image 2.6 经济版** 的 `resolution: "2k"` 在 `aspect_ratio: "1:1"` 下输出 2048 × 2048。详情见 [分辨率和具体像素表](/cn/api-reference/image/gpt-image/gpt-image-2.6-rev)。
+
+图像和视频通过 [提交任务](/cn/api-reference/task/submit) 发起，使用返回的任务 ID [查询结果与实扣](/cn/api-reference/task/status)。

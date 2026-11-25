@@ -301,6 +301,7 @@
                 "pages": [
                   "cn/changelog/notices",
                   "cn/changelog/models",
+                  "cn/changelog/model-update-2026-11-25",
                   "cn/changelog/pricing"
                 ]
               },
@@ -507,6 +508,7 @@
                 "pages": [
                   "en/changelog/notices",
                   "en/changelog/models",
+                  "en/changelog/model-update-2026-11-25",
                   "en/changelog/pricing"
                 ]
               },
