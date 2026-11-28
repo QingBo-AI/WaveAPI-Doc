@@ -1,0 +1,34 @@
+---
+title: "MAGI-2"
+description: "1080p video generation with first and last frames, multimodal references, and native sound"
+api: "POST https://api.qingbo.ai/v1/tasks"
+---
+
+`magi-2` generates 1080p videos of 4–30 seconds. Set `action: "generate"` and specify the duration in whole seconds.
+
+```json
+{
+  "model": "magi-2",
+  "action": "generate",
+  "prompt": "Rain falls along the rim of a deep blue glazed ceramic cup, a slow camera push-in, with gentle rain in the background.",
+  "duration": 4,
+  "resolution": "1080p",
+  "aspect_ratio": "16:9",
+  "generate_audio": true
+}
+```
+
+| Mode | Input |
+|---|---|
+| Text-to-video | Provide a prompt and duration. Choose 16:9, 9:16, 1:1, 4:3, 3:4 or 21:9 |
+| First and last frames | Use `first_frame_image` and optional `last_frame_image`, or send one or two ordered `image_urls`. Omit the aspect ratio or use `auto` to follow the first frame. Fixed options are 16:9, 9:16, 1:1, 4:3 and 3:4 |
+| Multimodal references | Set `omni_reference_task_type: "reference"`. Pass up to 10 `image_urls`, five `video_urls` and five `audio_urls`. Video and audio each allow up to 30 seconds total, with clips of 2–30 seconds |
+
+`generate_audio` defaults to true and can be set to false. Billing follows the requested output duration at **$0.09 per second**. A four-second request reserves **$0.36**. The duration rate includes audio and references.
+
+Use the returned task ID to [check the status](/en/api-reference/task/status). Read `result.videos[0].url[]` for the completed video and check `cost` and `billing_status` for the final charge.
+
+## Example output
+
+- [Raindrops on a blue ceramic cup, 1080p with audio](https://s3.qingbo.ai/qingbo-public/waveapi/site/assets/2026/11/f9f34fc0-565c-4c46-8d59-ddcfc3bed80f.mp4)
+- [Blue glass vase, 1080p from a reference image](https://s3.qingbo.ai/qingbo-public/waveapi/site/assets/2026/11/279f68af-27cc-42e3-a277-87435b5f2900.mp4)
