@@ -2,6 +2,22 @@
 title: "Pricing Updates"
 ---
 
+<Update label="2026-11-28" description="Cached reads for GLM, Kimi, Step, and Grok">
+Rates are in USD per million cached input tokens. Uncached input and output tokens use the rates for the applicable tier.
+
+| Model | Standard cached reads | Cached reads above 200,000 input tokens |
+| --- | --- | --- |
+| `glm-5` | $0.18 | — |
+| `glm-5.1`, `glm-5.2` | $0.234 | — |
+| `kimi-k2.6` | $0.144 | — |
+| `kimi-k2.7-code` | $0.171 | — |
+| `step-3.7-flash` | $0.036 | — |
+| `grok-4.20-0309-non-reasoning`, `grok-4.20-0309-reasoning`, `grok-4.3` | $0.18 | $0.36 |
+| `grok-4.5` | $0.27 | $0.54 |
+
+The long-context tier for these Grok models starts at 200,001 input tokens. Once a request reaches that tier, its input, cached reads, and output all use the long-context rates. Cached reads are based on the reported API usage.
+</Update>
+
 <Update label="2026-11-13" description="Reference-image GIFs">
 Reference GIFs retain the official typed-token rates: text input $4.5, cached text $1.125, image input $7.2, cached image $1.8 and image output $27 per million tokens.
 
