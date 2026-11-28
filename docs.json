@@ -217,6 +217,7 @@
                   "cn/api-reference/video/kling",
                   "cn/api-reference/video/kling-v4",
                   "cn/api-reference/video/kling-v4-flash",
+                  "cn/api-reference/video/magi-2",
                   "cn/api-reference/video/hailuo",
                   "cn/api-reference/video/minimax-h3",
                   "cn/api-reference/video/vidu",
@@ -301,6 +302,7 @@
                 "pages": [
                   "cn/changelog/notices",
                   "cn/changelog/models",
+                  "cn/changelog/model-update-2026-11-25",
                   "cn/changelog/pricing"
                 ]
               },
@@ -423,6 +425,7 @@
                   "en/api-reference/video/kling",
                   "en/api-reference/video/kling-v4",
                   "en/api-reference/video/kling-v4-flash",
+                  "en/api-reference/video/magi-2",
                   "en/api-reference/video/hailuo",
                   "en/api-reference/video/minimax-h3",
                   "en/api-reference/video/vidu",
@@ -507,6 +510,7 @@
                 "pages": [
                   "en/changelog/notices",
                   "en/changelog/models",
+                  "en/changelog/model-update-2026-11-25",
                   "en/changelog/pricing"
                 ]
               },

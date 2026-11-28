@@ -1,0 +1,46 @@
+---
+title: "Model and parameter updates"
+description: "MAGI-2, Gemini 4, Kling image models, MAI Image 2.7, Seedance 2.5 Flash, and reference media updates"
+---
+
+| Model ID | API and parameters |
+| --- | --- |
+| `gemini-4-hydrogen` | `POST /v1/chat/completions` for text chat and streaming |
+| `magi-2` | 1080p videos of 4–30 seconds with native audio, first and last frames, and multimodal references. See the [MAGI-2 guide](/en/api-reference/video/magi-2) |
+| `kling-image-4.0` | `generate` for text-to-image or `edit` with references. Supports 2K, 4K and 8K, one output and up to ten reference images |
+| `kling-image-4.0-long-image` | `generate` for webpages or `edit` for product detail pages with one to three product images. Supports 1K and 2K, with short, medium and long product pages |
+| `mai-image-2.7`, `mai-image-2.7-flash` | 1K or 2K text-to-image, or editing with up to five references. The model sets the output size when editing. Charges follow actual token usage |
+| `seedance-2.5-flash` | 480p and 720p video generation with optional reference media. See the [Seedance guide](/en/api-reference/video/seedance) |
+
+## Product detail page
+
+```json
+{
+  "model": "kling-image-4.0-long-image",
+  "action": "edit",
+  "prompt": "Create a product detail page for the blue ceramic mug, with a hero image, glaze details and everyday use scenes.",
+  "resolution": "2k",
+  "length": "medium",
+  "image_urls": ["https://example.com/product.png"]
+}
+```
+
+`length` accepts `short`, `medium` and `long`. The default is `medium`. Product pages are priced by resolution and length, plus a charge for each reference image. Webpage mode also accepts `{"url": "...", "role": "style"}` or `{"url": "...", "role": "subject"}` in `image_with_roles`. Each role allows one image and is billed per image.
+
+## Reference media and high-resolution output
+
+- **Grok Imagine Image 2.0 Economy** accepts one to five `image_urls` with `action: "edit"` and generates one image. See the [Grok Imagine image guide](/en/api-reference/image/grok-imagine).
+- **Gemini Omni 1.2 Flash Economy** accepts one source video of up to 15 seconds in `video_urls` and up to ten `image_urls` with `action: "edit"` or `action: "extend"`. For edits, omit `duration`. Billing follows the source length. For extensions, specify 3–10 added seconds. Only the added seconds are billable.
+- **Seedance 2.5** accepts `resolution: "4k"`. Seedance 2.5 and Flash estimate reservations by duration and settle on actual completion tokens. Requests with reference video use the corresponding reference-video rate.
+- **GPT Image 2.6 Economy** outputs 2048 × 2048 when `resolution: "2k"` is paired with `aspect_ratio: "1:1"`. See the [supported dimensions](/en/api-reference/image/gpt-image/gpt-image-2.6-rev).
+
+Use [Submit Task](/en/api-reference/task/submit) for image and video requests. Use the returned task ID to [check the results and final charge](/en/api-reference/task/status).
+
+## Generated examples
+
+- [Kling Image 4.0](https://s3.qingbo.ai/qingbo-public/waveapi/site/assets/2026/11/bd81d83e-07f7-4712-9862-59b1f713a8db.png)
+- [Kling product detail page](https://s3.qingbo.ai/qingbo-public/waveapi/site/assets/2026/11/fc05ac03-5314-4b66-9f88-1aec22f53f88.png)
+- [Kling landing page](https://s3.qingbo.ai/qingbo-public/waveapi/site/assets/2026/11/79a29c4b-eceb-4720-8612-339cecce3e2c.png)
+- [MAI Image 2.7](https://s3.qingbo.ai/qingbo-public/waveapi/site/assets/2026/11/d13ab7e2-2fca-4554-a9c1-03cc157bc2b0.png)
+- [MAI Image 2.7 Flash](https://s3.qingbo.ai/qingbo-public/waveapi/site/assets/2026/11/fff8d88f-59f6-4290-af57-3144427d2f8e.png)
+- [Seedance 2.5 Flash at 720p](https://s3.qingbo.ai/qingbo-public/waveapi/site/assets/2026/11/3cef4695-62c0-4483-bc9e-fc5fa2edd751.mp4)

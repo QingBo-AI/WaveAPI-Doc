@@ -100,7 +100,7 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
   - `generate`：根据文字生成图片
   - `edit`：基于参考图改写；必须提供 `image_urls`
 
-  单图编辑与多图参考融合都走 `edit`，区别只在 `image_urls` 传几张。`grok-imagine-image-2.0-rev` 和 `grok-imagine-1.5-rev` 只支持 `generate`。
+  单图编辑与多图参考融合都走 `edit`，区别只在 `image_urls` 传几张。`grok-imagine-1.5-rev` 只支持 `generate`。
 </ParamField>
 
 <ParamField body="prompt" type="string" required>
@@ -108,7 +108,7 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
 </ParamField>
 
 <ParamField body="n" type="integer" default="1">
-  出图张数。`grok-imagine-image`、`grok-imagine-image-quality`、`grok-imagine-image-2.0`、`grok-imagine-1.5-rev` 和 `grok-imagine-1.5-edit-rev` 取 `1`–`10`；`grok-imagine-image` 在 `edit` 下只出 1 张。`grok-imagine-image-2.0-rev` 取 `1`–`12`。
+  出图张数。`grok-imagine-image`、`grok-imagine-image-quality`、`grok-imagine-image-2.0`、`grok-imagine-1.5-rev` 和 `grok-imagine-1.5-edit-rev` 取 `1`–`10`；`grok-imagine-image` 在 `edit` 下只出 1 张。`grok-imagine-image-2.0-rev` 文生图取 `1`–`12`，编辑固定 1 张。
 </ParamField>
 
 <ParamField body="aspect_ratio" type="string" default="auto">
@@ -124,7 +124,7 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
 </ParamField>
 
 <ParamField body="image_urls" type="string[]">
-  参考图 URL 数组，需公网可访问。`action: "edit"` 时必填：`grok-imagine-image` 接受 1–5 张，`grok-imagine-image-quality` 和 `grok-imagine-image-2.0` 接受 1–3 张，`grok-imagine-1.5-edit-rev` 接受 1–5 张。`grok-imagine-1.5-rev` 在 `generate` 下也接受参考图，最多 5 张；`grok-imagine-image-2.0-rev` 不接受。
+  参考图 URL 数组，需公网可访问。`action: "edit"` 时必填：`grok-imagine-image` 接受 1–5 张，`grok-imagine-image-quality` 和 `grok-imagine-image-2.0` 接受 1–3 张，`grok-imagine-1.5-edit-rev` 接受 1–5 张。`grok-imagine-1.5-rev` 在 `generate` 下也接受参考图，最多 5 张；`grok-imagine-image-2.0-rev` 在 `edit` 下接受 1–5 张。
 
   多图参考时数组顺序保留，可在提示词里按顺序指代第一张、第二张。
 </ParamField>
@@ -148,7 +148,7 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
 | `grok-imagine-image-2.0` | `action: "edit"` | 编辑需要 1 到 3 张参考图 |
 | `grok-imagine-image-2.0` | `action: "edit"` | 带参考图编辑时不能选择画质 |
 | `grok-imagine-image-2.0-rev` | 每次请求 | 每次请求可生成 1 至 12 张图片 |
-| `grok-imagine-image-2.0-rev` | `action: "generate"` | 该线路仅支持文生图 |
+| `grok-imagine-image-2.0-rev` | `action: "edit"` | 需要 1–5 张参考图，每次输出 1 张 |
 | `grok-imagine-1.5-rev` | 每次请求 | 一次最多出 10 张 |
 | `grok-imagine-1.5-edit-rev` | 每次请求 | 一次最多出 10 张 |
 
@@ -208,7 +208,7 @@ curl -X POST https://api.qingbo.ai/v1/tasks \
 | `grok-imagine-image` | `generate` / `edit` | 14 种 | `1k` `2k` | 1–5 张，按张另计 |
 | `grok-imagine-image-quality` | `generate` / `edit` | 14 种 | `1k` `2k` | 1–3 张，按张另计 |
 | `grok-imagine-image-2.0` | `generate` / `edit` | 14 种 | `1k` `2k` × `low` `medium` | 1–3 张，按张另计 |
-| `grok-imagine-image-2.0-rev` | `generate` | 7 种 | 固定 | 不接收 |
+| `grok-imagine-image-2.0-rev` | `generate` / `edit` | 7 种 | 固定 | 编辑时 1–5 张 |
 | `grok-imagine-1.5-rev` | `generate` | 5 种 | 固定 | 最多 5 张，不加价 |
 | `grok-imagine-1.5-edit-rev` | `generate` / `edit` | 不可选 | 固定 | 最多 5 张，不加价 |
 

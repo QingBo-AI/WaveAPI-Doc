@@ -18,6 +18,20 @@ Rates are in USD per million cached input tokens. Uncached input and output toke
 The long-context tier for these Grok models starts at 200,001 input tokens. Once a request reaches that tier, its input, cached reads, and output all use the long-context rates. Cached reads are based on the reported API usage.
 </Update>
 
+<Update label="2026-11-25" description="Gemini, Seedream and Veo rates">
+- Gemini 3.6 Flash input, cache reads and output cost $0.675, $0.0675 and $3.375 per million tokens.
+- Seedream 5.5 costs $0.018 per 1K or 1.5K image, $0.0315 per 2K image and $0.0072 per reference image.
+- Veo 3.1 Fast Economy, Quality Economy and Lite use eight billable seconds per generation task.
+
+| Model | 720p per task | 1080p per task | 4K per task |
+| --- | ---: | ---: | ---: |
+| Fast Economy | $0.675 | $0.84375 | $2.025 |
+| Quality Economy | $5.0625 | $5.23125 | $6.4125 |
+| Lite | $0.3375 | $0.50625 | $1.6875 |
+
+Seedance 2.5 and Flash reserve by duration and settle on actual token usage. See the [Seedance guide](/en/api-reference/video/seedance) for the rate lookup.
+</Update>
+
 <Update label="2026-11-13" description="Reference-image GIFs">
 Reference GIFs retain the official typed-token rates: text input $4.5, cached text $1.125, image input $7.2, cached image $1.8 and image output $27 per million tokens.
 
